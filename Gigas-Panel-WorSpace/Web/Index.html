@@ -2108,6 +2108,14 @@ function ejecutarTraspasoDrive() {
     input.value = '';
   });
 }
+  // Carga automática de listas nada más abrir la web
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    if (typeof lanzarRefrescarSoloListas === 'function') {
+      lanzarRefrescarSoloListas();
+    }
+  }, 500); // Espera medio segundo tras la carga para asegurar que todo el HTML está listo
+});
 </script>
 </body>
 </html>
