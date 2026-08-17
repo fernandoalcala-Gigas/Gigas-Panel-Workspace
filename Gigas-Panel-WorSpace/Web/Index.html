@@ -2147,6 +2147,13 @@ window.addEventListener('load', function() {
     }, 400); 
   }, 3000);
 }
+  // Cerrar todos los paneles centrales automáticamente al iniciar
+window.addEventListener('DOMContentLoaded', function() {
+  var todosLosPaneles = document.querySelectorAll('.card');
+  todosLosPaneles.forEach(function(panel) {
+    panel.classList.add('collapsed');
+  });
+});
 </script>
 </body>
 </html>
