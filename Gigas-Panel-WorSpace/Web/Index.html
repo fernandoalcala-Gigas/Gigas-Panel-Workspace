@@ -1175,7 +1175,7 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
     }
     pintarMetricasSalud(locTotal, locCon, locSin, locSusp, query); 
     
-    // --- AQUÍ EMPIEZA LA MAGIA DEL AVISO NUEVO ---
+    // --- AQUÍ LLAMAMOS AL POP-UP FLOTANTE ---
     if(matchCount > 0) { 
       document.getElementById('titulo-panel-dinamico').innerText = "📂 " + query + " (" + matchCount + ")";
       document.getElementById('head-cuentas-dinamicas').innerHTML = htmlHead; 
@@ -1183,12 +1183,12 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
       document.getElementById('card-cuentas-desglose').classList.remove('collapsed'); 
       if (matchCount === 1) seleccionarFila(lastCat, lastCorreo);
     } else { 
-      document.getElementById('titulo-panel-dinamico').innerText = "📂 Sin resultados";
-      document.getElementById('head-cuentas-dinamicas').innerHTML = "<tr><th>Estado de la búsqueda</th></tr>"; 
-      document.getElementById('body-cuentas-dinamicas').innerHTML = "<tr><td style='text-align:center; padding: 20px; color: #ef4444; font-weight: 500;'>No se ha encontrado ninguna cuenta ni lista para: <b>" + query + "</b></td></tr>"; 
-      document.getElementById('card-cuentas-desglose').classList.remove('collapsed');
+      // 1. Ocultamos el panel de abajo para que no estorbe
+      document.getElementById('card-cuentas-desglose').classList.add('collapsed');
+      // 2. Lanzamos nuestro Pop-up
+      mostrarPopUpBuscador("No se han encontrado resultados para: <b>" + query + "</b>");
     }
-    // ---------------------------------------------
+    // ----------------------------------------
 
     var filasPrincipalesListas = document.querySelectorAll('#tabla-listas-maestra tbody tr.main-row');
     filasPrincipalesListas.forEach(function(row) {
@@ -2128,6 +2128,25 @@ window.addEventListener('load', function() {
     }
   }, 300); // Comprueba en silencio cada 300 milisegundos
 });
+  function mostrarPopUpBuscador(texto) {
+  var viejoPop = document.getElementById('pop-buscador-flotante');
+  if(viejoPop) viejoPop.remove();
+
+  var pop = document.createElement('div');
+  pop.id = 'pop-buscador-flotante';
+  pop.innerHTML = "⚠️ " + texto;
+  
+  pop.style.cssText = "position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background-color: #ef4444; color: white; padding: 12px 24px; border-radius: 8px; z-index: 9999; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); font-family: sans-serif; font-size: 14px; font-weight: 500; transition: opacity 0.4s ease;";
+  
+  document.body.appendChild(pop);
+
+  setTimeout(function() {
+    pop.style.opacity = '0';
+    setTimeout(function() { 
+      if(pop.parentNode) pop.remove(); 
+    }, 400); 
+  }, 3000);
+}
 </script>
 </body>
 </html>
