@@ -1174,10 +1174,21 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
       });
     }
     pintarMetricasSalud(locTotal, locCon, locSin, locSusp, query); 
-    if(matchCount > 0) { document.getElementById('titulo-panel-dinamico').innerText = "📂 " + query + " (" + matchCount + ")";
-      document.getElementById('head-cuentas-dinamicas').innerHTML = htmlHead; document.getElementById('body-cuentas-dinamicas').innerHTML = htmlBody; document.getElementById('card-cuentas-desglose').classList.remove('collapsed'); if (matchCount === 1) seleccionarFila(lastCat, lastCorreo);
-    } else { document.getElementById('titulo-panel-dinamico').innerText = "📂 0";
-      document.getElementById('head-cuentas-dinamicas').innerHTML = "<tr><th>-</th></tr>"; document.getElementById('body-cuentas-dinamicas').innerHTML = "<tr><td>0</td></tr>"; }
+    
+    // --- AQUÍ EMPIEZA LA MAGIA DEL AVISO NUEVO ---
+    if(matchCount > 0) { 
+      document.getElementById('titulo-panel-dinamico').innerText = "📂 " + query + " (" + matchCount + ")";
+      document.getElementById('head-cuentas-dinamicas').innerHTML = htmlHead; 
+      document.getElementById('body-cuentas-dinamicas').innerHTML = htmlBody; 
+      document.getElementById('card-cuentas-desglose').classList.remove('collapsed'); 
+      if (matchCount === 1) seleccionarFila(lastCat, lastCorreo);
+    } else { 
+      document.getElementById('titulo-panel-dinamico').innerText = "📂 Sin resultados";
+      document.getElementById('head-cuentas-dinamicas').innerHTML = "<tr><th>Estado de la búsqueda</th></tr>"; 
+      document.getElementById('body-cuentas-dinamicas').innerHTML = "<tr><td style='text-align:center; padding: 20px; color: #ef4444; font-weight: 500;'>No se ha encontrado ninguna cuenta ni lista para: <b>" + query + "</b></td></tr>"; 
+      document.getElementById('card-cuentas-desglose').classList.remove('collapsed');
+    }
+    // ---------------------------------------------
 
     var filasPrincipalesListas = document.querySelectorAll('#tabla-listas-maestra tbody tr.main-row');
     filasPrincipalesListas.forEach(function(row) {
@@ -1193,8 +1204,7 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
         }
       }
     });
-  }
-
+}
   function filtrarCuentasPorCategoria() {
     var rawFilter = document.getElementById('selector-origen-dinamico').value; 
     var pref = langDict[document.getElementById('lang-selector').value].card_desglose || "📂 Desglose Completo";
