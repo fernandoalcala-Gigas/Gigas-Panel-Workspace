@@ -306,7 +306,7 @@
         <div class="card collapsed" id="card-creador" style="border-left: 4px solid #10b981;">
           <div class="card-header" onclick="toggleCard('card-creador')">
             <h3 data-i18n="card_creator">✨ Centro de Creación de Identidades</h3>
-            <button class="btn-header-inline" onclick="event.stopPropagation(); document.getElementById('card-creador').classList.add('collapsed');" data-i18n="btn_cerrar_panel">✖ Cerrar Panel</button>
+            <button class="btn-header-inline" onclick="cerrarYLimpiarPanel(event, 'card-creador');" data-i18n="btn_cerrar_panel">✖ Cerrar Panel</button>
           </div>
           <div class="card-body">
             <div class="creator-form">
@@ -379,7 +379,7 @@
         <div class="card collapsed" id="card-creador-lista" style="border-left: 4px solid #ef4444;">
            <div class="card-header" onclick="toggleCard('card-creador-lista')">
              <h3 data-i18n="card_creator_list">👥 Centro de Creación de Listas de Distribución</h3>
-            <button class="btn-header-inline" onclick="event.stopPropagation(); document.getElementById('card-creador-lista').classList.add('collapsed');" data-i18n="btn_cerrar_panel2">✖ Cerrar Panel</button>
+            <button class="btn-header-inline" onclick="cerrarYLimpiarPanel(event, 'card-creador-lista');" data-i18n="btn_cerrar_panel2">✖ Cerrar Panel</button>
           </div>
           <div class="card-body">
             <div class="creator-form">
