@@ -2108,6 +2108,16 @@ function ejecutarTraspasoDrive() {
     input.value = '';
   });
 }
+  // Espía de arranque: Espera a tener permisos para cargar las listas
+window.addEventListener('load', function() {
+  var vigilarPermisos = setInterval(function() {
+    // Si la llave de permisos ya está encendida (true)...
+    if (typeof IS_ADMIN_AUTHORIZED !== 'undefined' && IS_ADMIN_AUTHORIZED === true) {
+      clearInterval(vigilarPermisos); // Detenemos al espía para que no consuma memoria
+      lanzarRefrescarSoloListas();    // ¡Cargamos las listas automáticamente!
+    }
+  }, 300); // Comprueba en silencio cada 300 milisegundos
+});
 </script>
 </body>
 </html>
