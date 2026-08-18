@@ -15,6 +15,37 @@ function doGet() {
 // 🛡️ MÓDULO DE SEGURIDAD Y PERMISOS DINÁMICOS
 // =========================================================
 
+// 🆕 NUEVA FUNCIÓN: Obtiene si entra, quién es y qué ROL tiene (Lee la Columna D)
+function obtenerDetalleUsuarioActivo() {
+  var emailActual = Session.getActiveUser().getEmail().toLowerCase().trim();
+  var autorizado = false;
+  var rol = "NINGUNO";
+  
+  // Tú siempre eres ADMIN por defecto, por seguridad extrema
+  if (emailActual === "fernando.alcala@gigas.com") {
+    autorizado = true;
+    rol = "ADMIN";
+  }
+
+  try {
+    var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Permisos_Panel");
+    if (hoja) {
+      var datos = hoja.getDataRange().getValues();
+      for (var i = 1; i < datos.length; i++) {
+        if (String(datos[i][0]).toLowerCase().trim() === emailActual) {
+          autorizado = true;
+          // Lee la columna D (índice 3). Si está en blanco, le pone "OPERADOR" por seguridad.
+          rol = datos[i][3] ? String(datos[i][3]).toUpperCase().trim() : "OPERADOR";
+          break;
+        }
+      }
+    }
+  } catch(e) {}
+  
+  return { autorizado: autorizado, rol: rol, email: emailActual };
+}
+
+// Mantenemos esta para la seguridad interna del servidor
 function obtenerOperadoresAutorizados() {
   var operadores = ["fernando.alcala@gigas.com"];
   try {
@@ -47,13 +78,15 @@ function webAlternarPermisosPanel(emailObjetivo) {
 
   var emailClean = emailObjetivo.toLowerCase().trim();
   if (emailClean === "fernando.alcala@gigas.com") return "🛡️ No puedes quitarte los permisos a ti mismo.";
+  
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var hoja = ss.getSheetByName("Permisos_Panel");
   
   if (!hoja) {
     hoja = ss.insertSheet("Permisos_Panel");
-    hoja.appendRow(["Correos Autorizados", "Añadido por", "Fecha"]);
-    hoja.getRange("A1:C1").setFontWeight("bold").setBackground("#0f172a").setFontColor("#ffffff");
+    // 🛠️ Actualizado para incluir la 4ª columna
+    hoja.appendRow(["Correos Autorizados", "Añadido por", "Fecha", "Rol"]);
+    hoja.getRange("A1:D1").setFontWeight("bold").setBackground("#0f172a").setFontColor("#ffffff");
     hoja.hideSheet(); 
   }
 
@@ -75,12 +108,12 @@ function webAlternarPermisosPanel(emailObjetivo) {
     return "🔴 Permisos REVOCADOS para " + emailClean;
   } else {
     var fechaHoy = Utilities.formatDate(new Date(), "Europe/Madrid", "dd/MM/yyyy HH:mm");
-    hoja.appendRow([emailClean, ejecutor, fechaHoy]);
-    registrarEnHistorial("OTORGAR ACCESO", "Se ha dado acceso total al panel a: " + emailClean);
-    return "🟢 Permisos CONCEDIDOS a " + emailClean + ". Ya puede operar.";
+    // 🛠️ Actualizado: Añade "OPERADOR" automáticamente al final (Columna D)
+    hoja.appendRow([emailClean, ejecutor, fechaHoy, "OPERADOR"]);
+    registrarEnHistorial("OTORGAR ACCESO", "Se ha dado acceso de OPERADOR al panel a: " + emailClean);
+    return "🟢 Permisos CONCEDIDOS a " + emailClean + ". Rol asignado: OPERADOR.";
   }
 }
-
 // =========================================================
 // 🏷️ MÓDULO DE GESTIÓN DE ALIAS EN CALIENTE
 // =========================================================
