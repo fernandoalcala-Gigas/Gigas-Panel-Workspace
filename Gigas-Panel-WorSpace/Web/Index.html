@@ -63,7 +63,7 @@
     .select-style { padding: 9px 16px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc; color: #0f172a; font-weight: 600; font-size: 13px; min-width: 280px; outline: none; transition: all 0.3s; }
     .table-container { width: 100%; max-height: 60vh; overflow-y: auto; overflow-x: auto; position: relative; border-radius: 4px;}
     .excel-table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; text-align: left; }
-    .excel-table th { background-color: #f8fafc; color: #475569; padding: 12px 16px; border-bottom: 2px solid #e2e8f0; font-weight: 600; position: sticky; top: 0; z-index: 10; transition: background-color 0.3s, color 0.3s, border-color 0.3s; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.05); }
+    .excel-table th { background-color: #f8fafc; color: #475569; padding: 12px 16px; border-bottom: 2px solid #e2e8f0; font-weight: 600; position: sticky; top: 0; z-index: 10; transition: background-color 0.3s, color: 0.3s, border-color 0.3s; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.05); }
     .excel-table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; transition: border-color 0.3s, color 0.3s; }
     .excel-table tbody tr.main-row:hover { background-color: #f8fafc; cursor: pointer; transition: background-color 0.15s; }
     .metrics-summary { display: flex; gap: 16px; margin-bottom: 20px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; transition: background-color 0.3s, border-color 0.3s; }
@@ -225,7 +225,7 @@
       </div>
     </div>
 
-    <div class="sidebar-section collapsed">
+    <div class="sidebar-section collapsed" id="seccion-servicios">
       <div class="sidebar-section-header">
         <span class="section-title" data-i18n="lbl_servicios">CUENTAS DE SERVICIO</span>
         <span class="section-arrow">▼</span>
@@ -257,7 +257,7 @@
       </div>
     </div>
 
-    <div class="sidebar-section collapsed">
+    <div class="sidebar-section collapsed" id="seccion-bajas">
       <div class="sidebar-section-header">
         <span class="section-title" style="color:#f87171;" data-i18n="lbl_bajas">🔥 ACCIONES CRÍTICAS BAJAS</span>
         <span class="section-arrow">▼</span>
@@ -1951,7 +1951,7 @@ function procesarSubidaRRHH(input) {
         }
         
         var totalUsuarios = datosParaSubir.length - 1;
-        if (confirm("🔄 Se van a revisar y sincronizar con la nube " + totalUsuarios + " cuentas desde el archivo de RRHH.\n\n¿Confirmas la actualización en Google Workspace?")) {
+        if (confirm("🔄 Se van a revisar y sincronizar com la nube " + totalUsuarios + " cuentas desde el arquivo de RRHH.\n\n¿Confirmas la actualización en Google Workspace?")) {
             document.body.style.cursor = "wait";
             var btn = document.getElementById("btn-up-rrhh");
             if(btn) btn.innerText = "⏳ Subiendo y aplicando cambios...";
@@ -2220,17 +2220,17 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // 1. MOSTRAR EL ROL AL LADO DEL CORREO
-var contenedorUsuario = document.getElementById("display-user-email"); 
+    var contenedorUsuario = document.getElementById("display-user-email"); 
 
-if (contenedorUsuario) {
-  // Elegimos un color: Rojo para Admin, Azul para Operador
-  var colorBadge = (usuario.rol === "ADMIN") ? "#e11d48" : "#2563eb"; 
-  
-  // Inyectamos el correo y el cartelito
-  contenedorUsuario.innerHTML = usuario.email + 
-    " <span style='background-color:" + colorBadge + "; color:white; padding:2px 6px; margin-left:8px; border-radius:4px; font-size:11px; font-weight:bold;'>" 
-    + usuario.rol + "</span>";
-}
+    if (contenedorUsuario) {
+      // Elegimos un color: Rojo para Admin, Azul para Operador
+      var colorBadge = (usuario.rol === "ADMIN") ? "#e11d48" : "#2563eb"; 
+      
+      // Inyectamos el correo y el cartelito
+      contenedorUsuario.innerHTML = usuario.email + 
+        " <span style='background-color:" + colorBadge + "; color:white; padding:2px 6px; margin-left:8px; border-radius:4px; font-size:11px; font-weight:bold;'>" 
+        + usuario.rol + "</span>";
+    }
 
     // ========================================================
     // 2. APLICAR LOS "CANDADOS" (Si es OPERADOR, escondemos cosas)
@@ -2238,17 +2238,17 @@ if (contenedorUsuario) {
     if (usuario.rol === "OPERADOR") {
       console.log("🔒 Perfil OPERADOR: Ocultando módulos críticos.");
       
-      // Ocultar módulo "ACCIONES CRÍTICAS BAJAS" (Pon el ID real de tu botón del menú)
-      var menuBajas = document.getElementById("id-boton-menu-bajas");
+      // Ocultar sección completa de "ACCIONES CRÍTICAS BAJAS"
+      var menuBajas = document.getElementById("seccion-bajas");
       if (menuBajas) menuBajas.style.display = "none";
 
-      // Ocultar módulo "CUENTAS DE SERVICIO" (Pon el ID real de tu botón del menú)
-      var menuServicio = document.getElementById("id-boton-menu-servicio");
+      // Ocultar sección completa de "CUENTAS DE SERVICIO"
+      var menuServicio = document.getElementById("seccion-servicios");
       if (menuServicio) menuServicio.style.display = "none";
-
-      // Ocultar botón de "Traspasos de Drive" (si lo tienes por separado)
-      var btnTraspaso = document.getElementById("id-boton-traspaso");
-      if (btnTraspaso) btnTraspaso.style.display = "none";
+      
+      // Ocultar el botón de dar/quitar accesos del panel (por si acaso)
+      var btnPermisos = document.getElementById("btn-seguridad-panel");
+      if (btnPermisos) btnPermisos.style.display = "none";
     }
 
   }).obtenerDetalleUsuarioActivo();
