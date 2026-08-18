@@ -471,7 +471,7 @@
           <select id="selector-origen-dinamico" class="select-style" onchange="filtrarCuentasPorCategoria()"><option value="">Cargando...</option></select>
           <button class="btn-download-excel" onclick="descargarTablaExcel()" data-i18n="btn_descargar" data-i18n-title="tt_descargar">📥 Download Vista (Excel/CSV)</button>
         </div>
-  
+ 
         <div class="card" id="card-cuentas-desglose" style="border-left: 4px solid #0284c7;">
           <div class="card-header" onclick="toggleCard('card-cuentas-desglose')"><h3 id="titulo-panel-dinamico" data-i18n="card_desglose">📂 Desglose Completo de Usuarios</h3><span class="toggle-icon">▼</span></div>
           <div class="card-body table-container">
@@ -557,6 +557,36 @@
   </div>
 
 <script>
+  // =========================================================
+  // 🌟 SISTEMA DE AVISOS FLOTANTES (TOAST)
+  // =========================================================
+  function mostrarAvisoFlotante(mensaje, tipo = "exito") {
+    var toastId = "notificacion-global-toast";
+    var toast = document.getElementById(toastId);
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = toastId;
+      toast.style.cssText = "position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); padding: 15px 25px; border-radius: 8px; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10000; opacity: 0; pointer-events: none; transition: all 0.4s ease;";
+      document.body.appendChild(toast);
+    }
+    toast.innerHTML = mensaje;
+    if (tipo === "exito") {
+      toast.style.backgroundColor = "#10b981";
+    } else if (tipo === "error") {
+      toast.style.backgroundColor = "#ef4444";
+    } else {
+      toast.style.backgroundColor = "#f59e0b";
+    }
+    setTimeout(function() {
+      toast.style.opacity = "1";
+      toast.style.transform = "translateX(-50%) translateY(0)";
+    }, 10);
+    setTimeout(function() {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateX(-50%) translateY(-20px)";
+    }, 4000);
+  }
+
   const langDict = {
     es: {
       lbl_ou_creador: "Unidad Organizativa (OU)",
@@ -797,40 +827,63 @@
       motivo: document.getElementById('creador-motivo').value
     };
     if (!datos.alias || datos.alias.trim() === "") return errAction("Escribe un alias para el correo.");
-    showLog("⏳ Desplegando cuenta...");
+    
+    // Mostramos aviso flotante de carga en amarillo
+    mostrarAvisoFlotante("⏳ Desplegando cuenta en Google Workspace...", "info");
+    
     google.script.run.withSuccessHandler(function(res) {
       if (res.exito) {
+        
+        // 1. Mostrar tu caja del LOG clásico para poder copiar la clave
         var l = document.getElementById('log'); l.style.backgroundColor = "#10b981"; 
         var mLic = res.msgLic ? "<span style='display:block; margin-top:8px; font-size:12px; color:#fef3c7;'> " + res.msgLic + "</span>" : "";
         l.innerHTML = "<strong>✅ USUARIO CREADO</strong><br><br><b>Email:</b> " + res.email + "<br><b>Destino:</b> " + res.hoja + mLic + "<br><div style='display:flex; gap:8px; align-items:center; margin-bottom:12px; background:#0f172a; padding:10px; border-radius:6px; border:1px solid #334155;'><input type='text' id='pass-temp-input' value='" + res.pass + "' readonly style='background:transparent; color:#38bdf8; border:none; font-family:monospace; font-size:15px; font-weight:bold; width:100%; outline:none; pointer-events:all;' /><button onclick='copiarClaveAlPortapapeles()' style='background:#0284c7; color:white; border:none; padding:6px 10px; border-radius:4px; font-size:12px; cursor:pointer; font-weight:bold; width:auto; margin:0;'>📋 Copiar</button></div><span id='copy-toast' style='display:none; font-size:12px; color:#34d399; font-weight:bold;'>¡Copiado! 🚀<br><br></span><button onclick=\"document.getElementById('log').style.display='none'; document.getElementById('card-creador').classList.add('collapsed'); ejecutarActualizarGrupos();\" style='background:#334155; color:white; border:none; padding:8px 14px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:bold; width:100%;'>Cerrar y Refrescar</button>";
         l.style.display = 'block';
         appendToLogHistory("Usuario creado: " + res.email + ". " + (res.msgLic||""), "SUCCESS");
 
-        // =========================================================================
-        // ⭐ INYECCIÓN QUIRÚRGICA: ENRIQUECIMIENTO AL MILISEGUNDO DE CREARSE ⭐
-        // =========================================================================
+        // 2. ⭐ LA NOTIFICACIÓN FLOTANTE DEFINITIVA ⭐
+        mostrarAvisoFlotante("✅ Usuario creado: " + res.email + " (Clave en pantalla)", "exito");
+        
+        // 3. ⭐ LIMPIAR LAS CAJAS DEL FORMULARIO PARA OTRA ALTA ⭐
+        document.getElementById('creador-alias').value = "";
+        document.getElementById('creador-nombre').value = "";
+        document.getElementById('creador-apellido').value = "";
+        document.getElementById('creador-manager').value = "";
+        document.getElementById('creador-motivo').value = "";
+        document.getElementById('creador-puesto').value = "";
+        document.getElementById('creador-departamento').value = "";
+        document.getElementById('creador-telefono').value = "";
+        document.getElementById('creador-email-personal').value = "";
+        document.getElementById('creador-grupo').value = "";
+        document.getElementById('creador-preview').innerText = "escribe.alias@gigas.com";
+        
+
+        // INYECCIÓN DE PERFIL ENRIQUECIDO (Se queda como lo tenías)
         var datosExtra = {
-          email: res.email, // ¡Usamos el correo oficial confirmado por el servidor!
+          email: res.email, 
           nombre: document.getElementById('creador-nombre') ? document.getElementById('creador-nombre').value.trim() : "",
-          apellidos: document.getElementById('creador-apellidos') ? document.getElementById('creador-apellidos').value.trim() : "",
+          apellidos: document.getElementById('creador-apellido') ? document.getElementById('creador-apellido').value.trim() : "",
           puesto: document.getElementById('creador-puesto') ? document.getElementById('creador-puesto').value.trim() : "",
           departamento: document.getElementById('creador-departamento') ? document.getElementById('creador-departamento').value.trim() : "",
           telefono: document.getElementById('creador-telefono') ? document.getElementById('creador-telefono').value.trim() : "",
-          emailPersonal: document.getElementById('creador-recovery') ? document.getElementById('creador-recovery').value.trim() : "",
+          emailPersonal: document.getElementById('creador-email-personal') ? document.getElementById('creador-email-personal').value.trim() : "",
           grupo: document.getElementById('creador-grupo') ? document.getElementById('creador-grupo').value.trim() : ""
         };
         
-        // Si rellenaste algún campo nuevo o metiste listas, se los mandamos a Google
         if (datosExtra.puesto || datosExtra.departamento || datosExtra.telefono || datosExtra.emailPersonal || datosExtra.grupo) {
           google.script.run
             .withSuccessHandler(function() { 
+              // Avisamos de que el perfil extra se ha guardado bien
+              mostrarAvisoFlotante("✅ Perfil de " + res.email + " enriquecido correctamente.", "info");
               console.log("✅ Perfil enriquecido y listas asignadas con éxito para " + res.email); 
             })
             .actualizarUsuarioGoogleEnriquecido(datosExtra);
         }
-        // =========================================================================
 
-      } else { errAction(res.error); }
+      } else { 
+        errAction(res.error); 
+        mostrarAvisoFlotante("❌ Error: " + res.error, "error");
+      }
     }).webCrearUsuarioAvanzado(datos);
   }
 
