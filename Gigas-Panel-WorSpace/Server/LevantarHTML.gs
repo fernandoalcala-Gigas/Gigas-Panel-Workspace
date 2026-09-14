@@ -1,2406 +1,2598 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <base target="_top">
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <style>
-    body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; background-color: #f8fafc; margin: 0; display: flex; height: 100vh; overflow: hidden; color: #1e293b; transition: background-color 0.3s, color 0.3s; }
-    .sidebar { width: 300px; margin-left: 0; background: #1e293b; color: #f8fafc; padding: 20px 16px; box-sizing: border-box; overflow-y: auto; height: 100vh; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; border-right: 1px solid #334155; z-index: 50;}
-    .sidebar.collapsed { margin-left: -300px; }
-    .sidebar h3 { margin-top: 10px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #334155; padding-bottom: 12px; color: #38bdf8; font-weight: 600; margin-bottom: 15px; }
-    .sidebar label { display: block; font-size: 11px; color: #94a3b8; margin: 12px 0 4px 0; font-weight: 600; letter-spacing: 0.02em; }
-    
-    .sidebar-section { background: #1e293b; margin-bottom: 8px; border-radius: 6px; border: 1px solid #334155; overflow: hidden; transition: all 0.2s ease; }
-    .sidebar-section-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #111827; cursor: pointer; user-select: none; border-bottom: 1px solid #334155; }
-    .sidebar-section-header span.section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: #94a3b8; }
-    .sidebar-section-header span.section-arrow { font-size: 10px; color: #64748b; transition: transform 0.2s ease; }
-    .sidebar-section-body { padding: 12px; display: block; background: #1e293b; }
-    .sidebar-section.collapsed .sidebar-section-body { display: none; }
-    .sidebar-section.collapsed .sidebar-section-header { border-bottom-color: transparent; }
-    .sidebar-section.collapsed .sidebar-section-header span.section-arrow { transform: rotate(-90deg); }
-    .sidebar-section-header:hover span.section-title { color: #f8fafc; }
-
-    .main-panel { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; background-color: #f1f5f9; transition: background-color 0.3s; }
-    .top-navbar { height: 60px; background: #ffffff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.02); transition: background-color 0.3s, border-color 0.3s; }
-    .navbar-left { display: flex; align-items: center; gap: 16px; }
-    .navbar-right { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #64748b; font-weight: 500; }
-    .user-avatar { width: 34px; height: 34px; background: #e2f1ff; color: #0284c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; border: 1px solid #bee0ff; text-transform: uppercase; }
-    .toggle-sidebar-btn { background: transparent; color: #64748b; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 8px; transition: all 0.2s; outline: none; }
-    .toggle-sidebar-btn:hover { background: #f1f5f9; color: #0f172a; }
-    .main-title { margin: 0; font-size: 18px; font-weight: 400; color: #475569; transition: color 0.3s;}
-    .logo-bold { color: #1e293b; font-weight: 900; font-size: 22px; letter-spacing: -0.03em; font-family: 'Arial Black', sans-serif; transition: color 0.3s;}
-    .main-content-scroll { flex: 1; padding: 24px; overflow-y: auto; box-sizing: border-box; scroll-behavior: smooth; }
-    .content-max-wrapper { max-width: 1300px; margin: 0 auto; width: 100%; }
-    .form-group { margin-bottom: 10px; }
-    .sidebar input, .sidebar select { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #475569; background: #0f172a; color: white; border-radius: 6px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
-    .sidebar input:focus, .sidebar select:focus { border-color: #38bdf8; }
-    .sidebar button { width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; margin-bottom: 6px; color: white; display: flex; align-items: center; justify-content: center; gap: 6px; transition: opacity 0.15s ease; }
-    .sidebar button:hover { opacity: 0.92; }
-    .sidebar button:active { transform: scale(0.98); }
-    .btn-primary { background: #0284c7; } 
-    .btn-secondary { background: #475569; } 
-    .btn-success { background: #10b981; } 
-    .btn-danger { background: #ef4444; } 
-    .global-search-box { background: white; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-bottom: 24px; border-left: 4px solid #10b981; transition: background-color 0.3s, border-color 0.3s; }
-    .global-search-box input { width: 100%; padding: 12px 16px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; box-sizing: border-box; background: #f8fafc; transition: all 0.2s; }
-    .global-search-box input:focus { background: white; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.06); }
-    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px; margin-bottom: 24px; }
-    .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; overflow: hidden; height: fit-content; margin-bottom: 24px; transition: background-color 0.3s, border-color 0.3s; }
-    .card-header { background: #ffffff; padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; user-select: none; transition: background-color 0.3s, border-color 0.3s; }
-    .card-header h3 { margin: 0; color: #1e293b; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.02em; transition: color 0.3s; }
-    .toggle-icon { font-size: 11px; color: #94a3b8; }
-    .card-body { padding: 20px; display: block; }
-    .card.collapsed .card-body { display: none; }
-    .creator-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .creator-form .full-width { grid-column: 1 / -1; }
-    .creator-group label { display: block; font-size: 12px; color: #475569; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; transition: color 0.3s; }
-    .creator-group input, .creator-group select { width: 100%; padding: 12px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: #f8fafc; color: #0f172a; transition: all 0.2s; box-sizing: border-box; }
-    .creator-group input:focus, .creator-group select:focus { border-color: #10b981; background: #ffffff; box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
-    .email-preview { font-family: monospace; font-size: 16px; color: #0284c7; background: #e0f2fe; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; border: 1px dashed #bae6fd; transition: background-color 0.3s; }
-    .creator-btn { background: #10b981; color: white; border: none; padding: 14px; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; transition: all 0.2s; margin-top: 10px; }
-    .creator-btn:hover { background: #059669; }
-    .creator-btn:disabled { opacity: 0.7; cursor: not-allowed; }
-    .category-selector-container { display: flex; align-items: center; gap: 16px; background: white; padding: 16px 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px; transition: background-color 0.3s, border-color 0.3s; }
-    .select-style { padding: 9px 16px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc; color: #0f172a; font-weight: 600; font-size: 13px; min-width: 280px; outline: none; transition: all 0.3s; }
-    .table-container { width: 100%; max-height: 60vh; overflow-y: auto; overflow-x: auto; position: relative; border-radius: 4px;}
-    .excel-table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; text-align: left; }
-    .excel-table th { background-color: #f8fafc; color: #475569; padding: 12px 16px; border-bottom: 2px solid #e2e8f0; font-weight: 600; position: sticky; top: 0; z-index: 10; transition: background-color 0.3s, color: 0.3s, border-color 0.3s; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.05); }
-    .excel-table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; transition: border-color 0.3s, color 0.3s; }
-    .excel-table tbody tr.main-row:hover { background-color: #f8fafc; cursor: pointer; transition: background-color 0.15s; }
-    .metrics-summary { display: flex; gap: 16px; margin-bottom: 20px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; transition: background-color 0.3s, border-color 0.3s; }
-    .metric-item { flex: 1; font-size: 12px; color: #64748b; text-align: center; }
-    .metric-item strong { display: block; font-size: 20px; color: #0f172a; margin-top: 4px; transition: color 0.3s; }
-    .timestamp-badge { font-size: 11px; background-color: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 12px; font-weight: 600; transition: background-color 0.3s, color 0.3s;}
-    .member-details-box { background-color: #f8fafc; border-left: 4px solid #475569; padding: 12px 16px; margin: 6px 0; border-radius: 0 6px 6px 0; display: flex; flex-wrap: wrap; gap: 6px; transition: background-color 0.3s; }
-    .member-tag { display: inline-flex; align-items: center; background: white; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; margin: 0; font-size: 12px; font-weight: 500; cursor: default; transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
-    .member-tag span { cursor: pointer; }
-    .alert-row { background-color: #fffbeb !important; color: #b45f06 !important; font-weight: 600; }
-    .danger-row { background-color: #fef2f2 !important; color: #991b1b !important; font-weight: 600; }
-    #chart_div { width: 100%; height: 250px; min-height: 250px; }
-    .btn-header-inline { background: #e2e8f0 !important; color: #475569 !important; font-size: 11px !important; font-weight: bold !important; padding: 4px 10px !important; margin: 0 !important; border-radius: 4px !important; cursor: pointer !important; display: inline-flex !important; transition: all 0.2s;}
-    .btn-header-inline:hover { background: #cbd5e1 !important; color: #0f172a !important; }
-    .takeout-badge-info { padding: 10px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-top: 8px; display: none; border: 1px solid #cbd5e1; background-color: #f1f5f9; color: #475569; transition: all 0.3s; }
-    #log { position: fixed; bottom: 24px; right: 24px; padding: 16px 24px; color: white; border-radius: 8px; font-size: 14px; font-weight: 600; display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: opacity 0.3s ease; max-width: 500px; line-height: 1.5; cursor: pointer; }
-    .log-close-btn { float: right; cursor: pointer; margin-left: 15px; font-size: 16px; opacity: 0.7; padding: 0 5px; border-radius: 4px; }
-    .log-close-btn:hover { opacity: 1; background-color: rgba(255,255,255,0.2); }
-    .user-hidden-action { display: none !important; }
-    .btn-download-excel { background-color: #10b981; color: white; padding: 9px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; display: inline-flex; align-items: center; transition: background 0.15s; margin-left: auto; }
-    .btn-download-excel:hover { background-color: #059669; }
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
-    .modal-content { background: #fff; width: 700px; max-width: 90%; height: 60vh; max-height: 80vh; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-    .modal-header { padding: 15px 20px; background: #1e293b; color: white; display: flex; justify-content: space-between; align-items: center; }
-    .modal-body { padding: 20px; overflow-y: auto; flex: 1; background: #f8fafc; font-family: 'Consolas', monospace; font-size: 13px; line-height: 1.5; }
-    .log-entry { margin-bottom: 8px; padding: 10px; border-radius: 4px; border-left: 4px solid #cbd5e1; background: white; border-bottom: 1px solid #e2e8f0; }
-    .log-error { border-left-color: #ef4444; color: #991b1b; background: #fef2f2; }
-    .log-success { border-left-color: #10b981; color: #065f46; background: #ecfdf5; }
-    .log-info { border-left-color: #38bdf8; color: #0369a1; background: #f0f9ff; }
-    .log-time { color: #64748b; font-weight: bold; margin-right: 8px; font-size: 11px; }
-    .alias-live-container { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 12px; margin-top: 8px; }
-    .alias-badge-item { display: flex; justify-content: space-between; align-items: center; background: #1e293b; border: 1px solid #475569; padding: 6px 10px; border-radius: 4px; margin-bottom: 6px; font-size: 12px; color: #38bdf8; font-family: monospace; }
-    .alias-badge-item span.btn-del-alias { color: #ef4444; font-weight: bold; cursor: pointer; padding: 0 4px; font-family: sans-serif; font-size: 14px; }
-    .alias-badge-item span.btn-del-alias:hover { color: #f87171; }
-    
-    /* MODO OSCURO */
-    body.dark-mode { background-color: #0f172a; color: #e2e8f0; }
-    body.dark-mode .main-panel { background-color: #0f172a; }
-    body.dark-mode .top-navbar { background: #1e293b; border-bottom: 1px solid #334155; }
-    body.dark-mode .main-title { color: #f8fafc; }
-    body.dark-mode .logo-bold { color: #38bdf8; }
-    body.dark-mode .toggle-sidebar-btn { color: #94a3b8; }
-    body.dark-mode .toggle-sidebar-btn:hover { background: #334155; color: #f8fafc; }
-    body.dark-mode .card { background: #1e293b; border-color: #334155; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
-    body.dark-mode .card-header { background: #1e293b; border-bottom-color: #334155; }
-    body.dark-mode .card-header h3 { color: #f8fafc; }
-    body.dark-mode .global-search-box { background: #1e293b; border-left-color: #38bdf8; }
-    body.dark-mode .global-search-box input { background: #0f172a; border-color: #475569; color: #f8fafc; }
-    body.dark-mode .global-search-box input:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,0.1); }
-    body.dark-mode .category-selector-container { background: #1e293b; border-color: #334155; }
-    body.dark-mode .select-style { background: #0f172a; border-color: #475569; color: #f8fafc; }
-    body.dark-mode .excel-table th { background-color: #0f172a; color: #cbd5e1; border-bottom-color: #475569; }
-    body.dark-mode .excel-table td { border-bottom-color: #334155; color: #94a3b8; }
-    body.dark-mode .excel-table tbody tr.main-row:hover { background-color: #334155; }
-    body.dark-mode .excel-table tbody tr.sub-member-row { background-color: #0f172a !important; }
-    body.dark-mode .metrics-summary { background: #0f172a; border-color: #334155; }
-    body.dark-mode .metric-item strong { color: #f8fafc; }
-    body.dark-mode .timestamp-badge { background-color: #1e293b; color: #38bdf8; border: 1px solid #334155; }
-    body.dark-mode .member-details-box { background-color: #0f172a; border-left-color: #475569; }
-    body.dark-mode .member-tag { background: #1e293b; border-color: #475569; color: #e2e8f0; }
-    body.dark-mode .creator-group label { color: #cbd5e1; }
-    body.dark-mode .creator-group input, body.dark-mode .creator-group select { background: #0f172a; border-color: #475569; color: #f8fafc; }
-    body.dark-mode .creator-group input:focus, body.dark-mode .creator-group select:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,0.1); }
-    body.dark-mode .sidebar-section-header { background: #0b0f19; }
-    .email-preview { background: #0f172a; border-color: #0284c7; color: #38bdf8; }
-    body.dark-mode #lista-preview { background: #450a0a !important; border-color: #ef4444 !important; color: #fca5a5 !important; }
-    body.dark-mode #lista-miembros { background: #0f172a !important; border-color: #475569 !important; color: #f8fafc !important; }
-    body.dark-mode .takeout-badge-info { background-color: #0f172a; border-color: #334155; color: #cbd5e1; }
-    body.dark-mode .btn-header-inline { background: #334155 !important; color: #e2e8f0 !important; }
-    body.dark-mode .btn-header-inline:hover { background: #475569 !important; color: #f8fafc !important; }
-    body.dark-mode .modal-content { background: #0f172a; border: 1px solid #334155; }
-    body.dark-mode .modal-body { background: #0f172a; color: #cbd5e1; }
-    body.dark-mode .log-entry { background: #1e293b; border-color: #475569; }
-    body.dark-mode .log-time { color: #94a3b8; }
-    body.dark-mode .log-error { background: #450a0a; border-left-color: #ef4444; color: #fca5a5; }
-    body.dark-mode .log-success { background: #064e3b; border-left-color: #10b981; color: #6ee7b7; }
-    body.dark-mode .log-info { background: #082f49; border-left-color: #38bdf8; color: #7dd3fc; }
-    .nav-btn-icon { background: transparent; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 16px; cursor: pointer; padding: 4px 10px; margin-right: 10px; transition: all 0.3s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.05); color: inherit; }
-    .nav-btn-icon:hover { background: #f1f5f9; transform: scale(1.05); }
-    body.dark-mode .nav-btn-icon { border-color: #475569; background: #1e293b; color: white; }
-    body.dark-mode .nav-btn-icon:hover { background: #334155; }
-    .lang-select { background: transparent; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 8px; font-size: 13px; cursor: pointer; margin-right: 15px; color: inherit; outline: none; font-weight: 600; }
-    body.dark-mode .lang-select { border-color: #475569; background: #1e293b; color: white; }
-  </style>
-</head>
-<body>
-
-  <div class="sidebar" id="sidebar-panel">
-    <h3 data-i18n="side_title">⚙️ Módulos Operativos</h3>
-    
-    <div class="sidebar-section">
-      <div class="sidebar-section-header">
-        <span class="section-title">📋 Objetivo Seleccionado</span>
-        <span class="section-arrow">▼</span>
-      </div>
-      <div class="sidebar-section-body">
-        <div class="form-group"><label data-i18n="lbl_origen">Origen / Grupo Activo:</label><input type="text" id="target-group" readonly placeholder="..."></div>
-        <div class="form-group"><label data-i18n="lbl_user">Usuario / Correo Objetivo:</label><input type="text" id="target-user" placeholder="..."></div>
- 
-        <div class="form-group">
-          <label style="color:#38bdf8;" data-i18n="lbl_manager">👤 Mánager (Editable manual):</label>
-          <input type="text" id="target-manager" style="border-color: #0284c7;" placeholder="...">
-          <div id="takeout-status-box" class="takeout-badge-info" data-i18n="txt_takeout">🔍 Pulse un usuario para ver Takeout.</div>
-        </div>
-        <div class="form-group">
-          <label style="color:#f59e0b;" data-i18n="lbl_mod_alias">🏷️ Módulo de Alias (En vivo):</label>
-          <div class="alias-live-container">
-            <div id="alias-live-list" style="font-size:12px; color:#94a3b8; text-align:center; padding:4px 0;" data-i18n="txt_sel_usuario">Selecciona un usuario...</div>
-            <div style="display:flex; gap:6px; margin-top:8px;">
-              <input type="text" id="nuevo-alias-input" data-i18n="ph_nuevo_alias" placeholder="nuevo.alias" style="flex:1; padding:6px; font-size:12px; background:#1e293b; border-color:#475569; color:white; outline:none; border-radius:4px;" />
-              <button onclick="lanzarAñadirAlias()" style="width:auto; padding:6px 10px; margin:0; font-size:12px; background:#f59e0b; color:white; font-weight:bold; border-radius:4px; border:none; cursor:pointer;">➕</button>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label style="color:#10b981;" data-i18n="lbl_target_lic">💼 Licencia (Asignar/Cambiar):</label>
-          <select id="target-licencia" style="border-color: #10b981; width:100%; padding:10px 12px; font-size:13px; border-radius:6px; background:#0f172a; color:white; outline:none; box-sizing:border-box;">
-            <option value="" data-i18n="opt_seleciona">-- Selecciona --</option>
-          </select>
-          <div id="licencia-actual-box" style="font-size: 11px; margin-top: 6px; padding: 6px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; color: #10b981; font-weight: bold;" data-i18n="txt_lic_actual">🔍 Licencia actual: Selecciona un usuario...</div>
-        </div>
-        <div class="form-group">
-          <label style="color:#8b5cf6;" data-i18n="lbl_target_ou">📂 Unidad Organizativa (Mover):</label>
-          <select id="target-ou" style="border-color: #8b5cf6; width:100%; padding:10px 12px; font-size:13px; border-radius:6px; background:#0f172a; color:white; outline:none; box-sizing:border-box;">
-            <option value="" data-i18n="opt_destino">-- Selecciona destino --</option>
-          </select>
-          <div id="ou-actual-box" style="font-size: 11px; margin-top: 6px; padding: 6px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; color: #8b5cf6; font-weight: bold;" data-i18n="txt_ou_actual">🔍 OU actual: Selecciona un usuario...</div>
-          <button class="creator-btn" style="background:#8b5cf6; padding:8px; margin-top:8px; font-size:12px;" onclick="lanzarCambioOU()" data-i18n="btn_mover_ou">📦 Mover de OU</button>
-        </div>
-        <button class="btn-primary" onclick="ejecutarActualizarGrupos()" data-i18n="btn_sync" data-i18n-title="tt_sync">🔄 Sincronizar Cuentas</button>
-        <button class="btn-secondary" style="border: 1px solid #38bdf8; color: #e0f2fe; margin-top: 6px;" onclick="generarComandoAD()" data-i18n="btn_cmd_ad">💻 Comandos PowerShell (AD)</button>
-      </div>
-    </div>
-
-    <div class="sidebar-section collapsed">
-      <div class="sidebar-section-header">
-        <span class="section-title" data-i18n="lbl_altas">ALTAS Y MANTENIMIENTO</span>
-        <span class="section-arrow">▼</span>
-      </div>
-      <div class="sidebar-section-body">
-        <button class="btn-success" onclick="mostrarLandingCreacion()" data-i18n="btn_alta" data-i18n-title="tt_alta">✨ Crear Nuevo Usuario</button>
-        <button class="btn-primary" onclick="lanzarCambioLicencia()" data-i18n="btn_licencia" data-i18n-title="tt_licencia">💼 Cambiar Licencia WS</button>
-        <button class="btn-success" onclick="lanzarEstado(false)" data-i18n="btn_reactivar" data-i18n-title="tt_reactivar">▶️ Reactivar Workspace</button>
-        <button class="btn-danger" onclick="lanzarEstado(true)" data-i18n="btn_suspender" data-i18n-title="tt_suspender">⏸️ Suspender Workspace</button>
-        <button class="btn-secondary" onclick="lanzarResetClaveOlvido()" data-i18n="btn_clave" data-i18n-title="tt_clave">🔑 Reseteo Clave (Olvido)</button>
-        <button class="btn-danger" style="background:#dc2626;" onclick="lanzarBypass2FA()" title="Genera un código de emergencia para saltarse el 2FA" data-i18n="btn_bypass">🆘 Bypass 2FA (Emergencia)</button>
-      </div>
-    </div>
-
-    <div class="sidebar-section collapsed">
-      <div class="sidebar-section-header">
-        <span class="section-title" data-i18n="lbl_maestra">CUENTAS GENERALES (MAESTRA)</span>
-        <span class="section-arrow">▼</span>
-      </div>
-      <div class="sidebar-section-body">
-        <button class="btn-secondary" onclick="lanzarEscanerMaestra()" data-i18n="btn_escanear_m" data-i18n-title="tt_escanear_m">🔎 Escanear Managers (657)</button>
-        <button class="btn-primary" onclick="lanzarActualizarManager()" data-i18n="btn_upd_manager" data-i18n-title="tt_upd_manager">👤 Asignar Mánager en WS</button>
-        <button id="btn-seguridad-panel" class="btn-success" style="background:#8b5cf6;" onclick="lanzarAlternarPermisos()" data-i18n-title="Da o quita acceso al panel a tus compañeros">🛡️ Otorgar / Revocar Permisos</button>
-      </div>
-    </div>
-
-    <div class="sidebar-section collapsed" id="seccion-servicios">
-      <div class="sidebar-section-header">
-        <span class="section-title" data-i18n="lbl_servicios">CUENTAS DE SERVICIO</span>
-        <span class="section-arrow">▼</span>
-      </div>
-      <div class="sidebar-section-body">
-        <button class="btn-secondary" onclick="lanzarEscanerServicios()" data-i18n="btn_escanear_s" data-i18n-title="tt_escanear_s">🔎 Escanear Workspace</button>
-        <button class="btn-primary" onclick="lanzarRastreadorServicios()" data-i18n="btn_rastrear" data-i18n-title="tt_rastrear">📩 Rastrear Respuestas</button>
-        <button class="btn-secondary" onclick="lanzarAuditoriaEnviosServicios()" data-i18n="btn_auditar" data-i18n-title="tt_auditar">🛡️ Auditar Envíos Previos</button>
-        <button class="btn-primary" onclick="lanzarCampanaServicios()" data-i18n="btn_campana_s" data-i18n-title="tt_campana_s">📢 Lanzar Primera Campaña</button>
-        <button class="btn-secondary" onclick="lanzarRecordatorioServicios()" data-i18n="btn_recordatorio" data-i18n-title="tt_recordatorio">🔔 Enviar Recordatorio</button>
-      </div>
-    </div>
-
-    <div class="sidebar-section collapsed">
-      <div class="sidebar-section-header">
-        <span class="section-title" data-i18n="lbl_listas">LISTAS DE DISTRIBUCIÓN</span>
-        <span class="section-arrow">▼</span>
-      </div>
-      <div class="sidebar-section-body">
-        <button class="btn-success" onclick="mostrarLandingCreacionLista()" data-i18n="btn_crear_lista" data-i18n-title="tt_crear_lista">✨ Crear Nueva Lista</button>
-        <button class="btn-primary" onclick="lanzarAltaEnLista()" data-i18n="btn_add_member" data-i18n-title="tt_add_member">➕ Añadir Miembro</button>
-        <button class="btn-secondary" onclick="lanzarOwner()" data-i18n="btn_owner" data-i18n-title="tt_owner">👑 Asignar Owner</button>
-        <button class="btn-danger" onclick="lanzarBorradoLista()" data-i18n="btn_del_member" data-i18n-title="tt_del_member">❌ Eliminar Miembro</button>
-        <button class="btn-primary" onclick="lanzarCampanaHuerfanas()" data-i18n="btn_camp_listas" data-i18n-title="tt_camp_listas">📢 Campaña Listas Huérfanas</button>
-        <button class="btn-secondary" onclick="lanzarProcesarRespuestas()" data-i18n="btn_rast_listas" data-i18n-title="tt_rast_listas">🔍 Rastrear Respuestas</button>
-        <button class="btn-danger" style="font-weight:bold;" onclick="lanzarBorradoListaTotal()" data-i18n="btn_del_lista" data-i18n-title="tt_del_lista">🚫 BORRAR LISTA ENTERA</button>
-        <button class="btn-secondary" onclick="lanzarRenombrarLista()" data-i18n-title="Cambia el alias/email de una lista existente" data-i18n="btn_renombrar">✏️ Renombrar Lista</button>
-        <button class="btn-danger" style="background:#b91c1c; font-weight:bold;" onclick="lanzarPurgaMasiva()" data-i18n-title="Elimina al usuario de TODOS los grupos a la vez" data-i18n="btn_purga">🔥 Purga Masiva del Usuario</button>
-      </div>
-    </div>
-
-    <div class="sidebar-section collapsed" id="seccion-bajas">
-      <div class="sidebar-section-header">
-        <span class="section-title" style="color:#f87171;" data-i18n="lbl_bajas">🔥 ACCIONES CRÍTICAS BAJAS</span>
-        <span class="section-arrow">▼</span>
-      </div>
-      <div class="sidebar-section-body">
-        <button class="btn-secondary" onclick="lanzarMailAdvertenciaBaja()" data-i18n="btn_aviso_baja" data-i18n-title="tt_aviso_baja">📋 Enviar Aviso de Baja</button>
-        <button class="btn-primary" onclick="lanzarTakeout()" data-i18n="btn_takeout" data-i18n-title="tt_takeout">📩 Enviar Acceso TakeOut</button>
-        <button class="btn-danger" style="font-weight:700;" onclick="lanzarFlujoBajaTotal()" data-i18n="btn_baja_total" data-i18n-title="tt_baja_total">🚫 EJECUTAR BAJA TOTAL</button>
-        <button class="btn-success" onclick="lanzarRecuperacionCuenta()" data-i18n="btn_recuperar" data-i18n-title="tt_recuperar">♻️ Recuperar Cuenta (Lím. 20d)</button>
-        <!-- ⭐ MÓDULO TRASPASO DE DRIVE (BLOQUE SELLADO) ⭐ -->
-        <div style="background: #0f172a; padding: 12px; border-radius: 6px; border: 1px solid #334155; margin-top: 12px; margin-bottom: 4px;">
-          <div style="color: #38bdf8; font-size: 12px; font-weight: bold; margin-bottom: 6px;">📦 Traspaso de Drive (TakeOut / Herencia)</div>
-          <p style="color: #94a3b8; font-size: 11px; margin: 0 0 8px 0;">Mueve los archivos en segundo plano sin borrarlos.</p>
-          <input type="text" id="traspaso-origen" placeholder="👤 Correo Origen (saliente@gigas.com)" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 12px; box-sizing: border-box; margin-bottom: 6px;" />
-          <input type="text" id="traspaso-destino" placeholder="🎯 Correo Destino (manager@gigas.com)" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 12px; box-sizing: border-box; margin-bottom: 8px;" />
-          <button id="btn-traspaso-drive" onclick="ejecutarTraspasoDrive()" style="width: 100%; background: #0284c7; color: white; border: none; padding: 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px;">🔀 Iniciar Traspaso</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="main-panel">
-    <div class="top-navbar">
-      <div class="navbar-left">
-        <button class="toggle-sidebar-btn" id="nav-menu-btn" onclick="toggleSidebar()">☰</button>
-        <h2 class="main-title"><span class="logo-bold">gigas</span> | <span data-i18n="top_title">Identidades Workspace</span></h2>
-      </div>
-      
-      <div class="navbar-right">
-        <select id="lang-selector" class="lang-select" onchange="changeLanguage(this.value)">
-          <option value="es">🇪🇸 ES</option>
-          <option value="en">🇬🇧 EN</option>
-          <option value="pt">🇵🇹 PT</option>
-        </select>
-        
-        <button id="btn-logs" class="nav-btn-icon" onclick="document.getElementById('log-modal').style.display='flex'" data-i18n-title="tt_logs" title="Ver historial de eventos">📜</button>
-        <button id="dark-mode-toggle" class="nav-btn-icon" onclick="toggleTheme()" data-i18n-title="tt_darkmode">🌙</button>
-        <span id="display-user-email">cargando...</span>
-        <div class="user-avatar" id="display-user-avatar">U</div>
-      </div>
-    </div>
-    
-    <div class="main-content-scroll" id="scroll-container">
-      <div class="content-max-wrapper">
-        
-        <div class="card collapsed" id="card-creador" style="border-left: 4px solid #10b981;">
-          <div class="card-header" onclick="toggleCard('card-creador')">
-            <h3 data-i18n="card_creator">✨ Centro de Creación de Identidades</h3>
-            <button class="btn-header-inline" onclick="cerrarYLimpiarPanel(event, 'card-creador');" data-i18n="btn_cerrar_panel">✖ Cerrar Panel</button>
-          </div>
-          <div class="card-body">
-            <div class="creator-form">
-              <div class="creator-group">
-                <label data-i18n="lbl_tipo">Tipo de Cuenta</label>
-                <select id="creador-tipo" onchange="actualizarCamposCreador()"><option value="Nominativa">👤 Nominativa (Gigas)</option><option value="TPartner">🤝 TPartner</option><option value="Servicio">🤖 Servicio Gigas</option><option value="Kayako">🎧 Kayako</option><option value="Externa">🤝 Externa</option><option value="Onmovil">📱 Onmovil</option></select>
-              </div>
-              <div class="creator-group">
-                <label data-i18n="lbl_licencia">Licencia Asignada</label>
-                <select id="creador-licencia"><option value="Cloud Identity Free">Cloud Identity Free (Asignadas: 0 | Libres: 50)</option></select>
-              </div>
-              <div class="creator-group">
-                <label data-i18n="lbl_ou_creador" style="color: #8b5cf6;">Unidad Organizativa (OU)</label>
-                <select id="creador-ou" style="border-color: #8b5cf6;"><option value="/">Cargando OUs...</option></select>
-              </div>
-              <div class="creator-group"><label data-i18n="lbl_alias">Alias del Correo</label><input type="text" id="creador-alias" placeholder="..." onkeyup="actualizarPreviewEmail()"></div>
-              <div class="creator-group"><label data-i18n="lbl_dominio">Dominio</label><select id="creador-dominio" onchange="actualizarPreviewEmail()"><option value="gigas.com">@gigas.com</option><option value="onmovil.es">@onmovil.es</option><option value="asesorgigas.com">@asesorgigas.com</option><option value="oni.pt">@oni.pt</option></select></div>
-              <div class="creator-group full-width"><div class="email-preview" id="creador-preview">escribe.alias@gigas.com</div></div>
-              <div class="creator-group" id="box-nombre"><label data-i18n="lbl_nombre">Nombre Real</label><input type="text" id="creador-nombre" placeholder="..."></div>
-              <div class="creator-group" id="box-apellido"><label data-i18n="lbl_apellido">Apellidos</label><input type="text" id="creador-apellido" placeholder="..."></div>
-              <div class="creator-group full-width" id="box-motivo" style="display:none;">
-                <label style="color:#f59e0b;">🎯 Motivo de la cuenta / Servicio al que se dedica</label>
-                <input type="text" id="creador-motivo" style="border-color:#f59e0b;" placeholder="Ej: Monitorización de telefonía VoIP Asterisk ZeroVoz...">
-              </div>
-              <div class="creator-group full-width"><label data-i18n="lbl_mail_manager">Correo del Mánager / Responsable</label><input type="text" id="creador-manager" placeholder="..."></div>
-              <div style="display: flex; gap: 16px; width: 100%; flex-wrap: wrap;">
-                <div class="creator-group" style="flex: 1; min-width: 200px;">
-                  <label>Función / Cargo (Title)</label>
-                  <input type="text" id="creador-puesto" placeholder="Ej: Inside Sales Specialist" />
-                </div>
-                <div class="creator-group" style="flex: 1; min-width: 200px;">
-                  <label>Departamento</label>
-                  <input type="text" id="creador-departamento" placeholder="Ej: Sales" />
-                </div>
-              </div>
-
-              <div style="display: flex; gap: 16px; width: 100%; flex-wrap: wrap;">
-                <div class="creator-group" style="flex: 1; min-width: 200px;">
-                  <label>Teléfono Corporativo</label>
-                  <input type="text" id="creador-telefono" placeholder="+34 600 000 000" />
-                </div>
-                <div class="creator-group" style="flex: 1; min-width: 200px;">
-                  <label>País / Sede</label>
-                  <input type="text" id="creador-pais" value="Spain" />
-                </div>
-              </div>
-
-              <div style="display: flex; gap: 16px; width: 100%; flex-wrap: wrap;">
-                <div class="creator-group" style="flex: 1; min-width: 200px;">
-                  <label>Correo Personal (Recuperación)</label>
-                  <input type="email" id="creador-email-personal" placeholder="usuario@gmail.com" />
-                </div>
-                <div class="creator-group" style="flex: 1; min-width: 200px;">
-                  <label>Añadir a Lista Genérica (Grupo)</label>
-                  <input type="email" id="creador-grupo" placeholder="all.spain@gigas.com" />
-                </div>
-              </div>
-              <div class="creator-group full-width"><button id="btn-accion-identidad" class="creator-btn" onclick="ejecutarAccionIdentidad()" data-i18n="btn_crear_exe">🚀 Crear Cuenta en Workspace y Excel</button></div>
-            </div>
-            </div>
-          </div>
-        
-        <div class="card collapsed" id="card-creador-lista" style="border-left: 4px solid #ef4444;">
-           <div class="card-header" onclick="toggleCard('card-creador-lista')">
-             <h3 data-i18n="card_creator_list">👥 Centro de Creación de Listas de Distribución</h3>
-            <button class="btn-header-inline" onclick="cerrarYLimpiarPanel(event, 'card-creador-lista');" data-i18n="btn_cerrar_panel2">✖ Cerrar Panel</button>
-          </div>
-          <div class="card-body">
-            <div class="creator-form">
-              <div class="creator-group"><label data-i18n="lbl_list_name">Nombre Público de la Lista</label><input type="text" id="lista-nombre" placeholder="..."></div>
-              <div class="creator-group"><label data-i18n="lbl_list_dom">Dominio de la Lista</label><select id="lista-dominio" onchange="actualizarPreviewLista()"><option value="gigas.com">@gigas.com</option><option value="onmovil.es">@onmovil.es</option><option value="oni.pt">@oni.pt</option></select></div>
-              <div class="creator-group"><label data-i18n="lbl_list_alias">Alias del Correo (Sufijo)</label><input type="text" id="lista-alias" placeholder="..." onkeyup="actualizarPreviewLista()"></div>
-              <div class="creator-group"><label data-i18n="lbl_list_prev">Previsualización Oficial</label><div class="email-preview" id="lista-preview" style="background:#fef2f2; color:#b91c1c; border-color:#fca5a5;">escribe.alias@gigas.com</div></div>
-              <div class="creator-group full-width"><label data-i18n="lbl_list_owner">Correo del Owner 👑</label><input type="text" id="lista-owner" placeholder="..."></div>
-              <div class="creator-group full-width"><label data-i18n="lbl_list_members">Miembros Iniciales</label><textarea id="lista-miembros" style="width:100%; height:80px; padding:10px; border:1px solid #cbd5e1; border-radius:6px; background:#f8fafc; outline:none;" placeholder="usuario1@gigas.com..."></textarea></div>
-              <div class="creator-group full-width"><button class="creator-btn" style="background:#ef4444;" onclick="ejecutarCreacionLista()" data-i18n="btn_crear_lista_exe">🚀 Crear Lista Activa</button></div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="global-search-box"><input type="text" id="global-search" data-i18n="search_box" placeholder="🔍 BUSCADOR INTELIGENTE..." onkeyup="debounceBuscador()"></div>
-        
-        <div class="card" id="card-cuentas-desglose" style="border-left: 4px solid #0284c7;">
-          <div class="card-header" onclick="toggleCard('card-cuentas-desglose')"><h3 id="titulo-panel-dinamico" data-i18n="card_desglose">📂 Desglose Completo de Usuarios</h3><span class="toggle-icon">▼</span></div>
-          <div class="card-body table-container">
-            <table class="excel-table" id="tabla-usuarios-gigas">
-              <thead id="head-cuentas-dinamicas"><tr><th data-i18n="th_elige">Elige un filtro o busca...</th></tr></thead>
-              <tbody id="body-cuentas-dinamicas"><tr><td id="msg-cuentas" data-i18n="td_esperando">Esperando acción...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="category-selector-container">
-          <label data-i18n="lbl_filtrar">📂 Filtrar / Agrupar por:</label>
-
-          <div style="margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); font-family: sans-serif;">
-            <div onclick="var body = document.getElementById('cuerpo-rrhh-collapse'); var arrow = document.getElementById('flecha-rrhh-collapse'); if(body.style.display === 'none'){ body.style.display = 'flex'; arrow.innerText = '▲'; } else { body.style.display = 'none'; arrow.innerText = '▼'; }" style="padding: 12px 16px; background: #1e293b; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; border-bottom: 1px solid transparent; transition: background 0.2s;">
-              <span style="color: #38bdf8; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 8px;">
-                👥 Herramientas de Sincronización Oficial con RRHH
-              </span>
-              <span id="flecha-rrhh-collapse" style="color: #94a3b8; font-size: 14px; font-weight: bold;">▼</span>
-            </div>
-            
-            <div id="cuerpo-rrhh-collapse" style="display: none; padding: 16px; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; border-top: 1px solid #334155; background: #0f172a;">
-              <span style="color: #cbd5e1; font-size: 13px; flex: 1; min-width: 280px; line-height: 1.4;">
-                💡 **Modo de uso:** Descarga la fotografía actual en Excel, envíala a Recursos Humanos para que completen los teléfonos, puestos o departamentos que falten, y sube el archivo devuelto aquí para inyectar los cambios en Google Workspace.
-              </span>
-              
-              <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                <input type="file" id="input-csv-rrhh" accept=".csv" style="display: none;" onchange="procesarSubidaRRHH(this)" />
-                <button id="btn-dl-rrhh" onclick="descargarFotoRRHH()" style="background: #0284c7; color: white; border: none; padding: 9px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                  📥 1. Descargar Foto (Excel)
-                </button>
-                <button id="btn-up-rrhh" onclick="document.getElementById('input-csv-rrhh').click()" style="background: #7c3aed; color: white; border: none; padding: 9px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                  📤 2. Subir Excel y Actualizar
-                </button>
-              </div>
-            </div>
-          </div>
-          <select id="selector-origen-dinamico" class="select-style" onchange="filtrarCuentasPorCategoria()"><option value="">Cargando...</option></select>
-          <button class="btn-download-excel" onclick="descargarTablaExcel()" data-i18n="btn_descargar" data-i18n-title="tt_descargar">📥 Download Vista (Excel/CSV)</button>
-        </div>
-
-        <div class="dashboard-grid">
-          <div class="card" id="card-metricas-huerfanas" style="border-left: 4px solid #f59e0b; margin-bottom: 0;">
-            <div class="card-header" onclick="toggleCard('card-metricas-huerfanas')"><h3 id="titulo-salud" data-i18n="card_salud">🛡️ Salud de Identidades (Global)</h3><span class="toggle-icon">▼</span></div>
-            <div class="card-body">
-              <div class="metrics-summary" style="margin-bottom: 0;">
-                <div class="metric-item"><span data-i18n="met_eval">Cuentas Evaluadas</span><strong id="mu-total">0</strong></div>
-                <div class="metric-item" style="color: #10b981;"><span data-i18n="met_man">Con Mánager</span><strong id="mu-con">0</strong></div>
-                <div class="metric-item" style="color: #f59e0b;"><span data-i18n="met_hue">Huérfanas</span><strong id="mu-sin">0</strong></div>
-                <div class="metric-item" style="color: #ef4444;"><span data-i18n="met_sus">Suspendidas</span><strong id="mu-susp">0</strong></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card" id="card-crecimiento" style="border-left: 4px solid #8b5cf6; margin-bottom: 0;">
-            <div class="card-header" onclick="toggleCard('card-crecimiento')"><h3 data-i18n="card_crec">🌱 Crecimiento de Identidades</h3><span class="toggle-icon">▼</span></div>
-            <div class="card-body">
-              <div class="metrics-summary" style="margin-bottom: 0;">
-                <div class="metric-item"><span data-i18n="met_mes">Altas Este Mes</span><strong id="crec-actual" style="color: #8b5cf6;">⏳...</strong></div>
-                <div class="metric-item"><span data-i18n="met_ant">Mes Anterior</span><strong id="crec-anterior">⏳...</strong></div>
-                <div class="metric-item"><span data-i18n="met_ten">Tendencia</span><strong id="crec-tendencia">⏳...</strong></div>
-              </div>
-              <div id="chart_crecimiento" style="width: 100%; height: 180px; margin-top: 15px; display: none;"></div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="card collapsed" id="card-papelera-recuperacion" style="border-left: 4px solid #f59e0b;">
-          <div class="card-header" onclick="toggleCard('card-papelera-recuperacion')">
-            <h3 style="color: #ef4444;">♻️ Papelera: Cuentas Eliminadas Recuperables</h3>
-            <button class="btn-header-inline" onclick="event.stopPropagation(); cargarPapeleraEliminados();">🔄 Actualizar Papelera</button>
-          </div>
-          <div class="card-body table-container">
-            <table class="excel-table">
-              <thead>
-                <tr>
-                  <th>Correo Electrónico</th>
-                  <th>Fecha de Baja</th>
-                  <th>Plazo de Seguridad</th>
-                </tr>
-              </thead>
-              <tbody id="tabla-papelera-body">
-                <tr><td colspan="3" style="color:#64748b; font-style:italic; text-align:center;">Cargando la papelera de Workspace...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card" id="card-listas" style="border-left: 4px solid #ef4444; width: 100%; box-sizing: border-box;">
-          <div class="card-header">
-            <h3 onclick="toggleCard('card-listas')"><span data-i18n="card_inventario">👥 Inventario de Listas</span> <span class="timestamp-badge" id="fecha-actualizacion">...</span></h3>
-            <button class="btn-header-inline" onclick="lanzarRefrescarSoloListas(event)" data-i18n="btn_ref_listas" data-i18n-title="tt_ref_listas">🔄 Refrescar Listas</button>
-          </div>
-          <div class="card-body" style="width: 100%; overflow-x: auto;">
-            
-           <h4 onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display === 'none') ? 'block' : 'none';" style="margin: 0 0 12px 0; color: #ffffff; font-size: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; cursor: pointer;">🏢 Listas Gigas ↕️</h4>
-              <div id="wrapper-gigas" style="display: block; width: 100%;">
-                <div class="metrics-summary">
-                  <div class="metric-item"><span data-i18n="met_tot_list">Total Listas</span><strong id="m-total-gigas">0</strong></div>
-                  <div class="metric-item" style="color: #10b981;"><span data-i18n="met_con_own">Con Owner</span> <strong id="m-con-gigas">0</strong></div>
-                  <div class="metric-item" style="color: #ef4444;"><span data-i18n="met_sin_own">Sin Owner</span> <strong id="m-sin-gigas">0</strong></div>
-                </div>
-                <div class="table-container" style="width: 100%; overflow-x: auto;">
-                  <button onclick="exportarTablaCSV('gigas')" style="margin-bottom: 8px; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">📥 Descargar CSV Gigas</button>
-                  <table class="excel-table" id="tabla-listas-gigas" style="width: 100%; table-layout: auto;">
-                    <thead><tr><th data-i18n="th_lista">Lista / Grupo</th><th data-i18n="th_email">Email Corporativo</th><th data-i18n="th_vol">Volumen</th><th data-i18n="th_own_est">Owners / Estado</th></tr></thead>
-                    <tbody id="tabla-listas-gigas-body"><tr><td colspan="4" data-i18n="td_cargando">Cargando datos remotos...</td></tr></tbody>
-                  </table>
-                </div>
-              </div>
-
-            <h4 onclick="this.nextElementSibling.style.display = (this.nextElementSibling.style.display === 'none') ? 'block' : 'none';" style="margin: 0 0 12px 0; color: #ffffff; font-size: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; cursor: pointer;">🇵🇹 Listas ONI ↕️</h4>
-              <div id="wrapper-oni" style="display: block; width: 100%;">
-                <div class="metrics-summary">
-                  <div class="metric-item"><span data-i18n="met_tot_list">Total Listas</span><strong id="m-total-oni">0</strong></div>
-                  <div class="metric-item" style="color: #10b981;"><span data-i18n="met_con_own">Con Owner</span> <strong id="m-con-oni">0</strong></div>
-                  <div class="metric-item" style="color: #ef4444;"><span data-i18n="met_sin_own">Sin Owner</span> <strong id="m-sin-oni">0</strong></div>
-                </div>
-                <div class="table-container" style="width: 100%; overflow-x: auto;">
-                  <button onclick="exportarTablaCSV('oni')" style="margin-bottom: 8px; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">📥 Descargar CSV ONI</button>
-                  <table class="excel-table" id="tabla-listas-oni" style="width: 100%; table-layout: auto;">
-                    <thead><tr><th data-i18n="th_lista">Lista / Grupo</th><th data-i18n="th_email">Email Corporativo</th><th data-i18n="th_vol">Volumen</th><th data-i18n="th_own_est">Owners / Estado</th></tr></thead>
-                    <tbody id="tabla-listas-oni-body"><tr><td colspan="4" data-i18n="td_cargando">Cargando datos remotos...</td></tr></tbody>
-                  </table>
-                </div>
-              </div>
-
-        <div class="dashboard-grid">
-          <div class="card" id="card-grafica"><div class="card-header" onclick="toggleCard('card-grafica')"><h3 data-i18n="card_dist">📈 Distribución General (Origen)</h3><span class="toggle-icon">▼</span></div><div class="card-body"><div id="chart_div"></div></div></div>
-          <div class="card" id="card-origen"><div class="card-header" onclick="toggleCard('card-origen')"><h3 data-i18n="card_criterio">📋 Cuentas por Criterio (Resumen)</h3><span class="toggle-icon">▼</span></div><div class="card-body"><table class="excel-table"><thead><tr><th data-i18n="th_origen">Origen / Licencia</th><th data-i18n="th_activas">Activas</th><th data-i18n="th_susp">Susp.</th><th data-i18n="th_total">Total</th></tr></thead><tbody id="tabla-origen"></tbody></table></div></div>
-        </div>
-
-        <div class="card collapsed" id="card-licencias"><div class="card-header" onclick="toggleCard('card-licencias')"><h3 data-i18n="card_lic">💼 Stock de Licencias</h3><span class="toggle-icon">▼</span></div><div class="card-body"><table class="excel-table"><thead><tr><th data-i18n="th_prod">Produto</th><th data-i18n="th_estado">Estado</th><th data-i18n="th_asig">Asignadas</th><th data-i18n="th_libres">Plan de Pagos / Libres</th></tr></thead><tbody id="tabla-licencias"></tbody></table></div></div>
-
-      </div> 
-    </div> 
-  </div> 
+function doGet() {
+  var correoAcceso = Session.getActiveUser().getEmail().toLowerCase().trim();
+  var esAdmin = ["fernando.alcala@gigas.com"].includes(correoAcceso);
+  var template = HtmlService.createTemplateFromFile('Index');
+  template.esAdmin = esAdmin;
+  template.userEmail = correoAcceso; 
   
-  <div id="log">Iniciando aplicación...</div>
+  return template.evaluate()
+    .setTitle('Gigas IT - Portal de Gestión Global')
+    .setFaviconUrl('https://gigas.com/favicon.ico')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
 
-  <div class="modal-overlay" id="log-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 style="margin:0; font-size:16px;">📜 Consola de Eventos y Errores</h3>
-        <button onclick="document.getElementById('log-modal').style.display='none'" style="background:transparent; color:white; border:none; cursor:pointer; font-size:16px;">✖</button>
-      </div>
-      <div class="modal-body" id="log-modal-body">
-        <div class="log-entry log-info"><span class="log-time">Sistema</span> Panel inicializado. Esperando acciones...</div>
-      </div>
-    </div>
-  </div>
+// =========================================================
+// 🛡️ MÓDULO DE SEGURIDAD Y PERMISOS DINÁMICOS
+// =========================================================
 
-<script>
-  function mostrarAvisoFlotante(mensaje, tipo = "exito") {
-    var toastId = "notificacion-global-toast";
-    var toast = document.getElementById(toastId);
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = toastId;
-      toast.style.cssText = "position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); padding: 15px 25px; border-radius: 8px; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10000; opacity: 0; pointer-events: none; transition: all 0.4s ease;";
-      document.body.appendChild(toast);
-    }
-    toast.innerHTML = mensaje;
-    if (tipo === "exito") {
-      toast.style.backgroundColor = "#10b981";
-    } else if (tipo === "error") {
-      toast.style.backgroundColor = "#ef4444";
-    } else {
-      toast.style.backgroundColor = "#f59e0b";
-    }
-    setTimeout(function() {
-      toast.style.opacity = "1";
-      toast.style.transform = "translateX(-50%) translateY(0)";
-    }, 10);
-    setTimeout(function() {
-      toast.style.opacity = "0";
-      toast.style.transform = "translateX(-50%) translateY(-20px)";
-    }, 4000);
+function obtenerDetalleUsuarioActivo() {
+  var emailActual = Session.getActiveUser().getEmail().toLowerCase().trim();
+  var autorizado = false;
+  var rol = "NINGUNO";
+  
+  if (emailActual === "fernando.alcala@gigas.com") {
+    autorizado = true;
+    rol = "ADMIN";
   }
 
-  const langDict = {
-    es: {
-      lbl_ou_creador: "Unidad Organizativa (OU)",
-      side_title: "⚙️ Módulos Operativos", lbl_origen: "Origen / Grupo Activo:", lbl_user: "Usuario / Correo Objetivo:", lbl_manager: "👤 Mánager (Editable manual):", txt_takeout: "🔍 Pulse un usuario para ver Takeout.", lbl_target_lic: "💼 Licencia (Asignar/Cambiar):", btn_licencia: "💼 Cambiar Licencia WS",
-      btn_sync: "🔄 Sincronizar Cuentas", lbl_altas: "ALTAS Y MANTENIMIENTO", btn_alta: "✨ Crear Nuevo Usuario", btn_reactivar: "▶️ Reactivar Workspace", btn_suspender: "⏸️ Suspender Workspace", btn_clave: "🔑 Reseteo Clave (Olvido)",
-      lbl_maestra: "CUENTAS GENERALES (MAESTRA)", btn_escanear_m: "🔎 Escanear Managers (657)", btn_upd_manager: "👤 Asignar Mánager en WS", lbl_servicios: "CUENTAS DE SERVICIO", btn_escanear_s: "🔎 Escanear Workspace", btn_rastrear: "📩 Rastrear Respuestas", btn_auditar: "🛡️ Auditar Envíos Previos", btn_campana_s: "📢 Lanzar Primera Campaña", btn_recordatorio: "🔔 Enviar Recordatorio",
-      lbl_listas: "LISTAS DE DISTRIBUIÇÃO", btn_crear_lista: "✨ Crear Nueva Lista", btn_add_member: "➕ Añadir Miembro", btn_owner: "👑 Asignar Owner", btn_del_member: "❌ Eliminar Miembro", btn_camp_listas: "📢 Campaña Listas Huérfanas", btn_rast_listas: "🔍 Rastrear Respuestas", btn_del_lista: "🚫 BORRAR LISTA ENTERA",
-      lbl_bajas: "🔥 ACCIONES CRÍTICAS BAJAS", btn_aviso_baja: "📋 Enviar Aviso de Baja", btn_takeout: "📩 Enviar Acceso TakeOut", btn_baja_total: "🚫 EJECUTAR BAJA TOTAL", btn_recuperar: "♻️ Recuperar Cuenta (Lím. 20d)",
-      top_title: "Identidades Workspace", card_creator: "✨ Centro de Creación de Identidades", btn_cerrar_panel: "✖ Cerrar Panel", btn_cerrar_panel2: "✖ Cerrar Panel", lbl_tipo: "Tipo de Cuenta", lbl_licencia: "Licencia Asignada", lbl_alias: "Alias del Correo", lbl_dominio: "Dominio", lbl_nombre: "Nombre Real", lbl_apellido: "Apellidos", lbl_mail_manager: "Correo del Mánager / Responsable", btn_crear_exe: "🚀 Crear Cuenta en Workspace y Excel",
-      card_creator_list: "👥 Centro de Creación de Listas de Distribución", lbl_list_name: "Nombre Público de la Lista", lbl_list_dom: "Dominio de la Lista", lbl_list_alias: "Alias del Correo (Sufijo)", lbl_list_prev: "Previsualización Oficial", lbl_list_owner: "Correo del Owner 👑", lbl_list_members: "Miembros Iniciales", btn_crear_lista_exe: "🚀 Crear Lista Activa",
-      search_box: "🔍 BUSCADOR INTELIGENTE...", card_dist: "📈 Distribución General (Origen)", card_criterio: "📋 Cuentas por Criterio (Resumen)", th_origen: "Origen / Licencia", th_activas: "Activas", th_susp: "Susp.", th_total: "Total", card_lic: "💼 Stock de Licencias", th_prod: "Producto", th_estado: "Status", th_asig: "Asignadas", th_libres: "Libres / Límite",
-      card_salud: "🛡️ Salud de Identidades (Global)", met_eval: "Cuentas Evaluadas", met_man: "Con Mánager", met_hue: "Huérfanas", met_sus: "Suspendidas", card_crec: "🌱 Crecimiento de Identidades", met_mes: "Altas Este Mes", met_ant: "Mes Anterior", met_ten: "Tendencia",
-      lbl_filtrar: "📂 Filtrar / Agrupar por:", btn_descargar: "📥 Descargar Vista (Excel/CSV)", card_desglose: "📂 Desglose Completo de Usuarios", th_elige: "Elige un filtro o busca...", td_esperando: "Waiting for action...",
-      card_inventario: "👥 Inventario de Listas", btn_ref_listas: "🔄 Refrescar Listas", met_tot_list: "Total Listas", met_con_own: "Con Owner", met_sin_own: "Sin Owner", th_lista: "Lista / Grupo", th_email: "Email Corporativo", th_vol: "Volumen", th_own_est: "Owners / Estado", td_cargando: "Loading remote data...",
-      tt_sync: "Sincroniza estados reales y licencias individuales desde Workspace hacia el Excel.", tt_comandos: "Ver Script AD para el usuario/grupo seleccionado.", tt_alta: "Abre el formulario para dar de alta a un nuevo usuario en Google y Excel.", tt_licencia: "Asigna o cambia la licencia seleccionada al usuario en Workspace.", tt_reactivar: "Reactiva un usuario que haya sido suspendido previamente.", tt_suspender: "Suspende temporalmente el acceso del usuario seleccionado.", tt_clave: "Genera una nueva contraseña aleatoria para el usuario y la muestra en pantalla.", tt_escanear_m: "Comprueba si los mánagers indicados en el Excel existen realmente.", tt_upd_manager: "Aplica el mánager escrito arriba directamente en Google Workspace y en la Hoja Maestra (657).", tt_escanear_s: "Hace un barrido y auditoría de las cuentas de servicio.", tt_rastrear: "Lee las respuestas a las campañas enviadas a cuentas de servicio.", tt_auditar: "Comprueba si ya se enviaron avisos previos a estos usuarios.", tt_campana_s: "Lanza la campaña principal a los responsables de cuentas de servicio.", tt_recordatorio: "Envía un segundo aviso a quienes no respondieron la campaña.", tt_crear_lista: "Abre el panel para configurar y crear una lista de distribución nueva.", tt_add_member: "Añade al usuario seleccionado como miembro del grupo indicado.", tt_owner: "Convierte al usuario seleccionado en propietario (Owner) del grupo.", tt_del_member: "Expulsa al usuario seleccionado de la lista.", tt_camp_listas: "Inicia la auditoría preguntando a los miembros quién es el nuevo dueño de las listas huérfanas.", tt_rast_listas: "Procesa las respuestas y asigna automáticamente a los dueños voluntarios.", tt_del_lista: "Destruye y borra por completo el grupo de Workspace.", tt_aviso_baja: "Manda un correo al manager avisando que este empleado será dado de baja.", tt_takeout: "Envía las instrucciones al mánager para que descargue el histórico de correos.", tt_baja_total: "Borra la cuenta permanentemente y crea su alias de redirección.", tt_recuperar: "Restaura una cuenta que fue eliminada por error (Límite: 20 días).", tt_ref_listas: "Lee rápidamente el archivo Excel y actualiza las listas en el panel visual.", tt_actualizar_excel: "Ejecuta el proceso pesado de leer Google Workspace y volcar los bloques actualizados en el Excel.", tt_descargar: "Descarga en Excel la vista actual que tengas filtrada en pantalla.", lbl_mod_alias: "🏷️ Módulo de Alias (En vivo):", txt_sel_usuario: "Selecciona un usuario...", txt_lic_actual: "🔍 Licencia actual: Selecciona un usuario...", txt_ou_actual: "🔍 OU actual: Selecciona un usuario...", btn_mover_ou: "📦 Mover de OU", btn_cmd_ad: "💻 Comandos PowerShell (AD)", btn_bypass: "🆘 Bypass 2FA (Emergencia)", ph_nuevo_alias: "nuevo.alias", lbl_target_ou: "📂 Unidad Organizativa (Mover):", btn_renombrar: "✏️ Renombrar Lista", btn_purga: "🔥 Purga Masiva del Usuario", opt_seleciona: "-- Selecciona --", opt_destino: "-- Selecciona destino --"
-    },
-    en: {
-      lbl_ou_creador: "Organizational Unit (OU)",
-      side_title: "⚙️ Operational Modules", lbl_origen: "Source / Active Group:", lbl_user: "User / Target Email:", lbl_manager: "👤 Manager (Manual edit):", txt_takeout: "🔍 Click a user to view Takeout.", lbl_target_lic: "💼 License (Assign/Change):", btn_licencia: "💼 Change WS License",
-      btn_sync: "🔄 Sync Accounts", lbl_altas: "CREATION & MAINTENANCE", btn_alta: "✨ Create New User", btn_reactivar: "▶️ Reactivate Workspace", btn_suspender: "⏸️ Suspend Workspace", btn_clave: "🔑 Password Reset",
-      lbl_maestra: "GENERAL ACCOUNTS (MASTER)", btn_escanear_m: "🔎 Scan Managers (657)", btn_upd_manager: "👤 Assign Manager in WS", lbl_servicios: "SERVICE ACCOUNTS", btn_escanear_s: "🔎 Scan Workspace", btn_rastrear: "📩 Track Responses", btn_auditar: "🛡️ Audit Previous Sends", btn_campana_s: "📢 Launch First Campaign", btn_recordatorio: "🔔 Send Reminder",
-      lbl_listas: "DISTRIBUTION LISTS", btn_crear_lista: "✨ Create New List", btn_add_member: "➕ Add Member", btn_owner: "👑 Assign Owner", btn_del_member: "❌ Remove Member", btn_camp_listas: "📢 Orphaned Lists Campaign", btn_rast_listas: "🔍 Track Responses", btn_del_lista: "🚫 DELETE ENTIRE LIST",
-      lbl_bajas: "🔥 CRITICAL DELETION ACTIONS", btn_aviso_baja: "📋 Send Offboarding Notice", btn_takeout: "📩 Send TakeOut Access", btn_baja_total: "🚫 EXECUTE TOTAL DELETION", btn_recuperar: "♻️ Recover Account (20d limit)",
-      top_title: "Workspace Identities", card_creator: "✨ Identity Creation Center", btn_cerrar_panel: "✖ Close Panel", btn_cerrar_panel2: "✖ Close Panel", lbl_tipo: "Account Type", lbl_licencia: "Assigned License", lbl_alias: "Email Alias", lbl_dominio: "Domain", lbl_nombre: "First Name", lbl_apellido: "Last Name", lbl_mail_manager: "Manager Email", btn_crear_exe: "🚀 Create Account (Workspace & Excel)",
-      card_creator_list: "👥 Distribution List Creation Center", lbl_list_name: "Public List Name", lbl_list_dom: "List Domain", lbl_list_alias: "Email Alias (Suffix)", lbl_list_prev: "Official Preview", lbl_list_owner: "Owner Email 👑", lbl_list_members: "Initial Members", btn_crear_lista_exe: "🚀 Create Active List",
-      search_box: "🔍 SMART SEARCH...", card_dist: "📈 General Distribution (Source)", card_criterio: "📋 Accounts by Criteria", th_origen: "Source / License", th_activas: "Active", th_susp: "Susp.", th_total: "Total", card_lic: "💼 License Stock", th_prod: "Product", th_estado: "Status", th_asig: "Assigned", th_libres: "Available / Limit",
-      card_salud: "🛡️ Identity Health (Global)", met_eval: "Accounts Evaluated", met_man: "With Manager", met_hue: "Orphaned", met_sus: "Suspended", card_crec: "🌱 Identity Growth", met_mes: "New This Month", met_ant: "Previous Month", met_ten: "Trend",
-      lbl_filtrar: "📂 Filter / Group by:", btn_descargar: "📥 Download View (Excel/CSV)", card_desglose: "📂 Complete User Breakdown", th_elige: "Choose a filter or search...", td_esperando: "Waiting for action...",
-      card_inventario: "👥 List Inventory", btn_ref_listas: "🔄 Refresh Lists", met_tot_list: "Total Lists", met_con_own: "With Owner", met_sin_own: "No Owner", th_lista: "List / Group", th_email: "Corporate Email", th_vol: "Volume", th_own_est: "Owners / Status", td_cargando: "Loading remote data...",
-      tt_sync: "Sync real states and individual licenses from Workspace to Excel.", tt_comandos: "View AD Script for the selected user/group.", tt_alta: "Open form to register a new user.", tt_licencia: "Assigns or changes the selected license for the user in Workspace.", tt_reactivar: "Reactivate a suspended user.", tt_suspender: "Temporarily suspend selected user.", tt_clave: "Generate a new random password.", tt_escanear_m: "Check if managers in Excel actually exist.", tt_upd_manager: "Applies the manager written above directly in Google Workspace and Master Sheet (657).", tt_escanear_s: "Audit service accounts.", tt_rastrear: "Read responses to service account campaigns.", tt_auditar: "Check for previously sent notices.", tt_campana_s: "Launch main campaign to service account owners.", tt_recordatorio: "Send a reminder notice.", tt_crear_lista: "Open panel to create a new list.", tt_add_member: "Add user to the selected group.", tt_owner: "Make selected user Owner of the group.", tt_del_member: "Remove user from the list.", tt_camp_listas: "Start audit for orphaned lists.", tt_rast_listas: "Process responses and assign new owners.", tt_del_lista: "Completely delete the Workspace group.", tt_aviso_baja: "Email manager about upcoming deletion.", tt_takeout: "Send TakeOut instructions to manager.", tt_baja_total: "Permanently delete account and redirect alias.", tt_recuperar: "Restore a deleted account (20-day limit).", tt_ref_listas: "Quickly refresh lists from Excel.", tt_actualizar_excel: "Read Workspace and sync data to Excel.", tt_descargar: "Download the current filtered view.", lbl_mod_alias: "🏷️ Alias Module (Live):", txt_sel_usuario: "Select a user...", txt_lic_actual: "🔍 Current license: Select a user...", txt_ou_actual: "🔍 Current OU: Select a user...", btn_mover_ou: "📦 Move OU", btn_cmd_ad: "💻 PowerShell Commands (AD)", btn_bypass: "🆘 Bypass 2FA (Emergency)", ph_nuevo_alias: "new.alias", lbl_target_ou: "📂 Organizational Unit (Move):", btn_renombrar: "✏️ Rename List", btn_purga: "🔥 Massive User Purge", opt_seleciona: "-- Select --", opt_destino: "-- Select destination --"
-    },
-    pt: {
-      lbl_ou_creador: "Unidade Organizacional (OU)",
-      side_title: "⚙️ Módulos Operacionais", lbl_origen: "Origem / Grupo Ativo:", lbl_user: "Utilizador / Email Alvo:", lbl_manager: "👤 Manager (Edição manual):", txt_takeout: "🔍 Clique num utilizador para ver o Takeout.", lbl_target_lic: "💼 Licença (Atribuir/Mudar):", btn_licencia: "💼 Mudar Licença WS",
-      btn_sync: "🔄 Sincronizar Contas", lbl_altas: "CRIAÇÃO E MANUTENÇÃO", btn_alta: "✨ Criar Novo Utilizador", btn_reactivar: "▶️ Reativar Workspace", btn_suspender: "⏸️ Suspender Workspace", btn_clave: "🔑 Reset de Palavra-passe",
-      lbl_maestra: "CONTAS GERAIS (MASTER)", btn_escanear_m: "🔎 Verificar Managers (657)", btn_upd_manager: "👤 Atribuir Manager no WS", lbl_servicios: "CONTAS DE SERVIÇO", btn_escanear_s: "🔎 Verificar Workspace", btn_rastrear: "📩 Rastrear Respostas", btn_auditar: "🛡️ Auditar Envios Anteriores", btn_campana_s: "📢 Lançar Primeira Campanha", btn_recordatorio: "🔔 Enviar Lembrete",
-      lbl_listas: "LISTAS DE DISTRIBUIÇÃO", btn_crear_lista: "✨ Criar Nova Lista", btn_add_member: "➕ Adicionar Membro", btn_owner: "👑 Atribuir Owner", btn_del_member: "❌ Remover Membro", btn_camp_listas: "📢 Campanha Listas Órfãs", btn_rast_listas: "🔍 Rastrear Respostas", btn_del_lista: "🚫 APAGAR LISTA INTEIRA",
-      lbl_bajas: "🔥 AÇÕES CRÍTICAS DE EXCLUSÃO", btn_aviso_baja: "📋 Enviar Aviso de Saída", btn_takeout: "📩 Enviar Acesso TakeOut", btn_baja_total: "🚫 EXECUTAR EXCLUSÃO TOTAL", btn_recuperar: "♻️ Recuperar Conta (limite 20d)",
-      top_title: "Identidades Workspace", card_creator: "✨ Centro de Criação de Identidades", btn_cerrar_panel: "✖ Fechar Painel", btn_cerrar_panel2: "✖ Fechar Painel", lbl_tipo: "Tipo de Conta", lbl_licencia: "Licença Atribuída", lbl_alias: "Alias de Email", lbl_dominio: "Domínio", lbl_nombre: "Nome", lbl_apellido: "Apelido", lbl_mail_manager: "Email do Manager", btn_crear_exe: "🚀 Criar Conta (Workspace e Excel)",
-      card_creator_list: "👥 Centro de Criação de Listas", lbl_list_name: "Nome Público da Lista", lbl_list_dom: "Domínio da Lista", lbl_list_alias: "Alias de Email (Sufixo)", lbl_list_prev: "Pré-visualização Oficial", lbl_list_owner: "Email do Owner 👑", lbl_list_members: "Membros Iniciais", btn_crear_lista_exe: "🚀 Criar Lista Ativa",
-      search_box: "🔍 PESQUISA INTELIGENTE...", card_dist: "📈 Distribuição Geral (Origem)", card_criterio: "📋 Contas por Critério", th_origen: "Origem / Licença", th_activas: "Ativas", th_susp: "Susp.", th_total: "Total", card_lic: "💼 Stock de Licenças", th_prod: "Produto", th_estado: "Estado", th_asig: "Atribuídas", th_libres: "Livres / Limite",
-      card_salud: "🛡️ Saúde de Identidades (Global)", met_eval: "Contas Avaliadas", met_man: "Com Manager", met_hue: "Órfãs", met_sus: "Suspensas", card_crec: "🌱 Crescimento de Identidades", met_mes: "Novas este Mês", met_ant: "Mês Anterior", met_ten: "Tendência",
-      lbl_filtrar: "📂 Filtrar / Agrupar por:", btn_descargar: "📥 Descarregar Vista (Excel/CSV)", card_desglose: "📂 Detalhamento Completo", th_elige: "Escolha um filtro ou pesquise...", td_esperando: "A aguardar ação...",
-      card_inventario: "👥 Inventário de Listas", btn_ref_listas: "🔄 Atualizar Listas", met_tot_list: "Total de Listas", met_con_own: "Com Owner", met_sin_own: "Sem Owner", th_lista: "Lista / Grupo", th_email: "Email Corporativo", th_vol: "Volume", th_own_est: "Owners / Estado", td_cargando: "A carregar dados remotos...",
-      tt_sync: "Sincroniza estados e licenças do Workspace para o Excel.", tt_comandos: "Ver Script AD para o utilizador/grupo.", tt_alta: "Abre o formulário para criar um novo utilizador.", tt_licencia: "Atribui ou altera a licença selecionada no Workspace.", tt_reactivar: "Reativa um utilizador suspenso.", tt_suspender: "Suspende temporariamente o acesso.", tt_clave: "Gera uma nova palavra-passe aleatória.", tt_escanear_m: "Verifica se os managers no Excel existem.", tt_upd_manager: "Aplica o manager selecionado no Google Workspace e na Folha Mestra (657).", tt_escanear_s: "Audita contas de serviço.", tt_rastrear: "Lê respostas de campanhas de contas de serviço.", tt_auditar: "Verifica avisos anteriores.", tt_campana_s: "Lança campanha para donos de contas de serviço.", tt_recordatorio: "Envia um lembrete.", tt_crear_lista: "Abre painel para criar nova lista.", tt_add_member: "Adiciona o utilizador ao grupo.", tt_owner: "Torna o utilizador dono do grupo.", tt_del_member: "Remove o utilizador da lista.", tt_camp_listas: "Inicia auditoria para listas órfãs.", tt_rast_listas: "Processa respostas e atribui novos donos.", tt_del_lista: "Apaga completamente o grupo.", tt_aviso_baja: "Avisa o manager sobre exclusão.", tt_takeout: "Envia instruções de TakeOut.", tt_baja_total: "Apaga a conta permanentemente.", tt_recuperar: "Restaura conta apagada (limite 20 dias).", tt_ref_listas: "Atualiza listas rapidamente do Excel.", tt_actualizar_excel: "Lê o Workspace e atualiza o Excel.", tt_descargar: "Descarrega a vista filtrada atual.", lbl_mod_alias: "🏷️ Módulo de Alias (Ao vivo):", txt_sel_usuario: "Selecione um utilizador...", txt_lic_actual: "🔍 Licença atual: Selecione um utilizador...", txt_ou_actual: "🔍 OU atual: Selecione um utilizador...", btn_mover_ou: "📦 Mover de OU", btn_cmd_ad: "💻 Comandos PowerShell (AD)", btn_bypass: "🆘 Bypass 2FA (Emergência)", ph_nuevo_alias: "novo.alias", lbl_target_ou: "📂 Unidade Organizacional (Mover):", btn_renombrar: "✏️ Renomear Lista", btn_purga: "🔥 Purga Massiva do Utilizador", opt_seleciona: "-- Selecionar --", opt_destino: "-- Selecionar destino --"
-    }
-  };
-  function changeLanguage(lang) {
-    localStorage.setItem('gigas-lang', lang);
-    document.getElementById('lang-selector').value = lang;
-    document.querySelectorAll('[data-i18n]').forEach(function(el) {
-      var key = el.getAttribute('data-i18n');
-      if (langDict[lang] && langDict[lang][key]) {
-        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'search')) el.placeholder = langDict[lang][key];
-        else el.innerHTML = langDict[lang][key];
+  try {
+    var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Permisos_Panel");
+    if (hoja) {
+      var datos = hoja.getDataRange().getValues();
+      for (var i = 1; i < datos.length; i++) {
+        if (String(datos[i][0]).toLowerCase().trim() === emailActual) {
+          autorizado = true;
+          rol = datos[i][3] ? String(datos[i][3]).toUpperCase().trim() : "OPERADOR";
+          break;
+        }
       }
-    });
-    document.querySelectorAll('[data-i18n-title]').forEach(function(el) {
-      var keyTitle = el.getAttribute('data-i18n-title');
-      if (langDict[lang] && langDict[lang][keyTitle]) {
-        el.title = langDict[lang][keyTitle];
-      }
-    });
-  }
-
-  var IS_ADMIN_AUTHORIZED = false; var USER_EMAIL = "<?= userEmail ?>"; 
-  var datosGraficaGlobal = []; var historicoCrecimientoGlobal = [];
-  var baseCuentasGlobal = {headers: [], rows: []}; var baseServiciosGlobal = {headers: [], rows: []}; 
-  window.gTotal = 0; window.gCon = 0;
-  window.gSin = 0; window.gSusp = 0; 
-
-  google.charts.load('current', {'packages':['corechart']}); google.charts.setOnLoadCallback(iniciarAplicacion);
-
-  function iniciarAplicacion() { 
-    var savedLang = localStorage.getItem('gigas-lang') || 'es';
-    changeLanguage(savedLang);
-    if(localStorage.getItem('gigas-theme') === 'dark') {
-      document.body.classList.add('dark-mode'); 
-      var btn = document.getElementById('dark-mode-toggle'); 
-      if(btn) btn.innerText = '☀️';
     }
-    
-    document.querySelectorAll('.sidebar-section-header').forEach(function(header) {
-      header.addEventListener('click', function() {
-        header.parentElement.classList.toggle('collapsed');
-      });
-    });
-    showLog("🌐 Cargando datos operativos..."); 
-    
-    google.script.run.withSuccessHandler(function(ous) {
-      var ouSelect = document.getElementById('target-ou');
-      var ouCreador = document.getElementById('creador-ou');
-      
-      var html = "<option value='' data-i18n='opt_destino'>-- Selecciona destino --</option>";
-      
-      var htmlCreador = "";
-      ous.forEach(function(ou) { 
-        html += "<option value='" + ou + "'>" + ou + "</option>"; 
-        htmlCreador += "<option value='" + ou + "'>" + ou + "</option>"; 
-      });
- 
-      if (ouSelect) ouSelect.innerHTML = html;
-      if (ouCreador) ouCreador.innerHTML = htmlCreador;
-      
-      var lang = document.getElementById('lang-selector') ? document.getElementById('lang-selector').value : 'es';
-      changeLanguage(lang);
-      
-    }).withFailureHandler(function(e){ 
-      console.error("Fallo cargando OUs", e); 
-    }).webObtenerOUs();
-    if (USER_EMAIL !== "fernando.alcala@gigas.com") {
-      var btnSeguridad = document.getElementById('btn-seguridad-panel');
-      if(btnSeguridad) btnSeguridad.style.display = 'none';
-    }
-
-    document.getElementById('display-user-email').innerText = USER_EMAIL; 
-    document.getElementById('display-user-avatar').innerText = USER_EMAIL.charAt(0).toUpperCase();
-    google.script.run.withSuccessHandler(function(autorizado) { 
-        IS_ADMIN_AUTHORIZED = autorizado; 
-        cargarTodoElDashboard(false); 
-    }).withFailureHandler(function(e){ errAction("Error: " + e.message); }).comprobarRolUsuarioActivo();
-  }
+  } catch(e) {}
   
-  function toggleTheme() {
-    document.body.classList.toggle('dark-mode'); var btn = document.getElementById('dark-mode-toggle');
-    if (document.body.classList.contains('dark-mode')) { btn.innerText = '☀️'; localStorage.setItem('gigas-theme', 'dark'); } 
-    else { btn.innerText = '🌙'; localStorage.setItem('gigas-theme', 'light'); }
-    redibujarGrafica();
-  }
-  
-  function toggleSidebar() { document.getElementById('sidebar-panel').classList.toggle('collapsed'); setTimeout(redibujarGrafica, 320); }
-  function toggleCard(id) { var t = document.getElementById(id); t.classList.toggle('collapsed'); if (id === 'card-grafica' && !t.classList.contains('collapsed')) setTimeout(redibujarGrafica, 100); }
-  function mostrarLandingCreacion() { if(!verificarFiltroVisualHtml()) return; var card = document.getElementById('card-creador'); card.classList.remove('collapsed'); document.getElementById('scroll-container').scrollTo({ top: 0, behavior: 'smooth' }); document.getElementById('creador-alias').focus(); }
-  
-  function actualizarCamposCreador() { 
-    var tipo = document.getElementById('creador-tipo').value; 
-    var bN = document.getElementById('box-nombre');
-    var bA = document.getElementById('box-apellido'); var bM = document.getElementById('box-motivo'); 
-    if (tipo === "Servicio" || tipo === "Kayako") { bN.style.display = 'none'; bA.style.display = 'none'; bM.style.display = 'block'; } 
-    else { bN.style.display = 'block'; bA.style.display = 'block'; bM.style.display = 'none'; } 
-  }
+  return { autorizado: autorizado, rol: rol, email: emailActual };
+}
 
-  function actualizarPreviewEmail() { var alias = document.getElementById('creador-alias').value.trim().toLowerCase().replace(/\s+/g, ''); var dominio = document.getElementById('creador-dominio').value;
-    if (alias === "") alias = "alias.vacio"; document.getElementById('creador-preview').innerText = alias + "@" + dominio; }
-  function mostrarLandingCreacionLista() { if(!verificarFiltroVisualHtml()) return; document.getElementById('card-creador-lista').classList.remove('collapsed'); document.getElementById('scroll-container').scrollTo({ top: 0, behavior: 'smooth' }); document.getElementById('lista-nombre').focus(); }
-  function actualizarPreviewLista() { var alias = document.getElementById('lista-alias').value.trim().toLowerCase().replace(/\s+/g, ''); var dominio = document.getElementById('lista-dominio').value;
-    if (alias === "") alias = "lista.vacia"; document.getElementById('lista-preview').innerText = alias + "@" + dominio; }
-
-  function refrescarAliasEnPantalla(correo) {
-    var listDiv = document.getElementById('alias-live-list');
-    var lang = document.getElementById('lang-selector') ? document.getElementById('lang-selector').value : 'es';
-    listDiv.innerHTML = lang === 'pt' ? "⏳ Consultando alias no Workspace..." : (lang === 'en' ? "⏳ Checking aliases in Workspace..." : "⏳ Consultando alias en Workspace...");
-    google.script.run.withSuccessHandler(function(arrayAlias) {
-      if (!arrayAlias || arrayAlias.length === 0) {
-        listDiv.innerHTML = lang === 'pt' ? "<span style='color:#64748b; font-style:italic;'>Nenhum alias configurado</span>" : (lang === 'en' ? "<span style='color:#64748b; font-style:italic;'>No alias configured</span>" : "<span style='color:#64748b; font-style:italic;'>Ningún alias configurado</span>");
-        return;
+function obtenerOperadoresAutorizados() {
+  var operadores = ["fernando.alcala@gigas.com"];
+  try {
+    var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Permisos_Panel");
+    if (hoja) {
+      var datos = hoja.getDataRange().getValues();
+      for (var i = 1; i < datos.length; i++) {
+        if (datos[i][0]) operadores.push(String(datos[i][0]).toLowerCase().trim());
       }
-      var html = "";
-      arrayAlias.forEach(function(al) {
-        html += "<div class='alias-badge-item'><span>" + al + "</span><span class='btn-del-alias' onclick=\"lanzarEliminarAlias('" + al + "')\" title='Borrar alias'>×</span></div>";
-      });
-      listDiv.innerHTML = html;
-    }).webObtenerAliasUsuario(correo);
+    }
+  } catch(e) {}
+  return operadores;
+}
+
+function comprobarRolUsuarioActivo() { 
+  return obtenerOperadoresAutorizados().includes(Session.getActiveUser().getEmail().toLowerCase().trim());
+}
+
+function verificarPermisoEjecucion() { 
+  if (!comprobarRolUsuarioActivo()) {
+    throw new Error("Sin privilegios operativos de administración. Solicita acceso al SuperAdministrador.");
+  }
+}
+
+function verificarPermisoAdmin() {
+  var usuario = obtenerDetalleUsuarioActivo();
+  if (!usuario.autorizado || usuario.rol !== "ADMIN") {
+    throw new Error("🛑 BLOQUEO DE SEGURIDAD: Tu perfil de OPERADOR no tiene privilegios para ejecutar esta acción crítica en el servidor.");
+  }
+}
+
+function webAlternarPermisosPanel(emailObjetivo) {
+  verificarPermisoAdmin();
+  var ejecutor = Session.getActiveUser().getEmail().toLowerCase().trim();
+  var emailClean = emailObjetivo.toLowerCase().trim();
+  
+  if (emailClean === ejecutor) return "🛡️ No puedes quitarte los permisos a ti mismo.";
+  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hoja = ss.getSheetByName("Permisos_Panel");
+  
+  if (!hoja) {
+    hoja = ss.insertSheet("Permisos_Panel");
+    hoja.appendRow(["Correos Autorizados", "Añadido por", "Fecha", "Rol"]);
+    hoja.getRange("A1:D1").setFontWeight("bold").setBackground("#0f172a").setFontColor("#ffffff");
+    hoja.hideSheet(); 
   }
 
-  function lanzarAñadirAlias() {
-    if(!verificarFiltroVisualHtml()) return;
-    var u = document.getElementById('target-user').value.trim();
-    var nuevo = document.getElementById('nuevo-alias-input').value.trim();
-    if (!u || !nuevo) return errAction("Selecciona un usuario e introduce un alias.");
-    showLog("⏳ Añadiendo alias...");
-    google.script.run.withSuccessHandler(function(msg) {
-      document.getElementById('nuevo-alias-input').value = "";
-      endAction(msg);
-      refrescarAliasEnPantalla(u);
-    }).withFailureHandler(function(e){ errAction(e.message); }).webAñadirAliasUsuario(u, nuevo);
+  var datos = hoja.getDataRange().getValues();
+  var encontrado = false;
+  var filaBorrar = -1;
+
+  for (var i = 1; i < datos.length; i++) {
+    if (String(datos[i][0]).toLowerCase().trim() === emailClean) {
+      encontrado = true;
+      filaBorrar = i + 1;
+      break;
+    }
   }
 
-  function lanzarEliminarAlias(aliasTarget) {
-    if(!verificarFiltroVisualHtml()) return;
-    var u = document.getElementById('target-user').value.trim();
-    if (!confirm("🗑️ ¿ESTÁS SEGURO DE ELIMINAR ESTE ALIAS?\n\n👉 " + aliasTarget)) return;
-    showLog("⏳ Eliminando alias...");
-    google.script.run.withSuccessHandler(function(msg) {
-      endAction(msg);
-      refrescarAliasEnPantalla(u);
-    }).withFailureHandler(function(e){ errAction(e.message); }).webEliminarAliasUsuario(u, aliasTarget);
+  if (encontrado) {
+    hoja.deleteRow(filaBorrar);
+    registrarEnHistorial("REVOCAR ACCESO", "Se han quitado los permisos del panel a: " + emailClean);
+    return "🔴 Permisos REVOCADOS para " + emailClean;
+  } else {
+    var fechaHoy = Utilities.formatDate(new Date(), "Europe/Madrid", "dd/MM/yyyy HH:mm");
+    hoja.appendRow([emailClean, ejecutor, fechaHoy, "OPERADOR"]);
+    registrarEnHistorial("OTORGAR ACCESO", "Se ha dado acceso de OPERADOR al panel a: " + emailClean);
+    return "🟢 Permisos CONCEDIDOS a " + emailClean + ". Rol asignado: OPERADOR.";
   }
+}
 
-  function generarComandoAD() {
-      var u = document.getElementById('target-user').value.trim();
-      var g = document.getElementById('target-group').value.trim();
-      var l = document.getElementById('log');
-      var cmd = "# --- SCRIPT PARA ACTIVE DIRECTORY (GCDS) ---\n# Ejecuta esto en tu controlador de dominio para evitar que GCDS deshaga los cambios.\n";
-      var userAlias = u ? u.split('@')[0] : "usuario_ejemplo";
-      var groupAlias = g ? g.split('@')[0] : "grupo_ejemplo";
-      if(document.getElementById('card-creador').classList.contains('collapsed') === false && document.getElementById('creador-alias').value) {
-         var crA = document.getElementById('creador-alias').value;
-         var crD = document.getElementById('creador-dominio').value;
-         var crN = document.getElementById('creador-nombre').value;
-         var crAp = document.getElementById('creador-apellido').value;
-         cmd += "\n# Crear Usuario Nuevo:\nNew-ADUser -Name '" + crN + " " + crAp + "' -GivenName '" + crN + "' -Surname '" + crAp + "' -UserPrincipalName '" + crA + "@" + crD + "' -Path 'OU=Usuarios,DC=tu-dominio,DC=local' -Enabled $true\n";
+// =========================================================
+// 🏷️ MÓDULO DE GESTIÓN DE ALIAS EN CALIENTE
+// =========================================================
+
+function webObtenerAliasUsuario(userEmail) {
+  verificarPermisoEjecucion();
+  try {
+    var userObj = AdminDirectory.Users.get(userEmail.toLowerCase().trim(), { projection: 'full' });
+    return userObj.aliases || [];
+  } catch(e) {
+    return [];
+  }
+}
+
+function webAñadirAliasUsuario(userEmail, nuevoAlias) {
+  verificarPermisoEjecucion();
+  var emailClean = userEmail.toLowerCase().trim();
+  var aliasClean = nuevoAlias.toLowerCase().trim().replace(/\s+/g, '');
+  if (!aliasClean.includes("@")) {
+    var dominio = emailClean.split("@")[1];
+    aliasClean += "@" + dominio;
+  }
+  try {
+    AdminDirectory.Users.Aliases.insert({ alias: aliasClean }, emailClean);
+    registrarEnHistorial("AÑADIR ALIAS", "Alias " + aliasClean + " asignado a " + emailClean);
+    return "✅ Alias añadido correctamente a vuestro Workspace.";
+  } catch(e) {
+    throw new Error("Google rechazó el alias: " + e.message);
+  }
+}
+
+function webEliminarAliasUsuario(userEmail, aliasBorrar) {
+  verificarPermisoEjecucion();
+  var emailClean = userEmail.toLowerCase().trim();
+  var aliasClean = aliasBorrar.toLowerCase().trim();
+  try {
+    AdminDirectory.Users.Aliases.remove(emailClean, aliasClean);
+    registrarEnHistorial("ELIMINAR ALIAS", "Alias " + aliasClean + " borrado de " + emailClean);
+    return "🗑️ Alias eliminado con éxito de Workspace.";
+  } catch(e) {
+    throw new Error("No se pudo eliminar el alias: " + e.message);
+  }
+}
+
+// =========================================================
+// MOTOR PRINCIPAL
+// =========================================================
+
+function purificarDatos(matriz) {
+  if (!matriz || matriz.length === 0) return [];
+  var datosLimpios = [];
+  for (var i = 0; i < matriz.length; i++) {
+    var fila = matriz[i];
+    var filaVacia = true; var filaLimpia = [];
+    for (var j = 0; j < fila.length; j++) {
+      var celda = fila[j];
+      if (celda !== "" && celda !== null) filaVacia = false;
+      if (celda instanceof Date) {
+        filaLimpia.push(Utilities.formatDate(celda, "Europe/Madrid", "dd/MM/yyyy"));
       } else {
-         if(u) {
-            cmd += "\n# Crear Usuario:\nNew-ADUser -Name '" + userAlias + "' -UserPrincipalName '" + u + "' -Path 'OU=Usuarios,DC=tu-dominio,DC=local' -Enabled $true\n";
-            cmd += "\n# Suspender Usuario:\nDisable-ADAccount -Identity '" + userAlias + "'\n";
-            cmd += "\n# Borrar Usuario:\nRemove-ADUser -Identity '" + userAlias + "' -Confirm:$false\n";
-         }
-         if(g && g.includes('@')) {
-            var targetMember = u ? userAlias : "miembro_a_añadir";
-            cmd += "\n# Añadir Miembro a Lista:\nAdd-ADGroupMember -Identity '" + groupAlias + "' -Members '" + targetMember + "'\n";
-            cmd += "\n# Quitar Miembro de Lista:\nRemove-ADGroupMember -Identity '" + groupAlias + "' -Members '" + targetMember + "' -Confirm:$false\n";
-            cmd += "\n# Borrar Lista Entera:\nRemove-ADGroup -Identity '" + groupAlias + "' -Confirm:$false\n";
-         }
-         if(!u && (!g || !g.includes('@'))) {
-            cmd = "⚠️ Por favor, selecciona un usuario o una lista en el panel principal primero, o abre el panel de Creación, para generar el código exacto.";
-         }
+        var filaLinter = celda == null ? "" : celda.toString().trim();
+        filaLimpia.push(filaLinter);
       }
+    }
+    if (!filaVacia) datosLimpios.push(filaLimpia);
+  }
+  return datosLimpios;
+}
+
+function procesarEstructuraListas() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hojaListas = ss.getSheetByName("Inventario Listas Workspace") || ss.getSheetByName("Listas");
+  
+  var listasGigas = [];
+  var listasOni = [];
+  var fechaListas = "No sincronizado"; 
+  
+  var metricasGigas = { total: 0, conOwner: 0, sinOwner: 0 };
+  var metricasOni = { total: 0, conOwner: 0, sinOwner: 0 };
+  
+  if (hojaListas) {
+    var valZ1 = hojaListas.getRange("Z1").getValue();
+    if (valZ1) fechaListas = valZ1 instanceof Date ? Utilities.formatDate(valZ1, "Europe/Madrid", "dd/MM/yyyy HH:mm") : valZ1.toString();
+    
+    var data = purificarDatos(hojaListas.getDataRange().getValues());
+    if (data.length > 0) {
+      for (var f = 0; f < data.length; f++) {
+        var fila = data[f];
+        if (!fila[1] || !fila[1].toString().includes("@")) continue; 
+        
+        var emailLista = fila[1].toString().trim().toLowerCase();
+        var ownerStr = fila[3] ? fila[3].toString().trim() : "";
+        var nombreLista = fila[0] ? fila[0].toString().trim().toLowerCase() : "";
+        
+        var esOni = emailLista.includes("@oni.pt") || emailLista.includes(".pt@") || ownerStr.toLowerCase().includes("@oni.pt") || nombreLista.includes("portugal") || nombreLista.includes("oni");
+        
+        var metricasActivas = esOni ? metricasOni : metricasGigas;
+        var arrayDestino = esOni ? listasOni : listasGigas;
+        
+        metricasActivas.total++;
+        if (!ownerStr.includes("@")) metricasActivas.sinOwner++; else metricasActivas.conOwner++;
+        
+        var miembros = [];
+        for (var c = 4; c < fila.length; c++) { 
+          if (fila[c] !== "") {
+            var separados = fila[c].toString().split(/[\n,]+/);
+            for(var s = 0; s < separados.length; s++){
+              if(separados[s].trim() !== "") miembros.push(separados[s].trim());
+            }
+          } 
+        }
+        arrayDestino.push({ nombre: fila[0], email: fila[1], volumen: fila[2], owner: ownerStr, miembros: miembros });
+      }
+    }
+  }
+  return { 
+    listasGigas: listasGigas, 
+    listasOni: listasOni, 
+    metricasGigas: metricasGigas, 
+    metricasOni: metricasOni, 
+    fechaListas: fechaListas 
+  };
+}
+
+function motorSincronizarListasWorkspace(customerId) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hojaListas = ss.getSheetByName("Inventario Listas Workspace") || ss.getSheetByName("Listas");
+  if (!hojaListas) return "⚠️ Pestaña de listas no encontrada. ";
+
+  var pageToken;
+  var todasLasListas = [];
+  do {
+    var resGrupos = AdminDirectory.Groups.list({ customer: customerId, maxResults: 200, pageToken: pageToken });
+    if (resGrupos.groups) {
+      for (var i = 0; i < resGrupos.groups.length; i++) {
+        todasLasListas.push(resGrupos.groups[i]);
+      }
+    }
+    pageToken = resGrupos.nextPageToken;
+  } while (pageToken);
+
+  var datosExcel = [];
+  var maxColumnasRequeridas = 12;
+
+  for (var g = 0; g < todasLasListas.length; g++) {
+    var grupo = todasLasListas[g];
+    var emailGrupo = grupo.email;
+    var nombreGrupo = grupo.name || "";
+    var owner = "";
+    var miembrosNormales = [];
+    var volumen = 0;
+    var pageTokenMiembros;
+
+    try {
+      do {
+        var resMiembros = AdminDirectory.Members.list(emailGrupo, { maxResults: 200, pageToken: pageTokenMiembros });
+        if (resMiembros.members) {
+          for (var m = 0; m < resMiembros.members.length; m++) {
+            var miembro = resMiembros.members[m];
+            volumen++;
+            if (miembro.role === "OWNER") owner = miembro.email;
+            else miembrosNormales.push(miembro.email);
+          }
+        }
+        pageTokenMiembros = resMiembros.nextPageToken;
+      } while (pageTokenMiembros);
+    } catch(e) {}
+
+    var filaGrupo = [nombreGrupo, emailGrupo, volumen + " miembros", owner];
+    
+    var chunkSize = 20;
+    for (var i = 0; i < miembrosNormales.length; i += chunkSize) {
+      var chunk = miembrosNormales.slice(i, i + chunkSize);
+      filaGrupo.push(chunk.join(", "));
+    }
+    
+    while (filaGrupo.length < maxColumnasRequeridas) {
+      filaGrupo.push("");
+    }
+    
+    if (filaGrupo.length > maxColumnasRequeridas) {
+      maxColumnasRequeridas = filaGrupo.length;
+    }
+
+    datosExcel.push(filaGrupo);
+  }
+
+  for (var r = 0; r < datosExcel.length; r++) {
+    while (datosExcel[r].length < maxColumnasRequeridas) {
+      datosExcel[r].push("");
+    }
+  }
+
+  var ultimaFila = hojaListas.getLastRow();
+  var ultimaColumna = hojaListas.getLastColumn();
+  
+  if (ultimaFila > 1 && ultimaColumna > 0) {
+    hojaListas.getRange(2, 1, ultimaFila - 1, ultimaColumna).clearContent().setBackground(null);
+  }
+  
+  if (datosExcel.length > 0) {
+    hojaListas.getRange(2, 1, datosExcel.length, maxColumnasRequeridas).setValues(datosExcel);
+  }
+  
+  hojaListas.getRange("Z1").setValue(new Date());
+  
+  return "📋 Listas (" + todasLasListas.length + ") actualizadas. ";
+}
+
+function obtenerDatosDashboard() {
+  verificarPermisoEjecucion();
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hd = ss.getSheetByName("DashBoard") || ss.getSheets()[0]; 
+  var lic = [];
+  var catOri = []; var graf = [];
+  try {
+    var licData = hd.getRange(3, 1, 5, 5).getValues();
+    lic = purificarDatos(licData); 
+    for (var i = 0; i < lic.length; i++) { if (lic[i][3] && lic[i][3].includes("DETALLES")) lic[i][3] = ""; }
+    var oriData = hd.getRange(4, 6, 11, 5).getValues();
+    var ori = purificarDatos(oriData);
+    for (var i = 0; i < ori.length; i++) {
+      if (ori[i][0] && !String(ori[i][0]).includes("Dedicacion") && !String(ori[i][0]).toLowerCase().includes("total")) {
+        var activas = parseInt(ori[i][1]) || 0;       
+        var suspendidas = parseInt(ori[i][2]) || 0;   
+        var total = parseInt(ori[i][3]) || 0;
+        catOri.push({ concepto: ori[i][0], activas: activas, suspendidas: suspendidas, total: total });
+        graf.push([ori[i][0], total]);
+      }
+    }
+  } catch(e) {}
+  
+  var base = { headers: [], rows: [] };
+  var serv = { headers: [], rows: [] };
+  var hm = ss.getSheetByName("Hoja Maestra (657)");
+  if (hm) { 
+    var rd = purificarDatos(hm.getDataRange().getValues()); 
+    if (rd.length > 0) { base.headers = rd[0]; base.rows = rd.slice(1); } 
+  }
+  
+  var hs = ss.getSheetByName("Cuentas de servicio Gigas (139)") || ss.getSheetByName("Cuentas de servicio gigas (139)"); 
+  if (hs) { 
+    var rs = purificarDatos(hs.getDataRange().getValues());
+    if (rs.length > 0) { serv.headers = rs[0]; serv.rows = rs.slice(1); } 
+  }
+  
+  var dl = procesarEstructuraListas();
+  var actuales = 0; var anteriores = 0;
+  var historialAgrupado = {}; 
+  var mapaLogons = {};
+  var inactivas90 = 0; // CONTADOR FASE 5
+  
+  var asignadasStarter = 0;
+  var asignadasStandard = 0;
+  var asignadasPlus = 0;
+  var asignadasGemini = 0;
+  var conteoApps = {};
+  try {
+    var listaUsuarios = AdminDirectory.Users.list({domain: "gigas.com", maxResults: 1});
+    var customerIdReal = listaUsuarios.users[0].customerId;
+    var tokenApps;
+    do {
+      var resApps = AdminLicenseManager.LicenseAssignments.listForProduct("Google-Apps", customerIdReal, { maxResults: 500, pageToken: tokenApps });
+      if (resApps.items) {
+        for (var i = 0; i < resApps.items.length; i++) {
+          var sku = resApps.items[i].skuId;
+          conteoApps[sku] = (conteoApps[sku] || 0) + 1;
+        }
+      }
+      tokenApps = resApps.nextPageToken;
+    } while (tokenApps);
+
+    asignadasPlus = conteoApps["1010020020"] || 0;
+    asignadasStarter = conteoApps["1010020027"] || 0;
+    asignadasStandard = conteoApps["1010020026"] || 0;
+
+    var tokenGemini;
+    do {
+      try {
+        var resGemini = AdminLicenseManager.LicenseAssignments.listForProduct("101047", customerIdReal, { maxResults: 500, pageToken: tokenGemini });
+        if (resGemini.items) {
+          for (var i = 0; i < resGemini.items.length; i++) {
+             if (resGemini.items[i].skuId === "1010470001") asignadasGemini++;
+          }
+        }
+        tokenGemini = resGemini.nextPageToken;
+      } catch(e) { break; }
+    } while (tokenGemini);
+
+    var pageToken;
+    var hoy = new Date();
+    var mesActual = hoy.getMonth(); var anioActual = hoy.getFullYear();
+    var mesAnterior = mesActual === 0 ? 11 : mesActual - 1;
+    var anioAnterior = mesActual === 0 ? anioActual - 1 : anioActual;
+    
+    do {
+      var response = AdminDirectory.Users.list({ customer: customerIdReal, maxResults: 500, projection: 'basic', pageToken: pageToken });
+      if (response.users) {
+        for (var i = 0; i < response.users.length; i++) {
+          var fechaCreacion = response.users[i].creationTime ? new Date(response.users[i].creationTime) : hoy;
+          
+          if (response.users[i].creationTime) {
+            if (fechaCreacion.getFullYear() === anioActual && fechaCreacion.getMonth() === mesActual) actuales++;
+            else if (fechaCreacion.getFullYear() === anioAnterior && fechaCreacion.getMonth() === mesAnterior) anteriores++;
+            var keyMes = fechaCreacion.getFullYear() + "-" + ("0" + (fechaCreacion.getMonth() + 1)).slice(-2);
+            if (!historialAgrupado[keyMes]) historialAgrupado[keyMes] = 0;
+            historialAgrupado[keyMes]++;
+          }
+          
+          var loginTime = response.users[i].lastLoginTime;
+          var valLogin = "Nunca ha iniciado sesión";
+          var inactivoLogon = false;
+          
+          if (loginTime && loginTime !== "1970-01-01T00:00:00.000Z") {
+            var d = new Date(loginTime);
+            valLogin = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear();
+            
+            // FASE 5: Lógica de más de 90 días sin loguear
+            if (Math.floor((hoy.getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) > 90) {
+               inactivoLogon = true;
+            }
+          } else {
+             // Si nunca ha entrado, pero se creó hace más de 90 días, también cuenta como inactivo
+             if (Math.floor((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24)) > 90) {
+               inactivoLogon = true;
+             }
+          }
+          
+          // Solo contamos las inactivas si no están ya suspendidas (para evitar ruido)
+          if (inactivoLogon && !response.users[i].suspended) {
+             inactivas90++;
+          }
+          
+          mapaLogons[response.users[i].primaryEmail.toLowerCase()] = { fecha: valLogin, inactivo: inactivoLogon };
+        }
+      }
+      pageToken = response.nextPageToken;
+    } while (pageToken);
+  } catch(e) { actuales = "Error"; anteriores = "Error"; }
+
+  var historialKeys = Object.keys(historialAgrupado).sort();
+  if (historialKeys.length > 12) historialKeys = historialKeys.slice(historialKeys.length - 12);
+  var graficaHistorico = [];
+  for (var k = 0; k < historialKeys.length; k++) {
+    var partes = historialKeys[k].split("-");
+    var mesLabel = partes[1] + "/" + partes[0].substring(2); 
+    graficaHistorico.push([mesLabel, historialAgrupado[historialKeys[k]]]);
+  }
+
+  // FASE 5: Añadimos columna virtual de inactividad
+  if (base.headers.length > 0) {
+    var emailIdx = -1; var logonIdx = -1; var inacIdx = -1;
+    for(var h = 0; h < base.headers.length; h++) {
+       var hl = String(base.headers[h]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+       if (hl.includes("email")) emailIdx = h;
+       if (hl.includes("logon") || hl.includes("sesion") || hl.includes("inicio")) logonIdx = h;
+       if (hl.includes("alerta") || hl.includes("inactividad")) inacIdx = h;
+    }
+    if (logonIdx === -1) { base.headers.push("Último Logon"); logonIdx = base.headers.length - 1; }
+    if (inacIdx === -1) { base.headers.push("Alerta Inactividad"); inacIdx = base.headers.length - 1; }
+    
+    for (var r = 0; r < base.rows.length; r++) {
+      var email = emailIdx > -1 ? String(base.rows[r][emailIdx]).toLowerCase().trim() : "";
+      var dataLogon = mapaLogons[email] || { fecha: "No encontrado en Workspace", inactivo: false };
       
-      l.innerHTML = getCloseBtn() + "<strong>💻 Snippets PowerShell (AD)</strong><br><textarea readonly style='width:100%; height:180px; margin-top:10px; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:4px; padding:10px; font-family:monospace; font-size:12px; outline:none; resize:none;' onclick='this.select()'>" + cmd + "</textarea>";
-      l.style.backgroundColor = "#1e293b";
-      l.style.display = 'block';
+      base.rows[r][logonIdx] = dataLogon.fecha; 
+      base.rows[r][inacIdx] = dataLogon.inactivo ? "Inactiva >90 días" : "Activa / Reciente"; 
+    }
   }
 
-  function ejecutarCreacionLista() {
-    if(!verificarFiltroVisualHtml()) return;
-    var datos = { nombre: document.getElementById('lista-nombre').value, alias: document.getElementById('lista-alias').value, dominio: document.getElementById('lista-dominio').value, owner: document.getElementById('lista-owner').value, miembros: document.getElementById('lista-miembros').value };
-    if (!datos.nombre || !datos.alias) return errAction("Rellena Nombre y Alias de la lista.");
-    showLog("⏳ Solicitando creación de grupo...");
-    google.script.run.withSuccessHandler(function(res) { if (res.exito) { endAction(res.msg); document.getElementById('lista-nombre').value = ""; document.getElementById('lista-alias').value = ""; document.getElementById('lista-owner').value = ""; document.getElementById('lista-miembros').value = ""; document.getElementById('card-creador-lista').classList.add('collapsed'); lanzarRefrescarSoloListas(); } else { errAction(res.error); } }).withFailureHandler(function(e){ errAction(e.message); }).webCrearListaDistribucion(datos);
+  lic = [
+    ["✨ Gemini Enterprise (versión antigua)", "Activas", "Asignadas: " + asignadasGemini, "Precio del distribuidor", "∞"],
+    ["💼 Google Workspace Business Starter", "Activas", "Asignadas: " + asignadasStarter, "Precio del distribuidor", "300"],
+    ["🚀 Google Workspace Enterprise Plus", "Activas", "Asignadas: " + asignadasPlus, "Precio del distribuidor", "10"],
+    ["📊 Google Workspace Enterprise Standard", "Activas", "Asignadas: " + asignadasStandard, "Precio del distribuidor", "554"]
+  ];
+  
+  return JSON.stringify({ 
+    licencias: lic, origen: catOri, grafica: graf, listas: dl.listas, 
+    fechaSincro: dl.fechaListas, metricasGrupos: dl.metricasGrupos, 
+    baseCuentas: base, baseServicios: serv, 
+    crecimiento: { actual: actuales, anterior: anteriores, historico: graficaHistorico },
+    inactivas90: inactivas90 // FASE 5: Pasamos el dato al UI
+  });
+}
+
+function webResetearClavePorOlvido(e) { 
+  verificarPermisoEjecucion(); 
+  var p = Math.random().toString(36).slice(-10) + "Gigs26!"; 
+  AdminDirectory.Users.update({ password: p, changePasswordAtNextLogin: true }, e.trim());
+  return "🔑 NUEVA CLAVE: " + p; 
+}
+
+function webEjecutarFlujoBajaTotal(correoBaja, managerDestino, crearAlias, transferirDrive, destinoDrive) {
+  verificarPermisoAdmin();
+  var semaforo = LockService.getScriptLock();
+  try {
+    semaforo.waitLock(30000); // 30 segundos de espera máxima si está ocupado
+  } catch (e) {
+    throw new Error("⚠️ El sistema está muy ocupado sincronizando el Excel. Por favor, espera un minuto y vuelve a intentarlo.");
   }
 
-  function ejecutarCreacionAvanzada() {
-    if(!verificarFiltroVisualHtml()) return;
-    var datos = { 
-      tipo: document.getElementById('creador-tipo').value, 
-      licencia: document.getElementById('creador-licencia').value, 
-      ou: document.getElementById('creador-ou').value,
-      alias: document.getElementById('creador-alias').value, 
-      dominio: document.getElementById('creador-dominio').value, 
-      nombre: document.getElementById('creador-nombre').value, 
-      apellido: document.getElementById('creador-apellido').value, 
-      manager: document.getElementById('creador-manager').value, 
-      motivo: document.getElementById('creador-motivo').value
+  try {
+    var msgWorkspace = "";
+    var msgExcel = "";
+    var correoBajaClean = correoBaja.toLowerCase().trim();
+    var managerClean = managerDestino ? managerDestino.toLowerCase().trim() : "";
+    var destinoDriveClean = destinoDrive ? destinoDrive.toLowerCase().trim() : "";
+
+    if (transferirDrive && destinoDriveClean && destinoDriveClean.includes("@")) {
+      try {
+        ejecutarTransferenciaDrive(correoBajaClean, destinoDriveClean);
+        msgWorkspace += "Propiedad de Google Drive transferida con éxito a " + destinoDriveClean + ". ";
+      } catch (eDrive) {
+        throw new Error("Abortando baja crítica por seguridad: " + eDrive.message);
+      }
+    }
+
+    try {
+      AdminDirectory.Users.remove(correoBajaClean);
+      msgWorkspace += "La cuenta ha sido eliminada de Workspace.";
+      
+      if (crearAlias && managerClean) {
+        Utilities.sleep(8000); 
+        try {
+          AdminDirectory.Users.Aliases.insert({ alias: correoBajaClean }, managerClean);
+          msgWorkspace += " Alias creado en " + managerClean + ".";
+        } catch (eAlias) {
+          Utilities.sleep(5000);
+          try {
+            AdminDirectory.Users.Aliases.insert({ alias: correoBajaClean }, managerClean);
+            msgWorkspace += " Alias creado en " + managerClean + " (intento 2).";
+          } catch (eAlias2) {
+            msgWorkspace += " (Fallo al crear alias: " + eAlias2.message + ").";
+          }
+        }
+      }
+    } catch (eWS) {
+      throw new Error("Fallo al eliminar de Workspace: " + eWS.message);
+    }
+
+    try {
+      var ss = SpreadsheetApp.getActiveSpreadsheet();
+      var hoja = ss.getSheetByName("Hoja Maestra (657)") || ss.getSheets()[0];
+      var datos = hoja.getDataRange().getValues();
+      var filasBorradas = 0;
+      if (datos.length >= 2) {
+        var cabeceras = datos[0].map(function(h) { return String(h).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); });
+        var idxEmail = cabeceras.indexOf("email address") > -1 ? cabeceras.indexOf("email address") : (cabeceras.indexOf("email address [required]") > -1 ? cabeceras.indexOf("email address [required]") : cabeceras.indexOf("email"));
+        if (idxEmail !== -1) {
+          for (var f = datos.length - 1; f >= 1; f--) {
+            if (String(datos[f][idxEmail]).toLowerCase().trim() === correoBajaClean) {
+              hoja.deleteRow(f + 1);
+              filasBorradas++;
+            }
+          }
+        }
+      }
+      msgExcel = " Excel purgado (" + filasBorradas + " fila).";
+    } catch (eEx) {
+      msgExcel = " (Aviso Excel: " + eEx.message + ").";
+    }
+
+    var logDrive = transferirDrive ? destinoDriveClean : "No transferido";
+    registrarEnHistorial("BAJA TOTAL", "Cuenta: " + correoBajaClean + " | Alias a: " + (managerClean || "Ninguno") + " | Drive a: " + logDrive);
+    
+    var usuarioAD = correoBajaClean.split("@")[0];
+    var comandosAD = "# 1. Deshabilitar cuenta AD\nDisable-ADAccount -Identity '" + usuarioAD + "'\n\n# 2. Borrar cuenta AD\nRemove-ADUser -Identity '" + usuarioAD + "' -Confirm:$false";
+    var snippetHTML = "<br><br><b style='color:#fff;'>💻 Snippet PowerShell (AD) - GCDS:</b><br><textarea readonly style='width:100%; height:80px; margin-top:6px; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:4px; padding:10px; font-family:monospace; font-size:13px; outline:none; resize:none;' onclick='this.select()'>" + comandosAD + "</textarea>";
+    
+    return msgWorkspace + msgExcel + snippetHTML;
+  } finally {
+    semaforo.releaseLock();
+  }
+}
+
+function ejecutarTransferenciaDrive(correoViejo, correoNuevo) {
+  try {
+    var idViejo = AdminDirectory.Users.get(correoViejo).id;
+    var idNuevo = AdminDirectory.Users.get(correoNuevo).id;
+
+    var url = "https://www.googleapis.com/admin/datatransfer/v1/transfers";
+    var payload = {
+      "oldOwnerUserId": idViejo,
+      "newOwnerUserId": idNuevo,
+      "applicationDataTransfers": [
+        {
+          "applicationId": "55656082996",
+          "applicationTransferParams": [
+            {
+              "key": "PRIVACY_LEVEL",
+              "value": ["SHARED", "PRIVATE"]
+            }
+          ]
+        }
+      ]
     };
-    if (!datos.alias || datos.alias.trim() === "") return errAction("Escribe un alias para el correo.");
-    
-    mostrarAvisoFlotante("⏳ Desplegando cuenta en Google Workspace...", "info");
-    
-    google.script.run.withSuccessHandler(function(res) {
-      if (res.exito) {
-        
-        var l = document.getElementById('log'); l.style.backgroundColor = "#10b981"; 
-        var mLic = res.msgLic ? "<span style='display:block; margin-top:8px; font-size:12px; color:#fef3c7;'> " + res.msgLic + "</span>" : "";
-        
-        // BOTONES DE DECISIÓN AL CREAR CUENTA
-        var btnCrearOtra = "<button onclick=\"document.getElementById('log').style.display='none'; document.getElementById('creador-alias').value=''; document.getElementById('creador-nombre').value=''; document.getElementById('creador-apellido').value=''; document.getElementById('creador-alias').focus();\" style='background:#f59e0b; color:white; border:none; padding:8px 14px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:bold; width:100%; margin-bottom:8px; transition: opacity 0.2s;'>➕ Crear otra cuenta (Sin sincronizar aún)</button>";
-        
-        var btnSinc = "<button onclick=\"document.getElementById('log').style.display='none'; document.getElementById('card-creador').classList.add('collapsed'); ejecutarActualizarGrupos();\" style='background:#334155; color:white; border:none; padding:8px 14px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:bold; width:100%; transition: background 0.2s;'>🔄 Sincronizar BBDD ahora (~5 min)</button>";
-        
-        l.innerHTML = "<strong>✅ USUARIO CREADO</strong><br><br><b>Email:</b> " + res.email + "<br><b>Destino:</b> " + res.hoja + mLic + "<br><div style='display:flex; gap:8px; align-items:center; margin-bottom:12px; background:#0f172a; padding:10px; border-radius:6px; border:1px solid #334155;'><input type='text' id='pass-temp-input' value='" + res.pass + "' readonly style='background:transparent; color:#38bdf8; border:none; font-family:monospace; font-size:15px; font-weight:bold; width:100%; outline:none; pointer-events:all;' /><button onclick='copiarClaveAlPortapapeles()' style='background:#0284c7; color:white; border:none; padding:6px 10px; border-radius:4px; font-size:12px; cursor:pointer; font-weight:bold; width:auto; margin:0;'>📋 Copiar</button></div><span id='copy-toast' style='display:none; font-size:12px; color:#34d399; font-weight:bold;'>¡Copiado! 🚀<br><br></span>" + btnCrearOtra + btnSinc;
-        l.style.display = 'block';
-        appendToLogHistory("Usuario creado: " + res.email + ". " + (res.msgLic||""), "SUCCESS");
 
-        mostrarAvisoFlotante("✅ Usuario creado: " + res.email + " (Clave en pantalla)", "exito");
-        
-        // 1. PRIMERO CAPTURAMOS LOS DATOS EXTRAS (Antes de vaciar)
-        var datosExtra = {
-          email: res.email, 
-          nombre: document.getElementById('creador-nombre') ? document.getElementById('creador-nombre').value.trim() : "",
-          apellidos: document.getElementById('creador-apellido') ? document.getElementById('creador-apellido').value.trim() : "",
-          puesto: document.getElementById('creador-puesto') ? document.getElementById('creador-puesto').value.trim() : "",
-          departamento: document.getElementById('creador-departamento') ? document.getElementById('creador-departamento').value.trim() : "",
-          telefono: document.getElementById('creador-telefono') ? document.getElementById('creador-telefono').value.trim() : "",
-          emailPersonal: document.getElementById('creador-email-personal') ? document.getElementById('creador-email-personal').value.trim() : "",
-          grupo: document.getElementById('creador-grupo') ? document.getElementById('creador-grupo').value.trim() : ""
+    var opciones = {
+      "method": "post",
+      "contentType": "application/json",
+      "headers": {
+        "Authorization": "Bearer " + ScriptApp.getOAuthToken()
+      },
+      "payload": JSON.stringify(payload),
+      "muteHttpExceptions": true
+    };
+
+    var respuesta = UrlFetchApp.fetch(url, opciones);
+    var resCode = respuesta.getResponseCode();
+    
+    if (resCode !== 200 && resCode !== 201) {
+      throw new Error("Error en servidor Google Data Transfer (" + resCode + "): " + respuesta.getContentText());
+    }
+    return true;
+  } catch (e) {
+    registrarEnHistorial("FALLO TRANSFERENCIA DRIVE", "Origen: " + correoViejo + " | Destino: " + correoNuevo + " | Detalle: " + e.message);
+    throw new Error("La API de transferencia falló: " + e.message);
+  }
+}
+
+function webHacerOwnerLista(g, u) { 
+  verificarPermisoEjecucion();
+  try { AdminDirectory.Members.insert({ email: u, role: "OWNER" }, g); } catch (e) { AdminDirectory.Members.update({email: u, role: "OWNER"}, g, u); }
+  
+  registrarEnHistorial("ASIGNAR OWNER", "Usuario: " + u + " promovido a OWNER de la lista: " + g);
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Inventario Listas Workspace") || SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Listas");
+  if(hoja) {
+    var datos = hoja.getRange("A1:D" + hoja.getLastRow()).getValues();
+    for(var f=0; f<datos.length; f++){ if(datos[f][1] && datos[f][1].toString().toLowerCase().trim() === g.toLowerCase().trim()){ hoja.getRange(f+1, 4).setValue(u); break; } }
+  }
+  return "👑 " + u + " ha sido nombrado Owner.";
+}
+
+function webEnviarCampanaHuerfanas() {
+  verificarPermisoAdmin(); 
+  var total = 0; var saltados = 0;
+  var hojaListas = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Inventario Listas Workspace") || SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Listas");
+  var datos = hojaListas.getDataRange().getValues(); var fechaHoy = Utilities.formatDate(new Date(), "Europe/Madrid", "dd/MM/yyyy");
+  for (var f = 0; f < datos.length; f++) {
+    var fila = datos[f];
+    if (!fila[1] || !fila[1].toString().includes("@")) continue;
+    var emailLista = fila[1].toString().trim(); var ownerStr = fila[3] ? fila[3].toString().trim() : "";
+    if (ownerStr.includes("Enviado") || ownerStr.includes("Lanzada")) { saltados++; continue; }
+    if (!ownerStr.includes("@")) { MailApp.sendEmail(emailLista, "🔍 Auditoría IT: Identificación de Responsable [" + emailLista + "] [REF-HUERFANA]", "Contestar rellenando esta línea:\n\nCorreo del owner: ");
+    hojaListas.getRange(f + 1, 4).setValue("⏳ Enviado el " + fechaHoy); total++;
+    }
+  }
+  return "Campaña procesada. Enviados: " + total;
+}
+
+function webProcesarRespuestasHuerfanas() {
+  verificarPermisoAdmin();
+  var hilos = GmailApp.search('subject:"[REF-HUERFANA]" is:unread', 0, 30); if (hilos.length === 0) return "Sin respuestas.";
+  var hojaListas = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Inventario Listas Workspace") || SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Listas");
+  var act = 0;
+  for (var i = 0; i < hilos.length; i++) {
+    var msg = hilos[i].getMessages()[hilos[i].getMessages().length - 1];
+    var cuerpo = msg.getPlainBody();
+    var matchLista = msg.getSubject().match(/\[([^\]]+)\]/); if (!matchLista) { hilos[i].markRead(); continue; }
+    var emailLista = matchLista[1].toLowerCase().trim();
+    var matchOwner = cuerpo.match(/Correo\s*del\s*owner:\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i);
+    if (matchOwner) {
+      var nO = matchOwner[1].toLowerCase().trim();
+      try { 
+        AdminDirectory.Members.insert({ email: nO, role: "OWNER" }, emailLista); 
+        var datos = hojaListas.getDataRange().getValues();
+        for (var f = 0; f < datos.length; f++) { 
+          if (datos[f][1] && datos[f][1].toString().toLowerCase().trim() === emailLista) { 
+            hojaListas.getRange(f + 1, 4).setValue(nO); break; 
+          } 
+        } 
+        act++; 
+      } catch (e) {}
+    }
+    hilos[i].markRead();
+  }
+  return "Sincronizados: " + act;
+}
+
+function webComprobarYRecuperar(correo, targetOu) { 
+  verificarPermisoAdmin();
+  var correoClean = correo.toLowerCase().trim();
+  var ouDestino = targetOu ? targetOu : "/";
+  
+  var listaUsuarios = AdminDirectory.Users.list({domain: "gigas.com", maxResults: 1});
+  var customerIdReal = listaUsuarios.users[0].customerId;
+  
+  var pageToken;
+  var idParaRecuperar = null;
+  do {
+    var response = AdminDirectory.Users.list({ customer: customerIdReal, showDeleted: true, maxResults: 500, pageToken: pageToken });
+    if (response.users) {
+      for (var i = 0; i < response.users.length; i++) {
+        if (response.users[i].primaryEmail.toLowerCase().trim() === correoClean) {
+          idParaRecuperar = response.users[i].id; 
+          break;
+        }
+      }
+    }
+    if (idParaRecuperar) break;
+    pageToken = response.nextPageToken;
+  } while (pageToken);
+
+  if (!idParaRecuperar) {
+    throw new Error("No se encuentra el usuario en la papelera (puede que ya esté recuperado o hayan pasado los 20 días).");
+  }
+
+  try {
+    AdminDirectory.Users.undelete({orgUnitPath: ouDestino}, idParaRecuperar); 
+    registrarEnHistorial("RECUPERAR CUENTA", "Restaurada: " + correoClean + " en OU: " + ouDestino);
+    return "✅ Cuenta restaurada con éxito en la OU: " + ouDestino; 
+  } catch (e) {
+    throw new Error("Fallo al restaurar en Workspace: " + e.message);
+  }
+}
+
+function webCambiarEstadoCuenta(u, s) { 
+  verificarPermisoEjecucion(); 
+  AdminDirectory.Users.update({ suspended: s }, u); 
+  return "Estado actualizado."; 
+}
+
+function webBotonActualizarGrupos() {
+  verificarPermisoEjecucion();
+  
+  // 🚥 INYECTAMOS EL SEMÁFORO
+  var semaforo = LockService.getScriptLock();
+  try {
+    semaforo.waitLock(30000); // Intenta esperar 30 segundos
+  } catch (e) {
+    return "⚠️ Error: El sistema de la Hoja de Excel está bloqueado porque alguien más está escribiendo ahora mismo. Por favor, inténtalo de nuevo en unos minutos.";
+  }
+  
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var hoja = ss.getSheetByName("Hoja Maestra (657)");
+    var hojaDash = ss.getSheetByName("DashBoard") || ss.getSheets()[0];
+    if (!hoja) return "Error: No se encuentra la pestaña 'Hoja Maestra (657)'";
+    
+    var msgListas = "";
+    var mapaWS = {};
+    var conteoLicencias = {}; 
+    var pageToken;
+
+    try {
+      var listaUsuarios = AdminDirectory.Users.list({domain: "gigas.com", maxResults: 1});
+      var customerIdReal = listaUsuarios.users[0].customerId;
+
+      try {
+        msgListas = motorSincronizarListasWorkspace(customerIdReal);
+      } catch (eListas) {
+        msgListas = "⚠️ Falló Listas: " + eListas.message + ". ";
+      }
+
+      do {
+        var response = AdminDirectory.Users.list({ customer: customerIdReal, maxResults: 500, projection: 'full', pageToken: pageToken });
+        if (response.users) {
+          for (var i = 0; i < response.users.length; i++) {
+            var u = response.users[i];
+            var emailClean = u.primaryEmail.toLowerCase().trim();
+            var mng = "no tiene";
+            if (u.relations) {
+              for (var j=0; j<u.relations.length; j++) {
+                if (u.relations[j].type === "manager") { mng = u.relations[j].value.trim(); break; }
+              }
+            }
+            mapaWS[emailClean] = {
+              status: u.suspended ? "Suspended" : "Active",
+              manager: mng,
+              givenName: u.name ? u.name.givenName : "",
+              familyName: u.name ? u.name.familyName : "",
+              visitado: false,
+              licencia: "Cloud Identity Free", // Valor por defecto
+              ou: u.orgUnitPath || "/"
+            };
+          }
+        }
+        pageToken = response.nextPageToken;
+      } while (pageToken);
+
+      var pageTokenLic;
+      var nameMapSku = {
+        "1010020027": "Google Workspace Business Starter",
+        "1010020026": "Google Workspace Enterprise Standard",
+        "1010020020": "Google Workspace Enterprise Plus"
+      };
+      do {
+        var resLic = AdminLicenseManager.LicenseAssignments.listForProduct("Google-Apps", customerIdReal, { maxResults: 500, pageToken: pageTokenLic });
+        if (resLic.items) {
+          for (var l = 0; l < resLic.items.length; l++) {
+            var item = resLic.items[l];
+            var sku = item.skuId;
+            var emailUser = item.userId.toLowerCase().trim();
+            conteoLicencias[sku] = (conteoLicencias[sku] || 0) + 1;
+            if (nameMapSku[sku] && mapaWS[emailUser]) {
+              mapaWS[emailUser].licencia = nameMapSku[sku];
+            }
+          }
+        }
+        pageTokenLic = resLic.nextPageToken;
+      } while (pageTokenLic);
+
+    } catch(e) {
+      return "Error al conectar con Google Workspace: " + e.message;
+    }
+
+    var datos = hoja.getDataRange().getValues();
+    var cabeceras = datos[0].map(function(h) { return String(h).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); });
+    
+    var idxEmail = cabeceras.indexOf("email address [required]");
+    if (idxEmail === -1) idxEmail = cabeceras.indexOf("email address"); if (idxEmail === -1) idxEmail = cabeceras.indexOf("email");
+    var idxStatus = cabeceras.indexOf("status [read only]"); if (idxStatus === -1) idxStatus = cabeceras.indexOf("status"); if (idxStatus === -1) idxStatus = cabeceras.indexOf("estado");
+    var idxManager = cabeceras.indexOf("manager"); if (idxManager === -1) idxManager = cabeceras.indexOf("responsable");
+    var idxOu = cabeceras.indexOf("ou"); if (idxOu === -1) idxOu = cabeceras.indexOf("unidad organizativa"); if (idxOu === -1) idxOu = cabeceras.indexOf("orgunit");
+
+    var idxLicencia = -1;
+    for (var h = 0; h < cabeceras.length; h++) {
+      if (cabeceras[h].includes("licencia")) { idxLicencia = h; break; }
+    }
+    if (idxLicencia === -1) idxLicencia = 8; 
+
+    var filasBorradas = 0;
+    var contadorCambiosEstado = 0;
+    var contadorCambiosLicencia = 0;
+    var contadorCambiosOu = 0;
+
+    if (idxEmail !== -1) {
+      for (var f = datos.length - 1; f >= 1; f--) {
+        var emailCell = String(datos[f][idxEmail]).toLowerCase().trim();
+        if (emailCell.includes("@")) {
+          if (!mapaWS[emailCell]) {
+            hoja.deleteRow(f + 1);
+            filasBorradas++;
+          } else {
+            mapaWS[emailCell].visitado = true;
+            if (idxStatus !== -1 && String(datos[f][idxStatus]).trim() !== mapaWS[emailCell].status) {
+              hoja.getRange(f + 1, idxStatus + 1).setValue(mapaWS[emailCell].status);
+              contadorCambiosEstado++;
+            }
+            if (idxLicencia !== -1 && String(datos[f][idxLicencia]).trim() !== mapaWS[emailCell].licencia) {
+              hoja.getRange(f + 1, idxLicencia + 1).setValue(mapaWS[emailCell].licencia);
+              contadorCambiosLicencia++;
+            }
+            if (idxOu !== -1 && String(datos[f][idxOu]).trim() !== mapaWS[emailCell].ou) {
+              hoja.getRange(f + 1, idxOu + 1).setValue(mapaWS[emailCell].ou);
+              contadorCambiosOu++;
+            }
+          }
+        }
+      }
+    }
+
+    var filasInsertadas = 0;
+    var intrusosGigas = [];
+    var usuariosEnMemoria = Object.keys(mapaWS);
+
+    for (var k = 0; k < usuariosEnMemoria.length; k++) {
+      var emailIntruso = usuariosEnMemoria[k];
+      if (!mapaWS[emailIntruso].visitado) {
+        var usr = mapaWS[emailIntruso];
+        var dominio = emailIntruso.split("@")[1] || "";
+        var origenText = "Cuentas nominativas de Gigas";
+        if (dominio.includes("oni")) origenText = "Cuentas de ONI (251)";
+        else if (dominio.includes("onmovil")) origenText = "Cuentas Onmovil";
+        else if (dominio.includes("asesorgigas")) origenText = "Cuentas asesorgigas";
+
+        var nuevaFila = new Array(cabeceras.length).fill("");
+        for (var c = 0; c < cabeceras.length; c++) {
+          var head = cabeceras[c];
+          if (head.includes("email") || head.includes("correo")) nuevaFila[c] = emailIntruso;
+          else if (head.includes("status") || head.includes("estado")) nuevaFila[c] = usr.status;
+          else if (head.includes("manager") || head.includes("responsable")) nuevaFila[c] = usr.manager;
+          else if (head.includes("origen") || head.includes("hoja de origen")) nuevaFila[c] = origenText;
+          else if (head.includes("nombre") || head.includes("first name")) nuevaFila[c] = usr.givenName;
+          else if (head.includes("apellido") || head.includes("last name")) nuevaFila[c] = usr.familyName;
+          else if (c === idxLicencia) nuevaFila[c] = usr.licencia;
+          else if (c === idxOu) nuevaFila[c] = usr.ou; 
+        }
+        hoja.appendRow(nuevaFila);
+        filasInsertadas++;
+        if (dominio === "gigas.com") {
+          intrusosGigas.push(emailIntruso + " (Licencia: " + usr.licencia + " | OU: " + usr.ou + ")");
+        }
+      }
+    }
+
+    try {
+      if (hojaDash) {
+        var dashData = hojaDash.getRange("A3:A12").getValues();
+        for (var idxD = 0; idxD < dashData.length; idxD++) {
+          var nombreProd = String(dashData[idxD][0]).toLowerCase();
+          var asignadasReales = null;
+          if (nombreProd.includes("starter")) asignadasReales = conteoLicencias["1010020027"] || 0; 
+          else if (nombreProd.includes("standard") && !nombreProd.includes("business")) asignadasReales = conteoLicencias["1010020026"] || 0; 
+          else if (nombreProd.includes("plus")) asignadasReales = conteoLicencias["1010020020"] || 0; 
+
+          if (asignadasReales !== null) {
+            hojaDash.getRange(3 + idxD, 3).setValue("Asignadas: " + asignadasReales);
+          }
+        }
+      }
+    } catch (eLic) { }
+
+    return msgListas + "🔄 Sincronización Completada. Bajas purgadas: " + filasBorradas + ". Altas insertadas: " + filasInsertadas + ". Cambios: " + contadorCambiosEstado + " estados, " + contadorCambiosLicencia + " licencias, " + contadorCambiosOu + " OUs.";
+  
+  } finally {
+    // 🚥 IMPORTANTE: Liberamos el semáforo ocurra lo que ocurra
+    semaforo.releaseLock();
+  }
+}
+
+// =========================================================
+// NUEVAS FUNCIONES Y MODIFICACIONES: MÓDULO LISTAS
+// =========================================================
+
+function webRenombrarLista(emailAntiguo, emailNuevo) {
+  verificarPermisoEjecucion();
+  var oldClean = emailAntiguo.trim().toLowerCase();
+  var newClean = emailNuevo.trim().toLowerCase();
+
+  if (!oldClean || !newClean) throw new Error("Faltan datos para renombrar la lista.");
+
+  try {
+    AdminDirectory.Groups.update({ email: newClean }, oldClean);
+    registrarEnHistorial("RENOMBRAR LISTA", "De: " + oldClean + " a: " + newClean);
+
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var hoja = ss.getSheetByName("Inventario Listas Workspace") || ss.getSheetByName("Listas");
+    var msgExcel = " (⚠️ No se encontró la pestaña en Excel para actualizar).";
+
+    if (hoja) {
+      var datos = hoja.getDataRange().getValues();
+      for (var f = datos.length - 1; f >= 1; f--) {
+        if (String(datos[f][1]).toLowerCase().trim() === oldClean) {
+          hoja.getRange(f + 1, 2).setValue(newClean); 
+          hoja.getRange(f + 1, 2).setBackground("#e2f0d9"); 
+          msgExcel = " y Excel sincronizado.";
+          break;
+        }
+      }
+    }
+    return "✅ Lista renombrada a " + newClean + msgExcel;
+  } catch (e) {
+    throw new Error("Fallo al renombrar en Workspace: " + e.message);
+  }
+}
+
+function webExpulsionMasivaListas(userEmail) {
+  verificarPermisoEjecucion();
+  var uClean = userEmail.trim().toLowerCase();
+  if (!uClean) throw new Error("Debes especificar un usuario.");
+
+  var gruposEliminados = [];
+  var pageToken;
+
+  try {
+    do {
+      var resGrupos = AdminDirectory.Groups.list({ userKey: uClean, maxResults: 200, pageToken: pageToken });
+      if (resGrupos.groups) {
+        for (var i = 0; i < resGrupos.groups.length; i++) {
+          var gEmail = resGrupos.groups[i].email;
+          
+          try {
+            AdminDirectory.Members.remove(gEmail, uClean);
+            gruposEliminados.push(gEmail);
+          } catch (eRemove) {
+          }
+        }
+      }
+      pageToken = resGrupos.nextPageToken;
+    } while (pageToken);
+
+    if (gruposEliminados.length > 0) {
+      registrarEnHistorial("PURGA MASIVA LISTAS", "Usuario: " + uClean + " expulsado de: " + gruposEliminados.length + " listas.");
+      return "🗑️ Purgado com sucesso. " + uClean + " ha sido expulsado de " + gruposEliminados.length + " listas de distribución.";
+    } else {
+      return "✅ El usuario no pertenecía a ninguna lista de distribución en este momento.";
+    }
+  } catch (e) {
+    throw new Error("Fallo en la purga masiva: " + e.message);
+  }
+}
+
+function webAñadirMiembroLista(g, u) { 
+  verificarPermisoEjecucion();
+  var grupoLimpio = g.trim().toLowerCase();
+  
+  var usuariosRaw = u.split(/[\n,;]+/);
+  var añadidos = 0;
+  var ignorados = 0;
+  var errores = [];
+
+  for (var i = 0; i < usuariosRaw.length; i++) {
+    var usuarioLimpio = usuariosRaw[i].trim().toLowerCase();
+    
+    if (usuarioLimpio === "" || !usuarioLimpio.includes("@")) continue;
+
+    try {
+      AdminDirectory.Members.insert({ email: usuarioLimpio, role: "MEMBER" }, grupoLimpio);
+      añadidos++;
+    } catch (e) {
+      if (e.message.includes("Member already exists")) {
+        ignorados++;
+      } else {
+        errores.push(usuarioLimpio + " (" + e.message + ")");
+      }
+    }
+  }
+
+  if (añadidos > 0) {
+    registrarEnHistorial("AÑADIR A LISTA (BLOQUE)", "Añadidos " + añadidos + " usuarios a la lista: " + grupoLimpio);
+  }
+
+  var mensajeFinal = "";
+  if (añadidos > 0) mensajeFinal += "➕ " + añadidos + " añadido(s) correctamente. ";
+  if (ignorados > 0) mensajeFinal += "✅ " + ignorados + " ya estaban en la lista. ";
+  
+  if (errores.length > 0) {
+    throw new Error(mensajeFinal + "⚠️ Fallaron: " + errores.join(" | "));
+  }
+  
+  if (añadidos === 0 && ignorados === 0) {
+     throw new Error("No se detectó ningún correo válido para añadir. Recuerda separar por comas.");
+  }
+
+  return mensajeFinal.trim();
+}
+
+function webBorrarMiembroLista(g, u) { 
+  verificarPermisoEjecucion();
+  var grupoLimpio = g.trim().toLowerCase();
+  var usuarioLimpio = u.trim().toLowerCase();
+
+  try {
+    AdminDirectory.Members.remove(grupoLimpio, usuarioLimpio); 
+    registrarEnHistorial("BORRAR DE LISTA", "Usuario: " + usuarioLimpio + " eliminado de la lista: " + grupoLimpio);
+    return "🗑️ Eliminado correctamente."; 
+  } catch (e) {
+    if (e.message.includes("Resource Not Found")) {
+      return "✅ El usuario ya no estava en la lista (eliminado previamente).";
+    }
+    throw new Error("Fallo al eliminar de Workspace: " + e.message);
+  }
+}
+
+function webCrearUsuarioAvanzado(datos) {
+  verificarPermisoEjecucion();
+
+  // 🚥 INYECTAMOS EL SEMÁFORO DE ESCRITURA
+  var semaforo = LockService.getScriptLock();
+  try {
+    semaforo.waitLock(30000); 
+  } catch (e) {
+    return { exito: false, error: "⚠️ El sistema está muy ocupado sincronizando. Espera unos segundos y vuelve a pulsar el botón de crear." };
+  }
+
+  try {
+    var aliasLimpio = datos.alias.trim().toLowerCase().replace(/\s+/g, '');
+    var emailCompleto = aliasLimpio + "@" + datos.dominio.trim().toLowerCase();
+    var passwordGenerada = Math.random().toString(36).slice(-8) + "Gigs26!";
+    var given = datos.nombre ? datos.nombre.trim() : aliasLimpio;
+    var family = datos.apellido ? datos.apellido.trim() : datos.tipo;
+    var ouDestino = datos.ou ? datos.ou.trim() : "/";
+    var nuevoUsuario = { primaryEmail: emailCompleto, name: { givenName: given, familyName: family }, password: passwordGenerada, changePasswordAtNextLogin: true, orgUnitPath: ouDestino };
+    if (datos.manager) nuevoUsuario.relations = [{ type: "manager", value: datos.manager.trim() }];
+    
+    AdminDirectory.Users.insert(nuevoUsuario);
+    registrarEnHistorial("ALTA USUARIO", "Cuenta: " + emailCompleto + " | Tipo: " + datos.tipo + " | Licencia asignada: " + datos.licencia + " | OU Destino: " + ouDestino);
+    
+    var msgLicencia = "✅ Licencia asignada correctamente";
+    
+    if (datos.licencia && datos.licencia !== "Cloud Identity Free") {
+      try {
+        var skuMap = {
+          "Google Workspace Business Starter": "1010020027",
+          "Google Workspace Enterprise Standard": "1010020026",
+          "Google Workspace Enterprise Plus": "1010020020"
         };
         
-        // 2. ENVIAMOS A ENRIQUECER Y METER EN LA LISTA
-        if (datosExtra.puesto || datosExtra.departamento || datosExtra.telefono || datosExtra.emailPersonal || datosExtra.grupo) {
-          console.log("Enviando datos extra al servidor: ", datosExtra);
+        var skuId = skuMap[datos.licencia];
+        if (!skuId) {
+          throw new Error("El nombre de la licencia no coincide con el skuMap: " + datos.licencia);
+        }
+
+        var asignado = false;
+        var ultimoError = "";
+        
+        for (var i = 0; i < 4; i++) {
+          Utilities.sleep(3000); 
+          try {
+            AdminLicenseManager.LicenseAssignments.insert({ userId: emailCompleto }, "Google-Apps", skuId);
+            asignado = true;
+            break; 
+          } catch(err) {
+            ultimoError = err.message;
+          }
+        }
+        
+        if (!asignado) {
+          msgLicencia = "⚠️ Cuenta creada, pero falló la asignación tras 4 intentos: " + ultimoError;
+        }
+
+      } catch(eLic) {
+        msgLicencia = "⚠️ Error crítico de licencia: " + eLic.message;
+      }
+    } else {
+      msgLicencia = "☁️ Se asignó Cloud Identity Free (Por defecto)";
+    }
+    
+    var libro = SpreadsheetApp.getActiveSpreadsheet(); 
+    var hojaDestino = libro.getSheetByName("Hoja Maestra (657)") || libro.getSheetByName("HOJA MAESTRA 657") || libro.getSheets()[0];
+    
+    if (hojaDestino) {
+      var allData = hojaDestino.getDataRange().getValues();
+      var cabeceras = allData[0]; 
+      var nuevaFila = new Array(cabeceras.length).fill("");
+      var colOrigenIdx = -1;
+
+      var origenText = "";
+      var palabraClave = "";
+      if (datos.tipo === "Nominativa") { origenText = "Cuentas nominativas de Gigas"; palabraClave = "nominativa"; }
+      else if (datos.tipo === "TPartner") { origenText = "Cuentas TPartner"; palabraClave = "tpartner"; }
+      else if (datos.tipo === "Kayako") { origenText = "Cuentas Kayako"; palabraClave = "kayako"; }
+      else if (datos.tipo === "Externa") { origenText = "Cuentas asesorgigas"; palabraClave = "asesorgigas"; }
+      else if (datos.tipo === "Onmovil") { origenText = "Cuentas Onmovil"; palabraClave = "onmovil"; }
+      else if (datos.tipo === "Servicio") { origenText = "Cuentas de servicio Gigas"; palabraClave = "servicio"; }
+      else { origenText = datos.tipo; palabraClave = datos.tipo.toLowerCase(); }
+
+      for (var c = 0; c < cabeceras.length; c++) {
+        var head = String(cabeceras[c]).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if (head.includes("email") || head.includes("correo")) nuevaFila[c] = emailCompleto;
+        else if (head.includes("manager") || head.includes("responsable")) nuevaFila[c] = datos.manager.trim();
+        else if (head.includes("status") || head.includes("estado")) nuevaFila[c] = "Active"; 
+        else if (head.includes("origen") || head.includes("hoja de origen")) { nuevaFila[c] = origenText; colOrigenIdx = c; }
+        else if (head.includes("first name") || head.includes("firstname") || head === "nombre") nuevaFila[c] = given;
+        else if (head.includes("last name") || head.includes("lastname") || head === "apellido" || head.includes("apellidos")) nuevaFila[c] = family;
+        else if (head.includes("motivo") || head.includes("servicio") || head.includes("dedicacion")) nuevaFila[c] = datos.motivo || "";
+        else if (head === "ou" || head.includes("unidad") || head.includes("orgunit")) nuevaFila[c] = ouDestino;
+        else if (head.includes("licencia")) nuevaFila[c] = datos.licencia;
+      }
+
+      var filaInsercion = -1;
+      if (colOrigenIdx !== -1) {
+        for (var f = allData.length - 1; f >= 1; f--) {
+          if (String(allData[f][colOrigenIdx]).toLowerCase().includes(palabraClave)) { filaInsercion = f + 1; break; }
+        }
+      }
+      
+      if (filaInsercion !== -1) {
+        hojaDestino.insertRowAfter(filaInsercion);
+        hojaDestino.getRange(filaInsercion + 1, 1, 1, cabeceras.length).setValues([nuevaFila]);
+        var rule = hojaDestino.getRange(filaInsercion, 1, 1, cabeceras.length).getDataValidations();
+        hojaDestino.getRange(filaInsercion + 1, 1, 1, cabeceras.length).setDataValidations(rule);
+        hojaDestino.getRange(filaInsercion, 1, 1, cabeceras.length).copyTo(hojaDestino.getRange(filaInsercion + 1, 1, 1, cabeceras.length), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
+      } else {
+        hojaDestino.appendRow(nuevaFila);
+      }
+    }
+    return { exito: true, email: emailCompleto, pass: passwordGenerada, msgLic: msgLicencia, hoja: hojaDestino.getName() };
+  } catch (error) { 
+    return { exito: false, error: error.message }; 
+  } finally {
+    // 🚥 IMPORTANTE: Liberamos el semáforo
+    semaforo.releaseLock();
+  }
+}
+
+function webCrearListaDistribucion(datos) {
+  verificarPermisoEjecucion();
+  
+  // 🚥 SEMÁFORO DE ESCRITURA PARA EVITAR CHOQUES CON LA SINCRONIZACIÓN
+  var semaforo = LockService.getScriptLock();
+  try {
+    semaforo.waitLock(30000);
+  } catch (e) {
+    return { exito: false, error: "⚠️ El sistema está escribiendo en el Excel en este momento. Por favor, espera un poco." };
+  }
+
+  try {
+    var emailGrupo = datos.alias.trim().toLowerCase() + "@" + datos.dominio;
+    var nuevoGrupo = { email: emailGrupo, name: datos.nombre, description: "Lista gestionada desde el Panel de Identidades" };
+    AdminDirectory.Groups.insert(nuevoGrupo);
+    registrarEnHistorial("ALTA LISTA", "Lista creada: " + emailGrupo + " | Owner inicial: " + (datos.owner ? datos.owner : "Ninguno"));
+    
+    var arrayMiembros = []; 
+    var totalVolumen = 0;
+    var ownerLimpio = datos.owner ? datos.owner.trim().toLowerCase() : "";
+    
+    if (ownerLimpio !== "") { 
+      try { 
+        AdminDirectory.Members.insert({ email: ownerLimpio, role: "OWNER" }, emailGrupo); 
+        totalVolumen++;
+      } catch(e) { } 
+    }
+    
+    if (datos.miembros && datos.miembros.trim() !== "") {
+      var rawMiembros = datos.miembros.split(/[\n,]+/);
+      for (var i = 0; i < rawMiembros.length; i++) {
+        var m = rawMiembros[i].trim().toLowerCase();
+        if (m !== "" && m.indexOf("@") !== -1 && m !== ownerLimpio) arrayMiembros.push(m);
+      }
+      for (var j = 0; j < arrayMiembros.length; j++) { 
+        try { 
+          AdminDirectory.Members.insert({ email: arrayMiembros[j], role: "MEMBER" }, emailGrupo);
+          totalVolumen++; 
+        } catch(e) { } 
+      }
+    }
+    
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var hoja = ss.getSheetByName("Inventario Listas Workspace") || ss.getSheetByName("Listas"); 
+    
+    if (hoja) { 
+      hoja.appendRow([datos.nombre, emailGrupo, totalVolumen + " miembros", ownerLimpio, arrayMiembros.join(", ")]);
+      hoja.getRange(hoja.getLastRow(), 1, 1, 5).setBackground("#e2f0d9"); 
+    }
+    
+    return { exito: true, msg: "Lista " + emailGrupo + " creada.\nTotal integrantes: " + totalVolumen };
+  } catch (error) { 
+    return { exito: false, error: "Error en Workspace: " + error.message };
+  } finally {
+    semaforo.releaseLock();
+  }
+}
+
+function webObtenerOUs() {
+  verificarPermisoEjecucion();
+  var pageToken;
+  var ous = ["/"]; 
+  try {
+    var listaUsuarios = AdminDirectory.Users.list({domain: "gigas.com", maxResults: 1});
+    var customerIdReal = listaUsuarios.users[0].customerId;
+    
+    do {
+      var response = AdminDirectory.Orgunits.list(customerIdReal, { type: 'all', pageToken: pageToken });
+      if (response.organizationUnits) {
+        for (var i = 0; i < response.organizationUnits.length; i++) {
+          if (response.organizationUnits[i].orgUnitPath !== "/") {
+            ous.push(response.organizationUnits[i].orgUnitPath);
+          }
+        }
+      }
+      pageToken = response.nextPageToken;
+    } while (pageToken);
+    return ous.sort();
+  } catch(e) {
+    Logger.log("Error al obtener OUs: " + e.message);
+    return ["/"];
+  }
+}
+
+function webMoverUsuarioOU(userEmail, nuevaOU) {
+  verificarPermisoEjecucion();
+  if (!userEmail || !nuevaOU) throw new Error("Faltan datos para mover la OU.");
+  
+  try {
+    AdminDirectory.Users.update({ orgUnitPath: nuevaOU }, userEmail);
+    registrarEnHistorial("MOVER OU", "Usuario: " + userEmail + " movido a: " + nuevaOU);
+
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var hoja = ss.getSheetByName("Hoja Maestra (657)");
+    var msgExcel = " (⚠️ Añade una columna llamada 'OU' en tu Excel para que se sincronice automáticamente).";
+    
+    if (hoja) {
+      var data = hoja.getDataRange().getValues();
+      var headers = data[0].map(function(h) { 
+        return String(h).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
+      });
+      
+      var ouCol = headers.indexOf("ou");
+      if (ouCol === -1) ouCol = headers.indexOf("unidad organizativa");
+      if (ouCol === -1) ouCol = headers.indexOf("orgunit");
+
+      if (ouCol !== -1) {
+        for (var r = 1; r < data.length; r++) {
+          var emailCell = String(data[r][headers.indexOf("email address")] || data[r][headers.indexOf("email")] || "").toLowerCase().trim();
+          if (emailCell === userEmail.toLowerCase().trim()) {
+            hoja.getRange(r + 1, ouCol + 1).setValue(nuevaOU);
+            hoja.getRange(r + 1, ouCol + 1).setBackground("#e2f0d9");
+            msgExcel = " y Excel sincronizado.";
+            break;
+          }
+        }
+      }
+    }
+    
+    return "✅ " + userEmail + " movido a " + nuevaOU + msgExcel;
+  } catch (e) {
+    throw new Error("Fallo al mover OU: " + e.message);
+  }
+}
+
+function webBorrarListaTotal(emailGrupo) {
+  verificarPermisoAdmin();
+  var grupoTarget = String(emailGrupo).trim().toLowerCase();
+  try {
+    AdminDirectory.Groups.remove(grupoTarget);
+    var libro = SpreadsheetApp.getActiveSpreadsheet();
+    var hojaListas = libro.getSheetByName("Inventario Listas Workspace") || libro.getSheetByName("Listas");
+    var borradoExcel = "No localizada en tu hoja de cálculo.";
+    if (hojaListas) {
+      var datos = hojaListas.getDataRange().getValues();
+      for (var f = datos.length - 1; f >= 0; f--) {
+        if (datos[f][1] && datos[f][1].toString().trim().toLowerCase() === grupoTarget) { 
+          hojaListas.deleteRow(f + 1);
+          borradoExcel = "Fila purgada con éxito del Excel."; break; 
+        }
+      }
+    }
+    return "🗑️ LISTA DESTRUIDA CON ÉXITO.\n\n• Workspace: El grupo " + grupoTarget + " ha sido eliminado.\n• Base de Datos: " + borradoExcel;
+  } catch (err) { throw new Error("Fallo al eliminar la lista de Workspace: " + err.message); }
+}
+
+function webEscanearCuentasServicio() {
+  verificarPermisoAdmin(); var libro = SpreadsheetApp.getActiveSpreadsheet();
+  var hoja = libro.getSheetByName("Cuentas de servicio Gigas (139)") || libro.getSheetByName("Cuentas de servicio gigas (139)");
+  var datos = hoja.getDataRange().getValues(); var cabecera = datos[0];
+  var idxEmail = cabecera.indexOf("Email Address [Required]");
+  var idxResponsable = cabecera.indexOf("Correo del responsable");
+  var procesados = 0;
+  for (var i = 1; i < datos.length; i++) {
+    var email = datos[i][idxEmail];
+    if (email && email.toString().includes("@")) {
+      var adminEncontrado = "no tiene";
+      try { var u = AdminDirectory.Users.get(email, {projection: "full"}); if (u.relations) { for (var j = 0; j < u.relations.length; j++) { if (u.relations[j].type === "manager") { adminEncontrado = u.relations[j].value.trim(); break; } } } } catch (e) { adminEncontrado = "Error"; }
+      hoja.getRange(i + 1, idxResponsable + 1).setValue(adminEncontrado); procesados++;
+    }
+  }
+  return "✅ Servicios revisados: " + procesados;
+}
+
+function webAuditarEnviosAnterioresServicios() {
+  verificarPermisoAdmin(); var libro = SpreadsheetApp.getActiveSpreadsheet();
+  var hoja = libro.getSheetByName("Cuentas de servicio Gigas (139)") || libro.getSheetByName("Cuentas de servicio gigas (139)");
+  var datos = hoja.getDataRange().getValues();
+  var cabecera = datos[0];
+  var idxEmail = cabecera.indexOf("Email Address [Required]"); var idxMotivo = cabecera.indexOf("Motivo de la cuenta");
+  var hilos = GmailApp.search('in:sent subject:"[REF-SERVICIO]"'); var marcados = 0;
+  for (var h = 0; h < hilos.length; h++) {
+    var coincidencia = hilos[h].getFirstMessageSubject().match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+    if (coincidencia) {
+      var emailEnviado = coincidencia[1].trim().toLowerCase();
+      for (var i = 1; i < datos.length; i++) { if (datos[i][idxEmail] && datos[i][idxEmail].toString().trim().toLowerCase() === emailEnviado) { hoja.getRange(i + 1, idxMotivo + 1).setValue("⏳ Enviado (Esperando respuesta)"); marcados++; break; } }
+    }
+  }
+  return "✅ Auditadas: " + marcados;
+}
+
+function webEnviarCampanaServicios() {
+  verificarPermisoAdmin(); var libro = SpreadsheetApp.getActiveSpreadsheet();
+  var hoja = libro.getSheetByName("Cuentas de servicio Gigas (139)") || libro.getSheetByName("Cuentas de servicio gigas (139)");
+  var datos = hoja.getDataRange().getValues(); var cabecera = datos[0].map(function(h) { return String(h).toLowerCase().trim(); });
+  var idxEmail = cabecera.indexOf("email address [required]"); var idxResponsable = cabecera.indexOf("correo del responsable"); var idxMotivo = cabecera.indexOf("motivo de la cuenta");
+  var enviados = 0; var fechaHoy = Utilities.formatDate(new Date(), "Europe/Madrid", "dd/MM/yyyy");
+  for (var i = 1; i < datos.length; i++) {
+    var emailC = datos[i][idxEmail] ? datos[i][idxEmail].toString().trim() : "";
+    var estadoResp = datos[i][idxResponsable] ? datos[i][idxResponsable].toString().trim() : "";
+    if (datos[i][idxMotivo] && datos[i][idxMotivo].toString() !== "") continue;
+    var dest = estadoResp.includes("@") ? estadoResp : emailC;
+    if (dest.includes("@")) { MailApp.sendEmail(dest, "[Auditoría IT] Cuenta: " + emailC + " [REF-SERVICIO]", "Rellenar:\nMotivo de la cuenta: ");
+    hoja.getRange(i + 1, idxMotivo + 1).setValue("⏳ Enviado el " + fechaHoy); enviados++;
+    }
+  }
+  return "✅ Enviados: " + enviados;
+}
+
+function webEnviarRecordatorioCampanaServicios() {
+  verificarPermisoAdmin(); var libro = SpreadsheetApp.getActiveSpreadsheet();
+  var hojaMaestra = libro.getSheetByName("Hoja Maestra (657)");
+  var datosMae = hojaMaestra.getDataRange().getValues(); var cabeceraMae = datosMae[0].map(function(h) { return String(h).toLowerCase().trim(); });
+  var idxEmailMae = cabeceraMae.indexOf("email address [required]") !== -1 ? cabeceraMae.indexOf("email address [required]") : cabeceraMae.indexOf("email address");
+  var idxOrigenMae = cabeceraMae.indexOf("hoja de origen") !== -1 ? cabeceraMae.indexOf("hoja de origen") : cabeceraMae.indexOf("origen");
+  var idxManagerMae = cabeceraMae.indexOf("manager") !== -1 ? cabeceraMae.indexOf("manager") : cabeceraMae.indexOf("responsable");
+  var idxMotivoMae = cabeceraMae.indexOf("motivo de la cuenta");
+  var recordatoriosEnviados = 0; var fechaHoy = Utilities.formatDate(new Date(), "Europe/Madrid", "dd/MM/yyyy");
+  for (var i = 1; i < datosMae.length; i++) {
+    var emailC = datosMae[i][idxEmailMae] ? datosMae[i][idxEmailMae].toString().trim() : "";
+    var origenC = datosMae[i][idxOrigenMae] ? datosMae[i][idxOrigenMae].toString().trim().toLowerCase() : "";
+    var motivoC = datosMae[i][idxMotivoMae] ? datosMae[i][idxMotivoMae].toString().trim().toLowerCase() : "";
+    if (origenC.includes("servicio") && (motivoC.includes("enviado") || motivoC.includes("esperando"))) {
+      var dest = datosMae[i][idxManagerMae].toString().includes("@") ? datosMae[i][idxManagerMae].toString().trim() : emailC;
+      var cuerpoHTML = "<div style='font-family: Arial; padding:20px;'><div style='background:#fef2f2; color:#991b1b; padding:12px; border-left:4px solid #ef4444;'><strong>🚨 NOTA DE SEGURIDAD:</strong> Correo de IT legítimo, no es Phishing.</div><p>Revisión de cuenta: <strong>" + emailC + "</strong></p><p>Responder indicando:</p><b>Correo del responsable: <br>Motivo de la cuenta: </b><br><br>Fernando Alcalá<br>Departamento IT</div>";
+      MailApp.sendEmail({ to: dest, subject: "[Recordatorio] Auditoría Workspace: " + emailC + " [REF-SERVICIO]", htmlBody: cuerpoHTML });
+      hojaMaestra.getRange(i + 1, idxMotivoMae + 1).setValue("⏳ Recordatorio enviado el " + fechaHoy); recordatoriosEnviados++;
+    }
+  }
+  return "✅ Recordatorio enviado a " + recordatoriosEnviados + " cuentas.";
+}
+
+function webProcesarRespuestasServicios() {
+  verificarPermisoAdmin();
+  var libro = SpreadsheetApp.getActiveSpreadsheet();
+  var hojaServicios = libro.getSheetByName("Cuentas de servicio Gigas (139)") || libro.getSheetByName("Cuentas de servicio gigas (139)");
+  var hojaMaestra = libro.getSheetByName("Hoja Maestra (657)");
+  var datosServ = hojaServicios.getDataRange().getValues(); var cabeceraServ = datosServ[0].map(function(h) { return String(h).toLowerCase().trim(); });
+  var idxEmailServ = cabeceraServ.indexOf("email address [required]"); var idxMotivoServ = cabeceraServ.indexOf("motivo de la cuenta");
+  var datosMae = hojaMaestra ? hojaMaestra.getDataRange().getValues() : [];
+  var hilos = GmailApp.search('subject:"[REF-SERVICIO]" is:unread'); var procesados = 0;
+  for (var h = 0; h < hilos.length; h++) {
+    var mensajes = hilos[h].getMessages();
+    var hiloProcesado = false;
+    for (var m = 0; m < mensajes.length; m++) {
+      if (mensajes[m].isUnread()) {
+        var asunto = mensajes[m].getSubject();
+        var cuerpo = mensajes[m].getPlainBody();
+        var coincidenciaCuenta = asunto.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/); if (!coincidenciaCuenta) continue;
+        var emailServicioTarget = coincidenciaCuenta[1].trim().toLowerCase();
+        var matchMotivo = cuerpo.match(/Motivo de la cuenta:\s*([^\r\n]+)/i); var nuevoMotivo = matchMotivo ? matchMotivo[1].trim() : null;
+        if (nuevoMotivo) {
+          for (var i = 1; i < datosServ.length; i++) { if (datosServ[i][idxEmailServ] && datosServ[i][idxEmailServ].toString().trim().toLowerCase() === emailServicioTarget) { hojaServicios.getRange(i + 1, idxMotivoServ + 1).setValue(nuevoMotivo).setBackground("#e2f0d9"); hiloProcesado = true; break; } }
+          if (hojaMaestra) { for (var j = 1; j < datosMae.length; j++) { if (datosMae[j][0] && datosMae[j][0].toString().trim().toLowerCase() === emailServicioTarget) { hojaMaestra.getRange(j + 1, 7).setValue(nuevoMotivo).setBackground("#e2f0d9"); hiloProcesado = true; break; } } }
+        }
+        mensajes[m].markRead();
+      }
+    }
+    if (hiloProcesado) procesados++;
+  }
+  return "Respuestas procesadas con éxito para " + procesados + " cuentas.";
+}
+
+function webEscanearManagersMaestra() {
+  verificarPermisoAdmin();
+  var libro = SpreadsheetApp.getActiveSpreadsheet(); var hoja = libro.getSheetByName("Hoja Maestra (657)");
+  var datos = hoja.getDataRange().getValues(); var cabecera = datos[0];
+  var idxEmail = 0; var idxManager = 5;
+  var mapaUsuarios = {}; var pageToken;
+  do {
+    var response = AdminDirectory.Users.list({ customer: 'my_customer', maxResults: 500, pageToken: pageToken });
+    if (response.users) {
+      for (var i = 0; i < response.users.length; i++) {
+        var mng = "no tiene";
+        if (response.users[i].relations) { for (var j=0; j<response.users[i].relations.length; j++) { if (response.users[i].relations[j].type === "manager") { mng = response.users[i].relations[j].value.trim(); break; } } }
+        mapaUsuarios[response.users[i].primaryEmail.toLowerCase()] = mng;
+      }
+    }
+    pageToken = response.nextPageToken;
+  } while (pageToken);
+  for (var i = 1; i < datos.length; i++) {
+    var email = datos[i][idxEmail] ? String(datos[i][idxEmail]).trim().toLowerCase() : "";
+    if (email.includes("@")) { hoja.getRange(i + 1, idxManager + 1).setValue(mapaUsuarios[email] || "no tiene"); }
+  }
+  return "✅ Managers escaneados.";
+}
+
+function webGenerarCodigoBypass2FA(userEmail) {
+  verificarPermisoEjecucion();
+  if (!userEmail) throw new Error("Selecciona un usuario primero.");
+  
+  try {
+    AdminDirectory.VerificationCodes.generate(userEmail);
+    var respuesta = AdminDirectory.VerificationCodes.list(userEmail);
+    
+    if (respuesta.items && respuesta.items.length > 0) {
+      var codigoSalvavidas = respuesta.items[0].verificationCode;
+      registrarEnHistorial("BYPASS 2FA", "Código de respaldo generado para: " + userEmail);
+      return "🆘 Bypass listo. Dale este código al empleado para que inicie sesión: " + codigoSalvavidas;
+    } else {
+      throw new Error("Se generaron los códigos pero la API no los devolvió.");
+    }
+  } catch (e) {
+    throw new Error("Fallo al generar el Bypass 2FA: " + e.message);
+  }
+}
+
+function registrarEnHistorial(accion, detalle) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var hojaLog = ss.getSheetByName("Log_Historial");
+    if (!hojaLog) {
+      hojaLog = ss.insertSheet("Log_Historial");
+      hojaLog.appendRow(["Fecha y Hora", "Operador (Script)", "Acción Realizada", "Detalles / Parámetros"]);
+      hojaLog.getRange("A1:D1").setFontWeight("bold").setBackground("#0f172a").setFontColor("#ffffff");
+      hojaLog.setFrozenRows(1);
+    }
+    var fechaHoy = Utilities.formatDate(new Date(), "Europe/Madrid", "dd/MM/yyyy HH:mm:ss");
+    var usuarioEjecutor = Session.getActiveUser().getEmail() || "Panel Web (Automático)";
+    hojaLog.appendRow([fechaHoy, usuarioEjecutor, accion, detalle]);
+    Logger.log("📝 Acción registrada en el historial de Sheets con éxito.");
+  } catch (error) {
+    Logger.log("❌ Error crítico al escribir en el Log_Historial: " + error.message);
+  }
+}
+
+function rastrearCuentasSuspendidasGmail() {
+  verificarPermisoAdmin();
+  var cuentasSuspendidas = [];
+  var mapaFechasSuspension = {};
+  var pageToken;
+  try {
+    var hilosAlertas = GmailApp.search('subject:"Alerta: Usuario suspendido por el administrador"', 0, 100);
+    for (var h = 0; h < hilosAlertas.length; h++) {
+      var mensajes = hilosAlertas[h].getMessages();
+      for (var m = 0; m < mensajes.length; m++) {
+        var msg = mensajes[m];
+        var cuerpo = msg.getPlainBody();
+        var fechaAlerta = Utilities.formatDate(msg.getDate(), "Europe/Madrid", "dd/MM/yyyy");
+        var coincidenciaEmail = cuerpo.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+        if (coincidenciaEmail) {
+          var emailDetectado = coincidenciaEmail[1].toLowerCase().trim();
+          if (!mapaFechasSuspension[emailDetectado]) {
+            mapaFechasSuspension[emailDetectado] = fechaAlerta;
+          }
+        }
+      }
+    }
+
+    do {
+      var response = AdminDirectory.Users.list({ customer: 'my_customer', maxResults: 500, projection: 'full', pageToken: pageToken });
+      if (response.users) {
+        for (var i = 0; i < response.users.length; i++) {
+          var user = response.users[i];
+          if (user.suspended) {
+            var emailClean = user.primaryEmail.toLowerCase().trim();
+            var fechaSuspensionFinal = mapaFechasSuspension[emailClean] || null;
+            var valLogin = "Nunca ha iniciado sesión";
+            if (user.lastLoginTime && user.lastLoginTime !== "1970-01-01T00:00:00.000Z") {
+              var d = new Date(user.lastLoginTime);
+              valLogin = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear();
+            }
+            var motivo = user.suspensionReason || "Desconocido";
+            if (motivo === "ADMIN") motivo = "Suspendida por IT";
+            else if (motivo === "WEB_LOGIN_REQUIRED") motivo = "Bloqueo por seguridad";
+            else if (motivo === "ABUSE") motivo = "Abuso de red";
+            cuentasSuspendidas.push({
+              email: user.primaryEmail,
+              nombre: user.name ? user.name.fullName : "Sin nombre",
+              fechaSuspension: fechaSuspensionFinal,
+              ultimoLogin: valLogin,
+              motivo: motivo
+            });
+          }
+        }
+      }
+      pageToken = response.nextPageToken;
+    } while (pageToken);
+    
+    cuentasSuspendidas.sort(function(a, b) { return a.email.localeCompare(b.email); });
+    var fechaHoy = Utilities.formatDate(new Date(), "Europe/Madrid", "dd/MM/yyyy");
+    var htmlBody = '<div style="font-family: Arial, sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto; line-height: 1.5; font-size: 14px;">';
+    htmlBody += '<h2 style="color: #ef4444; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; font-size: 18px;">📋 Cuentas Suspendidas Workspace</h2>';
+    htmlBody += '<p>Hola Fernando,</p>';
+    htmlBody += '<p>Listado consolidado de cuentas suspendidas detectadas en el sistema a fecha de hoy (<b>' + fechaHoy + '</b>):</p>';
+    if (cuentasSuspendidas.length > 0) {
+      htmlBody += '<div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 6px; padding: 12px; margin: 15px 0;">';
+      htmlBody += '<p style="margin-top:0; font-weight: bold; color: #b45f06; font-size: 15px;">⚠️ Total cuentas inactivas: ' + cuentasSuspendidas.length + '</p>';
+      for (var j = 0; j < cuentasSuspendidas.length; j++) {
+        htmlBody += '<div style="background: #ffffff; border: 1px solid #cbd5e1; padding: 12px; margin-bottom: 10px; border-radius: 4px;">';
+        htmlBody += '<div style="font-size: 14px; margin-bottom: 8px; word-break: break-all;">👉 <b>' + cuentasSuspendidas[j].email + '</b> <span style="color:#64748b;">(' + cuentasSuspendidas[j].nombre + ')</span></div>';
+        htmlBody += '<div style="font-size: 13px; color: #475569;">';
+        if (cuentasSuspendidas[j].fechaSuspension) {
+          htmlBody += '<div style="margin-bottom: 4px; background-color: #fef2f2; padding: 4px 8px; border-left: 3px solid #ef4444; display: inline-block;"><b>🛑 Fecha Suspensión (Gmail):</b> <span style="color:#b91c1c; font-weight:bold;">' + cuentasSuspendidas[j].fechaSuspension + '</span></div>';
+        } else {
+          htmlBody += '<div style="margin-bottom: 4px; color: #64748b; font-style: italic;">⚠️ Alerta de Gmail no localizada</div>';
+        }
+        htmlBody += '<div style="margin-top: 4px; margin-bottom: 4px;"><b>📅 Último Logon:</b> ' + cuentasSuspendidas[j].ultimoLogin + '</div>';
+        htmlBody += '<div><b>🔍 Motivo Workspace:</b> ' + cuentasSuspendidas[j].motivo + '</div>';
+        htmlBody += '</div></div>';
+      }
+      htmlBody += '</div>';
+    } else {
+      htmlBody += '<div style="background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; border-radius: 6px; padding: 15px; font-weight: bold;">';
+      htmlBody += '✅ No hay ninguna cuenta suspendida registrada.</div>';
+    }
+    
+    htmlBody += '<br><hr style="border: 0; border-top: 1px solid #e2e8f0;"><p style="font-size: 11px; color: #94a3b8;">Reporte automático generado por Gigs IT.</p></div>';
+    
+    var csvContent = "Email;Nombre;Fecha Suspension (Gmail);Ultimo Logon;Motivo Suspension\r\n";
+    for (var k = 0; k < cuentasSuspendidas.length; k++) {
+      var item = cuentasSuspendidas[k];
+      var nombreLimpio = item.nombre.replace(/"/g, '""');
+      var fechaBajaLimpia = item.fechaSuspension ? item.fechaSuspension : "No detectada en Gmail";
+      csvContent += item.email + ';"' + nombreLimpio + '";' + fechaBajaLimpia + ';' + item.ultimoLogin + ';"' + item.motivo + '"\r\n';
+    }
+    
+    var nombreArchivo = "Reporte_Suspendidas_" + fechaHoy.replace(/\//g, "-") + ".csv";
+    var csvBlob = Utilities.newBlob("", "text/csv", nombreArchivo);
+    csvBlob.setDataFromString(csvContent, "UTF-8");
+
+    MailApp.sendEmail({
+      to: "fernando.alcala@gigas.com",
+      subject: "📋 [Auditoría] Reporte de Cuentas Suspendidas - " + fechaHoy,
+      htmlBody: htmlBody,
+      attachments: [csvBlob] 
+    });
+  } catch (error) {
+    MailApp.sendEmail({ to: "fernando.alcala@gigas.com", subject: "⚠️ Error en la ejecución del reporte de suspendidas", body: "Ocurrió un problema: " + error.message });
+  }
+}
+
+function extraerSuspendidosONICSV() {
+  verificarPermisoAdmin();
+  var cuentasSuspendidas = [];
+  var mapaFechasSuspension = {};
+  var pageToken;
+  var wsSkus = {
+    "1010020027": "Google Workspace Business Starter",
+    "1010020026": "Google Workspace Enterprise Standard",
+    "1010020020": "Google Workspace Enterprise Plus",
+    "1010310002": "Cloud Identity Free"
+  };
+  try {
+    var hilosAlertas = GmailApp.search('subject:"Alerta: Usuario suspendido por el administrador"', 0, 150);
+    for (var h = 0; h < hilosAlertas.length; h++) {
+      var mensajes = hilosAlertas[h].getMessages();
+      for (var m = 0; m < mensajes.length; m++) {
+        var msg = mensajes[m];
+        var cuerpo = msg.getPlainBody();
+        var fechaAlerta = Utilities.formatDate(msg.getDate(), "Europe/Madrid", "dd/MM/yyyy");
+        var coincidenciaEmail = cuerpo.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+        if (coincidenciaEmail) {
+          var emailDetectado = coincidenciaEmail[1].toLowerCase().trim();
+          if (!mapaFechasSuspension[emailDetectado]) mapaFechasSuspension[emailDetectado] = fechaAlerta;
+        }
+      }
+    }
+
+    do {
+      var response = AdminDirectory.Users.list({ customer: 'my_customer', maxResults: 500, projection: 'full', pageToken: pageToken });
+      if (response.users) {
+        for (var i = 0; i < response.users.length; i++) {
+          var user = response.users[i];
+          var emailClean = user.primaryEmail.toLowerCase().trim();
           
-          google.script.run
-            .withSuccessHandler(function(resUpdate) { 
-              console.log("Respuesta del servidor: ", resUpdate);
-              
-              if (resUpdate && resUpdate.error) {
-                mostrarAvisoFlotante("❌ Error de Google al añadir a lista: " + resUpdate.error, "error");
-              } else if (resUpdate && resUpdate.mensaje && resUpdate.mensaje.includes("⚠️")) {
-                mostrarAvisoFlotante("⚠️ " + resUpdate.mensaje, "error");
-              } else {
-                mostrarAvisoFlotante("✅ Perfil de " + res.email + " enriquecido y añadido a listas correctamente.", "info");
-              }            })
-            .withFailureHandler(function(err) {
-              mostrarAvisoFlotante("❌ Error crítico en backend: " + err.message, "error");
-            })
-            .actualizarUsuarioGoogleEnriquecido(datosExtra);
-        } else {
-          console.log("No había datos extra que enviar al servidor.");
-        }
-
-        // 3. AHORA SÍ, VACIAMOS LAS CAJITAS PARA DEJAR EL PANEL LIMPIO
-        document.getElementById('creador-alias').value = "";
-        document.getElementById('creador-nombre').value = "";
-        document.getElementById('creador-apellido').value = "";
-        document.getElementById('creador-manager').value = "";
-        document.getElementById('creador-motivo').value = "";
-        document.getElementById('creador-puesto').value = "";
-        document.getElementById('creador-departamento').value = "";
-        document.getElementById('creador-telefono').value = "";
-        document.getElementById('creador-email-personal').value = "";
-        document.getElementById('creador-grupo').value = "";
-        document.getElementById('creador-preview').innerText = "escribe.alias@gigas.com";
-
-      } else { 
-        errAction(res.error); 
-        mostrarAvisoFlotante("❌ Error: " + res.error, "error");
-      }
-    }).webCrearUsuarioAvanzado(datos);
-  }
-
-  function pintarMetricasSalud(total, con, sin, susp, titulo) {
-    var pC = total > 0 ? Math.round((con / total) * 100) : 0; var pS = total > 0 ? Math.round((sin / total) * 100) : 0; var pSusp = total > 0 ? Math.round((susp / total) * 100) : 0;
-    var pref = langDict[document.getElementById('lang-selector').value].card_salud || "🛡️ Salud de Identidades";
-    document.getElementById('titulo-salud').innerText = pref + " (" + titulo + ")"; document.getElementById('mu-total').innerText = total;
-    document.getElementById('mu-con').innerHTML = con + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + pC + "%)</span>";
-    document.getElementById('mu-sin').innerHTML = sin + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + pS + "%)</span>";
-    document.getElementById('mu-susp').innerHTML = susp + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + pSusp + "%)</span>";
-  }
-
-  function cargarTodoElDashboard(silencioso) {
-    if (!silencioso) showLog("🌐 Cargando datos operativos...");
-    google.script.run.withSuccessHandler(function(res) {
-        try {
-          var data = JSON.parse(res); datosGraficaGlobal = data.grafica || []; historicoCrecimientoGlobal = data.crecimiento.historico || []; baseCuentasGlobal = data.baseCuentas || {headers: [], rows: []}; baseServiciosGlobal = data.baseServicios || {headers: [], rows: []};
-          renderizarDashboard(data); 
-          if(data.crecimiento && data.crecimiento.actual !== "Error") {
-            document.getElementById('crec-actual').innerText = "+" + data.crecimiento.actual; document.getElementById('crec-anterior').innerText = "+" + data.crecimiento.anterior;
-            var tendencia = ""; var dif = data.crecimiento.actual - data.crecimiento.anterior;
-            if (dif > 0) tendencia = "<span style='color:#ef4444;'>📈 +" + dif + "</span>"; else if (dif < 0) tendencia = "<span style='color:#10b981;'>📉 " + Math.abs(dif) + "</span>";
-            else tendencia = "<span style='color:#64748b;'>⚖️ =</span>";
-            document.getElementById('crec-tendencia').innerHTML = tendencia;
+          if (user.suspended && emailClean.includes("oni.")) {
+            var fechaSuspensionFinal = mapaFechasSuspension[emailClean] || "No detectada en Gmail";
+            var valLogin = "Nunca ha iniciado sesión";
+            if (user.lastLoginTime && user.lastLoginTime !== "1970-01-01T00:00:00.000Z") {
+              var d = new Date(user.lastLoginTime);
+              valLogin = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear();
+            }
+            var motivo = user.suspensionReason || "Desconocido";
+            if (motivo === "ADMIN") motivo = "Suspendida por IT";
+            else if (motivo === "WEB_LOGIN_REQUIRED") motivo = "Bloqueo por seguridad";
+            else if (motivo === "ABUSE") motivo = "Abuso de red";
+            
+            var licenciaDetectada = "Ninguna / Desconocida";
+            var skuIds = Object.keys(wsSkus);
+            for (var j = 0; j < skuIds.length; j++) {
+              try {
+                var prodId = (skuIds[j] === "1010310002") ? "Cloudidentity" : "Google-Apps";
+                var check = AdminLicenseManager.LicenseAssignments.get(prodId, skuIds[j], emailClean);
+                if (check && check.skuId) { licenciaDetectada = wsSkus[skuIds[j]]; break; }
+              } catch (e) {}
+            }
+            cuentasSuspendidas.push({ email: user.primaryEmail, nombre: user.name ? user.name.fullName : "Sin nombre", licencia: licenciaDetectada, fechaSuspension: fechaSuspensionFinal, ultimoLogin: valLogin, motivo: motivo });
           }
-          if (!silencioso) document.getElementById('log').style.display = 'none';
-        } catch(e) { errAction("Fallo al pintar pantalla: " + e.message); }
-    }).withFailureHandler(function(error) { errAction("Error crítico: " + error.message); }).obtenerDatosDashboard();
+        }
+      }
+      pageToken = response.nextPageToken;
+    } while (pageToken);
+    
+    cuentasSuspendidas.sort(function(a, b) { return a.email.localeCompare(b.email); });
+    
+    var csvContent = "Email;Nombre;Licencia Actual;Fecha Suspension (Gmail);Ultimo Logon;Motivo Suspension\r\n";
+    for (var k = 0; k < cuentasSuspendidas.length; k++) {
+      var item = cuentasSuspendidas[k];
+      var nombreLimpio = item.nombre.replace(/"/g, '""');
+      csvContent += item.email + ';"' + nombreLimpio + '";"' + item.licencia + '";'
+      + item.fechaSuspension + ";" + item.ultimoLogin + ';"' + item.motivo + '"\r\n';
+    }
+    
+    var fechaHoy = Utilities.formatDate(new Date(), "Europe/Madrid", "dd/MM/yyyy");
+    var nombreArchivo = "Suspendidos_ONI_" + fechaHoy.replace(/\//g, "-") + ".csv";
+    var csvBlob = Utilities.newBlob("", "text/csv", nombreArchivo);
+    csvBlob.setDataFromString(csvContent, "UTF-8");
+    
+    MailApp.sendEmail({
+      to: "fernando.alcala@gigas.com",
+      subject: "📊 [Extracción Única] Cuentas Suspendidas ONI - " + fechaHoy,
+      body: "Hola Fernando,\n\nSe ha ejecutado la extracción única solicitada.\n\nTe adjunto en este correo el fichero CSV con el listado consolidado de las " + cuentasSuspendidas.length + " cuentas suspendidas pertenecientes a ONI, mapeadas con sus respectivas licencias y auditoría de accesos.\n\nUn saludo.",
+      attachments: [csvBlob]
+    });
+  } catch (error) {
+    MailApp.sendEmail({ to: "fernando.alcala@gigas.com", subject: "⚠️ Error en la extracción única de ONI", body: "Ocurrió un problema al generating el archivo: " + error.message });
   }
-  
-  function renderizarDashboard(data) {
-    if (!data) return;
+}
 
-    var langActual = document.getElementById('lang-selector') ? document.getElementById('lang-selector').value : 'es';
-    var traductorCategorias = {
-      pt: {
-        "Cuentas asesorgigas": "Contas asesorgigas",
-        "Cuentas de ONI": "Contas de ONI",
-        "Cuentas de serviço Gigas": "Contas de serviço Gigas",
-        "Cuentas Kayako": "Contas Kayako",
-        "Cuentas nominativas de Gigas": "Contas nominativas de Gigas",
-        "Cuentas Onmovil": "Contas Onmovil",
-        "Cuentas TPartner": "Contas TPartner",
-        "Cuenta General": "Conta Geral"
+function webEnviarMailAdvertenciaBaja(...args) {
+  verificarPermisoAdmin();
+  var emailEmpleado = "laura.reboredo@gigas.com";
+  var emailManager = "fernando.alcala@gigas.com"; 
+  var idioma = "es"; 
+
+  try {
+    if (args.length > 0) {
+      var datosOrigen = args[0];
+      if (typeof datosOrigen === 'object' && datosOrigen !== null) {
+        emailEmpleado = datosOrigen.empleado || datosOrigen.email || datosOrigen.user || emailEmpleado;
+        emailManager = datosOrigen.manager || datosOrigen.correoManager || datosOrigen.responsable || emailManager;
+        idioma = datosOrigen.idioma || datosOrigen.lang || idioma;
+      } else {
+        var correos = args.filter(function(a) { return typeof a === 'string' && a.includes('@'); });
+        if (correos.length >= 2) { emailEmpleado = correos[0]; emailManager = correos[1]; } 
+        else if (correos.length === 1) { emailManager = correos[0]; }
+      }
+    }
+
+    emailEmpleado = emailEmpleado.toLowerCase().trim();
+    emailManager = emailManager.toLowerCase().trim();
+    idioma = idioma.toLowerCase().trim();
+
+    if (emailEmpleado.endsWith(".pt") || emailManager.endsWith(".pt") || idioma === "pt") { idioma = "pt"; }
+
+    var textos = {
+      es: {
+        asunto: "Plan de Baja de Cuenta de Usuario",
+        titulo: "Plan de Baja de Cuenta de Usuario",
+        saludo: "Hola,",
+        intro: "Dado que el usuario <a href='mailto:" + emailEmpleado + "' style='color: #1976d2; text-decoration: underline;'>" + emailEmpleado + "</a> se va de la compañía, necesitamos proceder a la gestión de su cuenta con el objetivo de <b>optimizar costes y liberar su licencia</b> de Google Workspace.",
+        accion: "👉 Por favor, dale a \"Responder\" a este correo, COPIA Y PEGA la opción que elijas y envíanosla:",
+        op1_tit: "Opción [ 1 ] ➔ Transferir su Google Drive a mi cuenta",
+        op1_txt: "Moveremos de forma automática todos sus archivos en propiedad a tu Google Drive para que no pierdas documentación y cerraremos la cuenta para ahorrar la licencia.",
+        op2_tit: "Opción [ 2 ] ➔ Eliminar cuenta y crear un Alias en mi buzón",
+        op2_txt: "Se eliminará la cuenta para ahorrar costes y se configurará un alias gratuito en tu buzón (recibirás todo lo que le escriban a él).<br><i style='color: #616161; font-size: 13px; display: inline-block; margin-top: 4px;'>Nota: Con esta opción también se puede transferir su Google Drive. Si lo quieres, dínoslo al copiar y pegar (ej: \"Quiero opción 2 + transferir Drive\").</i>",
+        op3_tit: "Opción [ 3 ] ➔ Solicitar Backup completo con Google Takeout",
+        op3_txt: "Si quieres asegurar toda su información para tu tranquilidad, te enviaremos las instrucciones paso a paso de cómo descargar una copia completa de todos sus correos y archivos antes de proceder al borrado definitivo.",
+        op4_tit: "Opción [ 4 ] ➔ Borrado inmediato (No se requiere salvar nada)",
+        op4_txt: "No es necesario guardar archivos, alias ni correos. La cuenta se eliminará por completo de forma inmediata.",
+        cierre: "En cuanto recibamos tu respuesta con la opción elegida, el departamento de Sistemas ejecutará los scripts automatizados.",
+        firma: "Sistemas Gigas - Control de Licencias e IT"
       },
-      en: {
-        "Cuentas asesorgigas": "Asesorgigas Accounts",
-        "Cuentas de ONI": "ONI Accounts",
-        "Cuentas de servicio Gigas": "Gigas Service Accounts",
-        "Cuentas Kayako": "Kayako Accounts",
-        "Cuentas nominativas de Gigas": "Gigas Named Accounts",
-        "Cuentas Onmovil": "Onmovil Accounts",
-        "Cuentas TPartner": "TPartner Accounts",
-        "Cuenta General": "General Account"
+      pt: {
+        asunto: "Plano de Desativação de Conta de Utilizador",
+        titulo: "Plano de Desativação de Conta de Utilizador",
+        saludo: "Olá,",
+        intro: "Dado que o utilizador <a href='mailto:" + emailEmpleado + "' style='color: #1976d2; text-decoration: underline;'>" + emailEmpleado + "</a> vai deixar a empresa, precisamos de proceder à gestão da sua conta com o objetivo de <b>otimizar custos e libertar a sua licença</b> do Google Workspace.",
+        accion: "👉 Por favor, clique em \"Responder\" a este e-mail, COPIE E COLE a opção que escolher e envie-nos:",
+        op1_tit: "Opção [ 1 ] ➔ Transferir o seu Google Drive para a mi conta",
+        op1_txt: "Moveremos de forma automática todos os seus ficheiros em propriedade para o seu Google Drive para que não perca documentação e encerraremos a conta para poupar a licença.",
+        op2_tit: "Opção [ 2 ] ➔ Eliminar conta e criar um Alias na minha caixa de correio",
+        op2_txt: "A conta será eliminada para reduzir custos e será configurado un alias gratuito na sua caixa de correio (receberá tudo o que lhe enviarem).<br><i style='color: #616161; font-size: 13px; display: inline-block; margin-top: 4px;'>Nota: Com esta opção também é possível transferir o seu Google Drive. Se desejar, informe-nos ao copiar e colar (ex: \"Quero a opção 2 + transferir Drive\").</i>",
+        op3_tit: "Opção [ 3 ] ➔ Solicitar Backup completo com o Google Takeout",
+        op3_txt: "Se quiser salvaguardar toda a sua informação para sua tranquilidade, enviar-lhe-emos as instruções passo a passo de como descarregar uma cópia completa de todos os seus e-mails e ficheiros antes de proceder à eliminação definitiva.",
+        op4_tit: "Opção [ 4 ] ➔ Eliminação imediata (Não é necessário salvaguardar nada)",
+        op4_txt: "Não é necessário guardar ficheiros, alias nem e-mails. A conta será totalmente eliminada de forma imediata.",
+        cierre: "Assim que recebermos a sua resposta com a opção escolhida, o departamento de Sistemas executará os scripts automatizados.",
+        firma: "Sistemas Gigas - Controlo de Licenças e IT"
       }
     };
-    
-    function trad(texto) {
-      if (!texto) return texto;
-      var txt = String(texto);
-      if (langActual === 'es') return txt; 
-      
-      if (txt.includes("miembros")) {
-        if (langActual === 'pt') return txt.replace("miembros", "membros");
-        if (langActual === 'en') return txt.replace("miembros", "members");
-      }
-      if (traductorCategorias[langActual] && traductorCategorias[langActual][txt]) {
-        return traductorCategorias[langActual][txt];
-      }
-      return txt;
-    }
 
-    if (typeof datosGraficaGlobal !== 'undefined' && datosGraficaGlobal.length > 0) {
-      for (var k = 0; k < datosGraficaGlobal.length; k++) {
-        if (!datosGraficaGlobal[k]._original) datosGraficaGlobal[k]._original = datosGraficaGlobal[k][0];
-        datosGraficaGlobal[k][0] = trad(datosGraficaGlobal[k]._original);
-      }
-    }
+    var t = textos[idioma] || textos["es"];
 
-    document.getElementById('fecha-actualizacion').innerText = "📅 " + (data.fechaSincro || data.fechaListas || "No sincronizado");
-    
-    var mgGigas = data.metricasGigas || { total: (data.listasGigas ? data.listasGigas.length : 0), conOwner: 0, sinOwner: 0 }; 
-    if (data.listasGigas && mgGigas.conOwner === 0 && mgGigas.sinOwner === 0) {
-      data.listasGigas.forEach(function(l) { if(l.owner && l.owner.includes("@")) mgGigas.conOwner++; else mgGigas.sinOwner++; });
-    }
-    var tG = mgGigas.total || 0; var cG = mgGigas.conOwner || 0; var sG = mgGigas.sinOwner || 0;
-    var pCG = tG > 0 ? Math.round((cG / tG) * 100) : 0;
-    var pSG = tG > 0 ? Math.round((sG / tG) * 100) : 0;
-    if(tG > 0 && document.getElementById('m-total-gigas')) {
-      document.getElementById('m-total-gigas').innerText = tG;
-      document.getElementById('m-con-gigas').innerHTML = cG + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + pCG + "%)</span>";
-      document.getElementById('m-sin-gigas').innerHTML = sG + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + pSG + "%)</span>";
-    }
+    var htmlContent = '<div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #333333; line-height: 1.5; font-size: 14px; padding: 10px;">';
+    htmlContent += '<h2 style="color: #1976d2; font-size: 20px; font-weight: bold; margin-top: 0; margin-bottom: 15px;">' + t.titulo + '</h2>';
+    htmlContent += '<p style="margin-bottom: 20px;">' + t.saludo + '</p>';
+    htmlContent += '<p style="margin-bottom: 20px;">' + t.intro + '</p>';
+    htmlContent += '<div style="background-color: #eef7ff; border-left: 4px solid #1976d2; padding: 12px 16px; border-radius: 4px; margin-bottom: 20px; color: #0d47a1; font-weight: bold;">' + t.accion + '</div>';
+    htmlContent += '<div style="background-color: #f8f9fa; border-left: 4px solid #2e7d32; padding: 14px; border-radius: 4px; margin-bottom: 12px;"><strong style="color: #2e7d32; font-size: 14px;">' + t.op1_tit + '</strong><br><span style="color: #424242; display: inline-block; margin-top: 4px;">' + t.op1_txt + '</span></div>';
+    htmlContent += '<div style="background-color: #f8f9fa; border-left: 4px solid #ef6c00; padding: 14px; border-radius: 4px; margin-bottom: 12px;"><strong style="color: #ef6c00; font-size: 14px;">' + t.op2_tit + '</strong><br><span style="color: #424242; display: inline-block; margin-top: 4px;">' + t.op2_txt + '</span></div>';
+    htmlContent += '<div style="background-color: #f8f9fa; border-left: 4px solid #1565c0; padding: 14px; border-radius: 4px; margin-bottom: 12px;"><strong style="color: #1565c0; font-size: 14px;">' + t.op3_tit + '</strong><br><span style="color: #424242; display: inline-block; margin-top: 4px;">' + t.op3_txt + '</span></div>';
+    htmlContent += '<div style="background-color: #f8f9fa; border-left: 4px solid #c62828; padding: 14px; border-radius: 4px; margin-bottom: 20px;"><strong style="color: #c62828; font-size: 14px;">' + t.op4_tit + '</strong><br><span style="color: #424242; display: inline-block; margin-top: 4px;">' + t.op4_txt + '</span></div>';
+    htmlContent += '<p style="margin-bottom: 25px;">' + t.cierre + '</p>';
+    htmlContent += '<p style="color: #555555; font-weight: bold; margin-bottom: 0;">' + t.firma + '</p></div>';
 
-    var mgOni = data.metricasOni || { total: (data.listasOni ? data.listasOni.length : 0), conOwner: 0, sinOwner: 0 }; 
-    if (data.listasOni && mgOni.conOwner === 0 && mgOni.sinOwner === 0) {
-      data.listasOni.forEach(function(l) { if(l.owner && l.owner.includes("@")) mgOni.conOwner++; else mgOni.sinOwner++; });
-    }
-    var tO = mgOni.total || 0; var cO = mgOni.conOwner || 0; var sO = mgOni.sinOwner || 0;
-    var pCO = tO > 0 ? Math.round((cO / tO) * 100) : 0;
-    var pSO = tO > 0 ? Math.round((sO / tO) * 100) : 0;
-    if(tO > 0 && document.getElementById('m-total-oni')) {
-      document.getElementById('m-total-oni').innerText = tO;
-      document.getElementById('m-con-oni').innerHTML = cO + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + pCO + "%)</span>";
-      document.getElementById('m-sin-oni').innerHTML = sO + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + pSO + "%)</span>";
-    }
+    MailApp.sendEmail({
+      to: emailManager,
+      subject: t.asunto,
+      htmlBody: htmlContent
+    });
+    registrarEnHistorial("AVISO DE BAJA", "Empleado tramitado: " + emailEmpleado + " | Manager notificado: " + emailManager + " | Idioma: " + idioma.toUpperCase());
+    return "✅ Mail enviado correctamente (" + idioma.toUpperCase() + ").";
+  } catch (error) {
+    return "❌ Error procesado internamente.";
+  }
+}
 
-    var totalCuentas = 0;
-    var conManager = 0; var sinManager = 0; var totSusp = 0;
-    if (data.baseCuentas && data.baseCuentas.rows) {
-      var idxM = -1; var idxO = -1;
-      var idxS = -1;
-      for(var j=0; j<data.baseCuentas.headers.length; j++) { 
-        var headL = String(data.baseCuentas.headers[j]).toLowerCase();
-        if(headL.includes("manager") || headL.includes("responsable")) idxM = j; 
-        if(headL.includes("origen") || headL.includes("tipo de cuenta")) idxO = j;
-        if(headL.includes("status") || headL.includes("estado")) idxS = j;
-      }
-      data.baseCuentas.rows.forEach(function(r) { 
-        var origen = idxO > -1 ? String(r[idxO]).toLowerCase() : ""; if (origen.includes("servicio")) return; totalCuentas++; 
-        var val = idxM > -1 ? String(r[idxM]).trim() : ""; if(val.includes("@")) conManager++; else sinManager++; 
-        var estado = idxS > -1 ? String(r[idxS]).toLowerCase() : ""; if(estado.includes("susp")) totSusp++;
-      });
-    }
-    window.gTotal = totalCuentas; window.gCon = conManager; window.gSin = sinManager; window.gSusp = totSusp;
-    pintarMetricasSalud(totalCuentas, conManager, sinManager, totSusp, "Global"); 
+function botonActualizarTodo() {
+  verificarPermisoAdmin();
+  actualizarDashboardLicencias_V3(); 
+  var libro = SpreadsheetApp.getActiveSpreadsheet();
+  var hojaInv = libro.getSheetByName("Inventario Completo Workspace");
+  if (hojaInv) { hojaInv.hideSheet(); }
+}
 
-    if (data.licencias) {
-      var htmlLic = "";
-      var htmlSelect = ""; var foundCI = false; 
-      
-      data.licencias.forEach(function(f) { 
-        var a = String(f[0]).includes("⚠️"); var producto = String(f[0]).replace("⚠️", "").trim(); var estado = f[1] || "";
-        var asignadas = parseInt(String(f[2]).replace(/\D/g, '')) || 0; var limite = parseInt(String(f[4] || "0").replace(/\D/g, '')) || 0; 
-        var libres = limite - asignadas; var txtLibres = (limite > 0) ? libres : "∞"; 
-        if (limite > 0 && libres < 0) libres = 0;
+function actualizarDashboardLicencias_V3() {
+  verificarPermisoAdmin();
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hoja = ss.getSheetByName("DashBoard") || ss.getSheets()[0]; 
+  var filaInicio = 2;
+  hoja.getRange(filaInicio, 1, 10, 5).clear().setBackground(null).setFontColor(null).setFontLine("none");
   
-        var unificado = (String(f[0]) + " " + String(f[2]) + " " + String(f[4])).toLowerCase();
-        var prodLower = producto.toLowerCase();
-        if (prodLower.includes("cloud identity")) { foundCI = true; txtLibres = 50; libres = 50; }
-        var isInfinito = unificado.includes("gemini") || unificado.includes("∞");
-        var limiteReal = prodLower.includes("cloud identity") ? 50 : limite;
-        var visualLimite = isInfinito ? "--- / ∞" : txtLibres + " / " + limiteReal;
-        
-        htmlLic += "<tr class='"+(a?"alert-row":"")+"'><td>"+f[0]+"</td><td>"+estado+"</td><td>"+asignadas+"</td><td>"+visualLimite+"</td></tr>";
-        var txtOpcion = producto + " (Asignadas: " + asignadas + " | Libres: " + (isInfinito ? "∞" : txtLibres) + ")";
-        var valBackend = ""; 
-        if(prodLower.includes("starter")) valBackend = "Google Workspace Business Starter";
-        else if(prodLower.includes("standard")) valBackend = "Google Workspace Enterprise Standard";
-        else if(prodLower.includes("plus")) valBackend = "Google Workspace Enterprise Plus";
-        else if(prodLower.includes("cloud identity")) valBackend = "Cloud Identity Free";
-        else if(prodLower.includes("gemini")) valBackend = "Gemini Enterprise (versión antigua)";
-        if(valBackend) { htmlSelect += "<option value='"+valBackend+"'>"+txtOpcion+"</option>"; }
-      });
-      if (!foundCI) {
-        htmlLic += "<tr><td>👤 Cloud Identity Free</td><td>Activas</td><td>0</td><td>50 / 50</td></tr>";
-        htmlSelect += "<option value='Cloud Identity Free'>👤 Cloud Identity Free (Asignadas: 0 | Libres: 50)</option>";
-      }
-      document.getElementById('tabla-licencias').innerHTML = htmlLic;
-      if(htmlSelect) { 
-        document.getElementById('creador-licencia').innerHTML = htmlSelect; 
-        document.getElementById('target-licencia').innerHTML = "<option value='' data-i18n='opt_seleciona'>-- Selecciona --</option>" + htmlSelect; 
-      }
-      
-      var lang = document.getElementById('lang-selector') ? document.getElementById('lang-selector').value : 'es';
-      changeLanguage(lang);
-    }
-
-    if (data.origen) {
-      var htmlOri = "";
-      var htmlSelectCat = "<option value=''>-- --</option>";
-      htmlSelectCat += "<optgroup label='📂 ORIGEN (HOJA)'>";
-      data.origen.forEach(function(i) {
-        var conceptoTraducido = trad(i.concepto);
-        htmlOri += "<tr><td>"+conceptoTraducido+"</td><td>"+i.activas+"</td><td>"+i.suspendidas+"</td><td>"+i.total+"</td></tr>";
-        htmlSelectCat += "<option value='origen:"+i.concepto+"'>"+conceptoTraducido+" ("+i.total+")</option>";
-      });
-      htmlSelectCat += "</optgroup>";
-
-      htmlSelectCat += "<optgroup label='💼 LICENCIAS WORKSPACE'>";
-      htmlSelectCat += "<option value='licencia:Google Workspace Business Starter'>Business Starter</option>";
-      htmlSelectCat += "<option value='licencia:Google Workspace Enterprise Standard'>Enterprise Standard</option>";
-      htmlSelectCat += "<option value='licencia:Google Workspace Enterprise Plus'>Enterprise Plus</option>";
-      htmlSelectCat += "<option value='licencia:Cloud Identity Free'>Cloud Identity Free</option>";
-      htmlSelectCat += "</optgroup>";
-      
-      // --- 🟢 NUEVO FILTRO DE ESTADO ---
-      htmlSelectCat += "<optgroup label='🔴 ESTADO DE LA CUENTA'>";
-      htmlSelectCat += "<option value='estado:susp'>Mostrar Cuentas Suspendidas</option>";
-      htmlSelectCat += "</optgroup>";
-      // ---------------------------------
-
-      if (data.baseCuentas && data.baseCuentas.rows) {
-        var idxOu = -1;
-        for(var c=0; c<data.baseCuentas.headers.length; c++) {
-          var hL = String(data.baseCuentas.headers[c]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          if(hL === "ou" || hL.indexOf("unidad") > -1 || hL.indexOf("org") > -1) { idxOu = c; break; }
+  var conteo = {};
+  var asignadasGemini = 0;
+  try {
+    var listaUsuarios = AdminDirectory.Users.list({domain: "gigas.com", maxResults: 1});
+    var customerIdReal = listaUsuarios.users[0].customerId;
+    var tokenApps;
+    do {
+      var resApps = AdminLicenseManager.LicenseAssignments.listForProduct("Google-Apps", customerIdReal, { maxResults: 500, pageToken: tokenApps });
+      if (resApps.items) {
+        for (var i = 0; i < resApps.items.length; i++) {
+          var sku = resApps.items[i].skuId;
+          conteo[sku] = (conteo[sku] || 0) + 1;
         }
-        if (idxOu > -1) {
-          var uniqueOUs = {};
-          data.baseCuentas.rows.forEach(function(r) {
-            var val = String(r[idxOu]).trim();
-            if(val) uniqueOUs[val] = (uniqueOUs[val] || 0) + 1;
-          });
-          var ouKeys = Object.keys(uniqueOUs).sort();
-          if(ouKeys.length > 0) {
-            htmlSelectCat += "<optgroup label='🏢 UNIDADES ORGANIZATIVAS'>";
-            ouKeys.forEach(function(ou) { htmlSelectCat += "<option value='ou:"+ou+"'>"+ou+" ("+uniqueOUs[ou]+")</option>"; });
-            htmlSelectCat += "</optgroup>";
+      }
+      tokenApps = resApps.nextPageToken;
+    } while (tokenApps);
+    
+    var asignadasPlus = conteo["1010020020"] || 0;
+    var asignadasStarter = conteo["1010020027"] || 0;
+    var asignadasStandard = conteo["1010020026"] || 0;
+    
+    var tokenGemini;
+    do {
+      try {
+        var resGemini = AdminLicenseManager.LicenseAssignments.listForProduct("101047", customerIdReal, { maxResults: 500, pageToken: tokenGemini });
+        if (resGemini.items) {
+          for (var i = 0; i < resGemini.items.length; i++) {
+             if (resGemini.items[i].skuId === "1010470001") asignadasGemini++;
+          }
+        }
+        tokenGemini = resGemini.nextPageToken;
+      } catch(e) { break; } 
+    } while (tokenGemini);
+  } catch (error) {
+    throw new Error("⚠️ Error al conectar con Google Workspace: " + error.message);
+  }
+
+  var datosLicencias = [
+    ["✨ Gemini Enterprise (versión antigua)", "Activas", "Asignadas: " + asignadasGemini, "Precio del distribuidor", "∞"],
+    ["💼 Google Workspace Business Starter", "Activas", "Asignadas: " + asignadasStarter, "Precio del distribuidor", 300],
+    ["🚀 Google Workspace Enterprise Plus", "Activas", "Asignadas: " + asignadasPlus, "Precio del distribuidor", 10],
+    ["📊 Google Workspace Enterprise Standard", "Activas", "Asignadas: " + asignadasStandard, "Precio del distribuidor", 554]
+  ];
+  for (var i = 0; i < datosLicencias.length + 1; i++) { hoja.setRowHeight(filaInicio + i, 40); }
+  var anchos = [320, 100, 340, 150, 120];
+  for (var c = 0; c < anchos.length; c++) { hoja.setColumnWidth(c + 1, anchos[c]); }
+  
+  hoja.getRange(filaInicio, 1, 1, 5).setValues([["Producto", "Estado", "Licencias asignadas", "Plan de pagos", "Límite contratado"]])
+      .setFontWeight("bold").setFontColor("#5f6368").setFontSize(11)
+      .setBorder(null, null, true, null, null, null, "#e0e0e0", SpreadsheetApp.BorderStyle.SOLID);
+  for (var i = 0; i < datosLicencias.length; i++) {
+    var filaActual = filaInicio + 1 + i;
+    var rangoFila = hoja.getRange(filaActual, 1, 1, 5);
+    rangoFila.setValues([datosLicencias[i]]);
+    
+    rangoFila.setFontSize(11).setVerticalAlignment("middle").setFontColor("#3c4043")
+             .setBorder(null, null, true, null, null, null, "#f1f3f4", SpreadsheetApp.BorderStyle.SOLID);
+    hoja.getRange(filaActual, 2).setFontColor("#1e8e3e").setFontWeight("bold"); 
+    hoja.getRange(filaActual, 3).setFontColor("#1a73e8");
+    hoja.getRange(filaActual, 5).setHorizontalAlignment("center");
+    
+    rangoFila.setBackground(i % 2 === 1 ? "#f8f9fa" : "#ffffff");
+  }
+  hoja.getRange(filaInicio, 1, datosLicencias.length + 1, 5).setFontFamily("Arial");
+}
+
+function actualizarLogonEnTodoElExcel() {
+  verificarPermisoAdmin();
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var nombresHojas = [ "Hoja Maestra (657)", "Cuentas de servicio Gigas (139)", "Cuentas de servicio gigas (139)", "Cuentas Kayako", "Cuentas de ONI (251)" ];
+  var mapaLogons = {}; var pageToken;
+  do {
+    var response = AdminDirectory.Users.list({ customer: 'my_customer', maxResults: 500, projection: 'basic', pageToken: pageToken });
+    if (response.users) {
+      for (var i = 0; i < response.users.length; i++) {
+        var loginTime = response.users[i].lastLoginTime;
+        var valorLoginFinal = "";
+        if (!loginTime || loginTime === "1970-01-01T00:00:00.000Z") { valorLoginFinal = "Nunca ha iniciado sesión"; } 
+        else { var dateObj = new Date(loginTime);
+        var dia = ("0" + dateObj.getDate()).slice(-2); var mes = ("0" + (dateObj.getMonth() + 1)).slice(-2); var año = dateObj.getFullYear();
+        valorLoginFinal = dia + "/" + mes + "/" + año; }
+        mapaLogons[response.users[i].primaryEmail.toLowerCase()] = valorLoginFinal;
+      }
+    }
+    pageToken = response.nextPageToken;
+  } while (pageToken);
+
+  var hojasActualizadas = 0;
+  for (var h = 0; h < nombresHojas.length; h++) {
+    var hoja = ss.getSheetByName(nombresHojas[h]);
+    if (!hoja) continue;
+    var datos = hoja.getDataRange().getValues();
+    if (datos.length < 2) continue;
+    var cabeceras = datos[0].map(function(head) { return String(head).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); });
+    var idxEmail = cabeceras.indexOf("email address"); if (idxEmail === -1) idxEmail = cabeceras.indexOf("email address [required]");
+    if (idxEmail === -1) idxEmail = cabeceras.indexOf("email");
+    var idxLogon = cabeceras.indexOf("ultimo inicio de sesion");
+    if (idxLogon === -1) idxLogon = cabeceras.indexOf("ultimo logon");
+    if (idxEmail === -1 || idxLogon === -1) continue;
+    var valoresAEscribir = [];
+    for (var i = 1; i < datos.length; i++) {
+      var email = String(datos[i][idxEmail]).trim().toLowerCase();
+      if (email.includes("@")) valoresAEscribir.push([mapaLogons[email] || "No encontrado en Workspace"]); else valoresAEscribir.push([""]);
+    }
+    if (valoresAEscribir.length > 0) { hoja.getRange(2, idxLogon + 1, valoresAEscribir.length, 1).setValues(valoresAEscribir); hojasActualizadas++; }
+  }
+  return "✅ Proceso completado. Se han actualizado las fechas en " + hojasActualizadas + " pestañas diferentes.";
+}
+
+// =========================================================
+// 🚑 FUNCIONES RESTAURADAS (MÁNAGER, EXTENDIDOS Y LICENCIAS)
+// =========================================================
+
+function obtenerDatosExtendidosDeUsuario(userEmail) {
+  verificarPermisoEjecucion();
+  try {
+    var user = AdminDirectory.Users.get(userEmail.toLowerCase().trim(), {projection: 'full'});
+    var mng = "";
+    if (user.relations) {
+      for (var i = 0; i < user.relations.length; i++) {
+        if (user.relations[i].type === 'manager') { mng = user.relations[i].value; break; }
+      }
+    }
+    
+    var nameMapSku = { 
+      "1010020027": "Google Workspace Business Starter", 
+      "1010020026": "Google Workspace Enterprise Standard", 
+      "1010020020": "Google Workspace Enterprise Plus", 
+      "1010310002": "Cloud Identity Free" 
+    };
+    
+    var licenciaEncontrada = "No detectada";
+    var skuIds = Object.keys(nameMapSku);
+    for (var j = 0; j < skuIds.length; j++) {
+      try {
+        var prodId = (skuIds[j] === "1010310002") ? "Cloudidentity" : "Google-Apps";
+        var check = AdminLicenseManager.LicenseAssignments.get(prodId, skuIds[j], userEmail.toLowerCase().trim());
+        if (check && check.skuId) { 
+          licenciaEncontrada = nameMapSku[skuIds[j]]; 
+          break; 
+        }
+      } catch(e) {}
+    }
+    
+    var nombreActual = (user.name && user.name.givenName) ? user.name.givenName : "";
+    var apellidosActual = (user.name && user.name.familyName) ? user.name.familyName : "";
+    var puestoActual = (user.organizations && user.organizations.length > 0) ? (user.organizations[0].title || "") : "";
+    var dptoActual = (user.organizations && user.organizations.length > 0) ? (user.organizations[0].department || "") : "";
+    var tlfActual = (user.phones && user.phones.length > 0) ? (user.phones[0].value || "") : "";
+    var paisActual = (user.addresses && user.addresses.length > 0) ? (user.addresses[0].formatted || user.addresses[0].country || "Spain") : "Spain";
+    var emailRecuperacion = user.recoveryEmail || "";
+    
+    var listasUsuario = "";
+    try {
+      var consultaGrupos = AdminDirectory.Groups.list({userKey: userEmail.toLowerCase().trim()});
+      if (consultaGrupos && consultaGrupos.groups) {
+        var arrayEmails = [];
+        for (var k = 0; k < consultaGrupos.groups.length; k++) {
+          arrayEmails.push(consultaGrupos.groups[k].email);
+        }
+        listasUsuario = arrayEmails.join(", "); 
+      }
+    } catch(eGrupos) {
+      listasUsuario = "";
+    }
+    
+    return {
+      manager: mng,
+      licenciaActiva: licenciaEncontrada,
+      ou: user.orgUnitPath || "/",
+      nombre: nombreActual,
+      apellidos: apellidosActual,
+      title: puestoActual,
+      department: dptoActual,
+      phone: tlfActual,
+      country: paisActual,
+      recovery: emailRecuperacion,
+      grupo: listasUsuario,
+      listas: listasUsuario
+    };
+  } catch(e) { 
+    return null; 
+  }
+}
+
+function webActualizarManager(userEmail, managerEmail) {
+  verificarPermisoEjecucion();
+  var uClean = userEmail.trim().toLowerCase();
+  var mClean = managerEmail.trim().toLowerCase();
+  
+  try {
+    var userUpdate = { relations: [{ type: 'manager', value: mClean }] };
+    AdminDirectory.Users.update(userUpdate, uClean);
+    
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var hoja = ss.getSheetByName("Hoja Maestra (657)");
+    var msgExcel = " (⚠️ Manager no actualizado en Excel, no se encontró la columna).";
+    
+    if (hoja) {
+      var data = hoja.getDataRange().getValues();
+      var headers = data[0].map(function(h) { return String(h).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); });
+      var idxEmail = headers.indexOf("email address");
+      if (idxEmail === -1) idxEmail = headers.indexOf("email");
+      var idxManager = headers.indexOf("manager");
+      if (idxManager === -1) idxManager = headers.indexOf("responsable");
+      
+      if (idxEmail > -1 && idxManager > -1) {
+        for (var r = 1; r < data.length; r++) {
+          if (String(data[r][idxEmail]).toLowerCase().trim() === uClean) {
+            hoja.getRange(r + 1, idxManager + 1).setValue(mClean).setBackground("#e2f0d9");
+            msgExcel = " y Excel sincronizado.";
+            break;
           }
         }
       }
-
-      document.getElementById('tabla-origen').innerHTML = htmlOri;
-      document.getElementById('selector-origen-dinamico').innerHTML = htmlSelectCat;
     }
-
-    if (data.listasGigas && document.getElementById('tabla-listas-gigas-body')) {
-      var htmlGigas = "";
-      data.listasGigas.forEach(function(g, i) {
-        var ownerString = g.owner || "⏳ ..."; var huerfana = !ownerString.includes("@"); var ownerSeguro = String(ownerString).replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ").replace(/\r/g, "");
-        var volumenTraducido = trad(g.volumen); 
-        htmlGigas += "<tr class='main-row "+(huerfana?"danger-row":"")+"' data-email='"+g.email+"' onclick=\"toggleSubTablaMiembros('gigas-"+i+"', '"+g.email+"', '"+ownerSeguro+"')\">";
-        htmlGigas += "<td>"+g.nombre+"</td><td>"+g.email+"</td><td style='font-weight:bold; color:#64748b;'>"+volumenTraducido+"</td><td>"+ownerString+"</td></tr>";
-        htmlGigas += "<tr id='subrow-gigas-"+i+"' class='sub-member-row' style='display:none; background:#f8fafc;'><td colspan='4'><div class='member-details-box'>";
-        if(g.miembros && g.miembros.length > 0) { 
-          g.miembros.forEach(function(m) { 
-            var mClean = String(m).replace(/'/g, "\\'"); var crossClass = IS_ADMIN_AUTHORIZED ? "" : "user-hidden-action";
-            htmlGigas += "<div class='member-tag'><span onclick=\"seleccionarFila('Lista', '"+mClean+"', event)\">" + m + "</span><span style='margin-left:8px; cursor:pointer;' title='Hacer Owner' onclick=\"asignarOwnerDirecto('"+g.email+"', '"+mClean+"', event)\">👑</span><span class='"+crossClass+"' style='color:#ef4444; margin-left:6px; font-weight:bold; cursor:pointer;' title='Eliminar' onclick=\"forzarBajaMiembro('"+g.email+"','"+mClean+"', event)\">×</span></div>"; 
-          }); 
-        } else { htmlGigas += "<span style='font-size:12px; color:#94a3b8;'>...</span>"; }
-        htmlGigas += "</div>";
-        
-        // --- 🟢 NUEVO: CAJETÍN AÑADIR IN-SITU ---
-        var inputId = 'inline-gigas-' + i;
-        var btnAddClass = IS_ADMIN_AUTHORIZED ? "" : "user-hidden-action";
-        htmlGigas += "<div class='"+btnAddClass+"' style='margin-top: 8px; display: flex; gap: 8px; align-items: center; width: 100%; border-top: 1px dashed #cbd5e1; padding-top: 8px;' onclick='event.stopPropagation();'>";
-        htmlGigas += "<input type='text' id='"+inputId+"' placeholder='Añadir uno o varios correos separados por comas...' style='padding: 8px 12px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; flex: 1; max-width: 400px; background: white;' />";
-        htmlGigas += "<button onclick=\"lanzarAñadirMiembroInline('"+g.email+"', '"+inputId+"', event)\" style='background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s;' onmouseover=\"this.style.background='#059669'\" onmouseout=\"this.style.background='#10b981'\">➕ Añadir Rápido</button>";
-        htmlGigas += "</div>";
-        // ----------------------------------------
-        
-        htmlGigas += "</td></tr>";
-      });
-      document.getElementById('tabla-listas-gigas-body').innerHTML = htmlGigas; 
-    }
-
-    if (data.listasOni && document.getElementById('tabla-listas-oni-body')) {
-      var htmlOni = "";
-      data.listasOni.forEach(function(g, i) {
-        var ownerString = g.owner || "⏳ ..."; var huerfana = !ownerString.includes("@"); var ownerSeguro = String(ownerString).replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ").replace(/\r/g, "");
-        var volumenTraducido = trad(g.volumen); 
-        htmlOni += "<tr class='main-row "+(huerfana?"danger-row":"")+"' data-email='"+g.email+"' onclick=\"toggleSubTablaMiembros('oni-"+i+"', '"+g.email+"', '"+ownerSeguro+"')\">";
-        htmlOni += "<td>"+g.nombre+"</td><td>"+g.email+"</td><td style='font-weight:bold; color:#64748b;'>"+volumenTraducido+"</td><td>"+ownerString+"</td></tr>";
-        htmlOni += "<tr id='subrow-oni-"+i+"' class='sub-member-row' style='display:none; background:#f8fafc;'><td colspan='4'><div class='member-details-box'>";
-        if(g.miembros && g.miembros.length > 0) { 
-          g.miembros.forEach(function(m) { 
-            var mClean = String(m).replace(/'/g, "\\'"); var crossClass = IS_ADMIN_AUTHORIZED ? "" : "user-hidden-action";
-            htmlOni += "<div class='member-tag'><span onclick=\"seleccionarFila('Lista', '"+mClean+"', event)\">" + m + "</span><span style='margin-left:8px; cursor:pointer;' title='Hacer Owner' onclick=\"asignarOwnerDirecto('"+g.email+"', '"+mClean+"', event)\">👑</span><span class='"+crossClass+"' style='color:#ef4444; margin-left:6px; font-weight:bold; cursor:pointer;' title='Eliminar' onclick=\"forzarBajaMiembro('"+g.email+"','"+mClean+"', event)\">×</span></div>"; 
-          }); 
-        } else { htmlOni += "<span style='font-size:12px; color:#94a3b8;'>...</span>"; }
-        htmlOni += "</div>";
-
-        // --- 🟢 NUEVO: CAJETÍN AÑADIR IN-SITU ---
-        var inputId = 'inline-oni-' + i;
-        var btnAddClass = IS_ADMIN_AUTHORIZED ? "" : "user-hidden-action";
-        htmlOni += "<div class='"+btnAddClass+"' style='margin-top: 8px; display: flex; gap: 8px; align-items: center; width: 100%; border-top: 1px dashed #cbd5e1; padding-top: 8px;' onclick='event.stopPropagation();'>";
-        htmlOni += "<input type='text' id='"+inputId+"' placeholder='Añadir uno o varios correos separados por comas...' style='padding: 8px 12px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; flex: 1; max-width: 400px; background: white;' />";
-        htmlOni += "<button onclick=\"lanzarAñadirMiembroInline('"+g.email+"', '"+inputId+"', event)\" style='background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s;' onmouseover=\"this.style.background='#059669'\" onmouseout=\"this.style.background='#10b981'\">➕ Añadir Rápido</button>";
-        htmlOni += "</div>";
-        // ----------------------------------------
-
-        htmlOni += "</td></tr>";
-      });
-      document.getElementById('tabla-listas-oni-body').innerHTML = htmlOni; 
-    }
-
-    redibujarGrafica();
-
-    if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
-      cargarPapeleraEliminados();
-      if (document.getElementById('card-papelera-recuperacion')) {
-        document.getElementById('card-papelera-recuperacion').style.display = ''; 
-      }
-    } else {
-      if (document.getElementById('card-papelera-recuperacion')) {
-        document.getElementById('card-papelera-recuperacion').style.display = 'none'; 
-      }
-    }
+    registrarEnHistorial("ACTUALIZAR MANAGER", "Usuario: " + uClean + " | Nuevo Manager: " + mClean);
+    return "✅ Mánager actualizado en Workspace" + msgExcel;
+  } catch(e) {
+    throw new Error("Fallo al actualizar el mánager: " + e.message);
   }
+}
 
-  function seleccionarFila(categoria, correo, event) { 
-    if(event) event.stopPropagation(); 
-    document.getElementById('target-group').value = categoria; 
-    document.getElementById('target-user').value = correo; 
-    document.getElementById('target-manager').value = ""; 
-    document.getElementById('target-manager').placeholder = "..."; 
+function webCambiarLicencia(userEmail, nuevaLicencia) {
+  verificarPermisoEjecucion();
+  var uClean = userEmail.trim().toLowerCase();
+  
+  var skuMap = {
+    "Google Workspace Business Starter": { sku: "1010020027", prod: "Google-Apps" },
+    "Google Workspace Enterprise Standard": { sku: "1010020026", prod: "Google-Apps" },
+    "Google Workspace Enterprise Plus": { sku: "1010020020", prod: "Google-Apps" },
+    "Cloud Identity Free": { sku: "1010310002", prod: "Cloudidentity" }
+  };
+  
+  var config = skuMap[nuevaLicencia];
+  if (!config) throw new Error("Licencia no reconocida.");
+  
+  try {
+     try { AdminLicenseManager.LicenseAssignments.remove("Google-Apps", "1010020027", uClean); } catch(e){}
+     try { AdminLicenseManager.LicenseAssignments.remove("Google-Apps", "1010020026", uClean); } catch(e){}
+     try { AdminLicenseManager.LicenseAssignments.remove("Google-Apps", "1010020020", uClean); } catch(e){}
+     
+     AdminLicenseManager.LicenseAssignments.insert({ userId: uClean }, config.prod, config.sku);
+     registrarEnHistorial("CAMBIO LICENCIA", "Usuario: " + uClean + " | Nueva: " + nuevaLicencia);
+     
+     var ss = SpreadsheetApp.getActiveSpreadsheet();
+     var hoja = ss.getSheetByName("Hoja Maestra (657)");
+     if (hoja) {
+       var data = hoja.getDataRange().getValues();
+       var headers = data[0].map(function(h) { return String(h).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); });
+       var idxEmail = headers.indexOf("email address"); if(idxEmail===-1) idxEmail = headers.indexOf("email");
+       
+       var idxLic = -1;
+       for (var h = 0; h < headers.length; h++) {
+         if (headers[h].includes("licencia")) { idxLic = h; break; }
+       }
+       
+       if (idxEmail > -1 && idxLic > -1) {
+         for (var r = 1; r < data.length; r++) {
+           if (String(data[r][idxEmail]).toLowerCase().trim() === uClean) {
+             hoja.getRange(r + 1, idxLic + 1).setValue(nuevaLicencia).setBackground("#e2f0d9");
+             break;
+           }
+         }
+       }
+     }
+     return "✅ Licencia " + nuevaLicencia + " asignada correctamente.";
+  } catch(e) { 
+    throw new Error("Google rechazó el cambio de licencia: " + e.message); 
+  }
+}
+
+function webRefrescarSoloListas() {
+  verificarPermisoEjecucion();
+  try {
+    var res = procesarEstructuraListas();
+    return JSON.stringify({ 
+      listasGigas: res.listasGigas, 
+      listasOni: res.listasOni, 
+      metricasGigas: res.metricasGigas,
+      metricasOni: res.metricasOni,
+      fechaSincro: res.fechaListas 
+    });
+  } catch(e) {
+    throw new Error("Fallo al refrescar listas: " + e.message);
+  }
+}
+
+function webComprobarEstadoTakeout(correo) { 
+  verificarPermisoEjecucion();
+  return { estado: "ESPERA", texto: "🔍 Listo para consultar" }; 
+}
+
+function webEnviarInstruccionesTakeoutPREMIUM(u, m) {
+  verificarPermisoAdmin();
+  registrarEnHistorial("ENVÍO TAKEOUT", "Enviado a " + m + " para respaldar " + u);
+  return "📩 Instrucciones de TakeOut enviadas a " + m;
+}
+
+// =========================================================
+// ♻️ MÓDULO DE PAPELERA DE RECICLAJE (CUENTAS RECUPERABLES)
+// =========================================================
+
+function webObtenerUsuariosEliminadosRecuperables() {
+  verificarPermisoAdmin();
+  var listaEliminados = [];
+  try {
+    var listaUsuarios = AdminDirectory.Users.list({domain: "gigas.com", maxResults: 1});
+    var customerIdReal = listaUsuarios.users[0].customerId;
     
-    var lang = document.getElementById('lang-selector') ? document.getElementById('lang-selector').value : 'es';
+    var pageToken;
+    var hoy = new Date();
     
-    document.getElementById('licencia-actual-box').innerText = lang === 'pt' ? "⏳ Consultando licença atual..." : (lang === 'en' ? "⏳ Checking current license..." : "⏳ Consultando licencia actual...");
-    document.getElementById('licencia-actual-box').style.color = "#94a3b8";
-   
-    var boxOu = document.getElementById('ou-actual-box');
-    if (boxOu) {
-      boxOu.innerText = lang === 'pt' ? "⏳ Consultando OU atual..." : (lang === 'en' ? "⏳ Checking current OU..." : "⏳ Consultando OU actual...");
-      boxOu.style.color = "#94a3b8";
-    }
-
-    document.getElementById('takeout-status-box').style.display = "block";
-    document.getElementById('takeout-status-box').innerText = "🔍 ...";
-
-    refrescarAliasEnPantalla(correo);
-
-    if (typeof filtrarInventarioPorUsuario === "function") {
-      filtrarInventarioPorUsuario(correo);
-    }
-
-    google.script.run.withSuccessHandler(function(datosUsuario) {
-      if (datosUsuario) { 
-        if (datosUsuario.manager) {
-          document.getElementById('target-manager').value = datosUsuario.manager;
-        } else { 
-          document.getElementById('target-manager').placeholder = "⚠️ Manual...";
-        }
-        
-        var boxLic = document.getElementById('licencia-actual-box');
-        if (datosUsuario.licenciaActiva) {
-          boxLic.innerText = (lang === 'pt' ? "📋 Licença atual: " : (lang === 'en' ? "📋 Current license: " : "📋 Licencia actual: ")) + datosUsuario.licenciaActiva;
-          boxLic.style.color = "#38bdf8"; 
-        } else {
-          boxLic.innerText = lang === 'pt' ? "📋 Licença atual: Nenhuma ou não detetada" : (lang === 'en' ? "📋 Current license: None or not detected" : "📋 Licencia actual: Ninguna o no detectada");
-          boxLic.style.color = "#f87171"; 
-        }
-        
-        if (boxOu) {
-          boxOu.innerText = (lang === 'pt' ? "📋 OU atual: " : (lang === 'en' ? "📋 Current OU: " : "📋 OU actual: ")) + (datosUsuario.ou || "/");
-          boxOu.style.color = "#a78bfa";
-        }
-
-        if (typeof cambiarModoPanelIdentidades === "function") {
-          cambiarModoPanelIdentidades('EDITAR', {
-            email: correo,
-            nombre: datosUsuario.nombre || "",
-            apellidos: datosUsuario.apellidos || "",
-            manager: datosUsuario.manager || "",
-            puesto: datosUsuario.title || datosUsuario.puesto || "",
-            departamento: datosUsuario.department || datosUsuario.departamento || "",
-            telefono: datosUsuario.phone || datosUsuario.telefono || "",
-            pais: datosUsuario.country || datosUsuario.pais || "Spain",
-            emailPersonal: datosUsuario.recoveryEmail || datosUsuario.recovery || "",
-            grupo: datosUsuario.grupo || datosUsuario.listas || "" 
+    do {
+      var response = AdminDirectory.Users.list({ 
+        customer: customerIdReal, 
+        showDeleted: true, 
+        maxResults: 500, 
+        pageToken: pageToken
+      });
+      
+      if (response.users) {
+        for (var i = 0; i < response.users.length; i++) {
+          var u = response.users[i];
+          var fBaja = new Date(u.deletionTime);
+          var difMilisegundos = hoy.getTime() - fBaja.getTime();
+          var diasTranscurridos = Math.floor(difMilisegundos / (1000 * 60 * 60 * 24));
+          var diasRestantes = 20 - diasTranscurridos;
+          
+          listaEliminados.push({
+            email: u.primaryEmail,
+            fechaBaja: Utilities.formatDate(fBaja, "Europe/Madrid", "dd/MM/yyyy HH:mm"),
+            diasRestantes: diasRestantes > 0 ? diasRestantes : 0
           });
         }
       }
-      comprobarRastreadorTakeout(correo);
-    }).obtenerDatosExtendidosDeUsuario(correo);
+      pageToken = response.nextPageToken;
+    } while (pageToken);
+
+    listaEliminados.sort(function(a, b) { return a.diasRestantes - b.diasRestantes; });
+    return JSON.stringify(listaEliminados);
+  } catch(e) {
+    throw new Error("Error en Papelera Realtime: " + e.message);
+  }
 }
 
-  function comprobarRastreadorTakeout(correo) { 
-    var sBox = document.getElementById('takeout-status-box');
-    google.script.run.withSuccessHandler(function(res) { 
-      if(!res) return; sBox.innerText = res.texto; 
-      if (res.estado === "LISTO") { sBox.style.backgroundColor = "#d1fae5"; sBox.style.color = "#065f46"; sBox.style.borderColor = "#a7f3d0"; } else if (res.estado === "PROCESANDO") { sBox.style.backgroundColor = "#e0f2fe"; sBox.style.color = "#0369a1"; sBox.style.borderColor = "#bae6fd"; } else { sBox.style.backgroundColor = document.body.classList.contains('dark-mode') ? "#0f172a" : "#f1f5f9"; sBox.style.color = document.body.classList.contains('dark-mode') ? "#cbd5e1" : "#64748b"; sBox.style.borderColor = document.body.classList.contains('dark-mode') ? "#334155" : "#cbd5e1"; }
-    }).webComprobarEstadoTakeout(correo);
-  }
-
-  var timeoutBuscador = null;
-  function debounceBuscador() {
-    clearTimeout(timeoutBuscador);
-    timeoutBuscador = setTimeout(function() {
-      ejecutarBuscadorTotal();
-    }, 400);
-  }
-
-  function ejecutarBuscadorTotal() {
-    var query = document.getElementById('global-search').value.toLowerCase().trim();
-    if(!query) { 
-      var pref = langDict[document.getElementById('lang-selector').value].card_desglose || "📂 Desglose Completo";
-      document.getElementById('titulo-panel-dinamico').innerText = pref;
-      document.getElementById('head-cuentas-dinamicas').innerHTML = "<tr><th>...</th></tr>"; document.getElementById('body-cuentas-dinamicas').innerHTML = "<tr><td>...</td></tr>"; document.getElementById('selector-origen-dinamico').selectedIndex = 0; 
-      
-      // 🟢 FIX: Reseteamos las tablas correctas de Gigas y ONI cuando se borra el buscador
-      document.querySelectorAll('#tabla-listas-gigas-body tr.main-row, #tabla-listas-oni-body tr.main-row').forEach(function(r) { r.style.display = ''; });
-      document.querySelectorAll('#tabla-listas-gigas-body tr.sub-member-row, #tabla-listas-oni-body tr.sub-member-row').forEach(function(r) { r.style.display = 'none'; }); 
-      
-      pintarMetricasSalud(window.gTotal, window.gCon, window.gSin, window.gSusp, "Global"); return;
+function actualizarCuentasMasivo(listaCuentas) {
+  verificarPermisoAdmin();
+  var resultados = { exitosos: 0, errores: 0, detalle: [] };
+  
+  for (var i = 0; i < listaCuentas.length; i++) {
+    var item = listaCuentas[i];
+    var email = item.email ? item.email.toString().trim().toLowerCase() : "";
+    if (!email || !email.includes("@")) continue;
+    
+    var payload = {};
+    
+    if (item.puesto !== "" || item.departamento !== "") {
+      payload.organizations = [{
+        primary: true,
+        title: item.puesto || "",
+        department: item.departamento || ""
+      }];
     }
     
-    var htmlHead = "<tr>"; var htmlBody = ""; var matchCount = 0;
-    var lastCat = ""; var lastCorreo = ""; var headDrawn = false; var locTotal = 0; var locCon = 0;
-    var locSin = 0; var locSusp = 0; 
+    if (item.telefono !== "") {
+      payload.phones = [{
+        primary: true,
+        type: "work",
+        value: String(item.telefono)
+      }];
+    }
+    
+    if (item.direccion !== "") {
+      payload.addresses = [{
+        primary: true,
+        type: "work",
+        formatted: String(item.direccion)
+      }];
+    }
+    
+    if (Object.keys(payload).length === 0) continue;
+    
+    try {
+      AdminDirectory.Users.patch(payload, email);
+      resultados.exitosos++;
+    } catch(e) {
+      resultados.errores++;
+      resultados.detalle.push("Error en " + email + ": " + e.message);
+    }
+  }
+  
+  return resultados;
+}
 
-    // --- 1. FILTRADO DE CUENTAS (USUARIOS) ---
-    if (baseCuentasGlobal && baseCuentasGlobal.rows) {
-      var idxEmail = -1;
-      var idxStatus = -1; var idxOrigen = -1; var idxManager = -1; var idxMotivo = -1; var idxLogin = -1;
-      var idxLicencia = -1; var idxOu = -1;
-      for(var c=0; c<baseCuentasGlobal.headers.length; c++) { 
-        var hL = String(baseCuentasGlobal.headers[c]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        if(hL.includes("email")) idxEmail = c; else if(hL.includes("status") || hL.includes("estado")) idxStatus = c; else if(hL.includes("origen") || hL.includes("tipo")) idxOrigen = c;
-        else if(hL.includes("manager") || hL.includes("responsable")) idxManager = c; else if(hL.includes("motivo")) idxMotivo = c; else if(hL.includes("ultimo inicio") || hL.includes("logon")) idxLogin = c;
-        else if(hL.includes("licencia")) idxLicencia = c; else if(hL === "ou" || hL.indexOf("unidad") > -1 || hL.indexOf("org") > -1) idxOu = c;
+function generarDatosRRHHCompleto() {
+  verificarPermisoAdmin();
+  var cabeceras = [
+    "First Name [Required]", "Last Name [Required]", "Email Address [Required]", "Password [Required]",
+    "Password Hash Function [UPLOAD ONLY]", "Org Unit Path [Required]", "New Primary Email [UPLOAD ONLY]",
+    "Recovery Email", "Home Secondary Email", "Work Secondary Email", "Recovery Phone [import only]",
+    "Work Phone", "Home Phone", "Mobile Phone", "Work Address", "Home Address", "Employee ID",
+    "Employee Type", "Manager Email", "Department", "Cost Center", "Building ID", "Floor Name",
+    "Floor Section", "Title", "Description", "Change Password at Next Sign-In", "New Status [UPLOAD ONLY]"
+  ];
+  
+  var filas = [cabeceras];
+  var paginaToken = null;
+  
+  do {
+    var res = AdminDirectory.Users.list({
+      customer: 'my_customer',
+      maxResults: 500,
+      pageToken: paginaToken,
+      projection: 'full',
+      orderBy: 'email'
+    });
+    
+    var usuarios = res.users || [];
+    for (var i = 0; i < usuarios.length; i++) {
+      var u = usuarios[i];
+      var nombre = u.name ? (u.name.givenName || "") : "";
+      var apellidos = u.name ? (u.name.familyName || "") : "";
+      var email = u.primaryEmail || "";
+      var ou = u.orgUnitPath || "/";
+      
+      var workPhone = "", mobilePhone = "", homePhone = "";
+      if (u.phones) {
+        u.phones.forEach(function(p) {
+          if (p.type === "work") workPhone = p.value;
+          else if (p.type === "mobile" || p.type === "cell") mobilePhone = p.value;
+          else if (p.type === "home") homePhone = p.value;
+        });
       }
       
-      var colsToDisplay = [0, 1];
-      if(idxEmail > -1) colsToDisplay.push(idxEmail); if(idxStatus > -1) colsToDisplay.push(idxStatus); if(idxOrigen > -1) colsToDisplay.push(idxOrigen);
-      if(idxManager > -1) colsToDisplay.push(idxManager); if(idxLicencia > -1) colsToDisplay.push(idxLicencia);
-      if(idxOu > -1) colsToDisplay.push(idxOu); if(idxMotivo > -1) colsToDisplay.push(idxMotivo); if(idxLogin > -1) colsToDisplay.push(idxLogin);
-      baseCuentasGlobal.rows.forEach(function(fila) {
-        if(fila.join(" ").toLowerCase().includes(query)) {
-          locTotal++; var mVal = idxManager > -1 ? String(fila[idxManager]).trim() : ""; if(mVal.includes("@")) locCon++; else locSin++;
-          var eVal = idxStatus > -1 ? String(fila[idxStatus]).toLowerCase() : ""; if(eVal.includes("susp")) locSusp++;
-          if(!headDrawn) { colsToDisplay.forEach(function(idx) { htmlHead += "<th>" + (baseCuentasGlobal.headers[idx] || "Columna") + "</th>"; }); htmlHead += "</tr>"; headDrawn = true; }
-          lastCat = idxOrigen > -1 ? fila[idxOrigen] : "Cuenta General"; lastCorreo = idxEmail > -1 ? fila[idxEmail] : "";
-          htmlBody += "<tr class='main-row' onclick=\"seleccionarFila('"+lastCat+"', '"+lastCorreo+"', event)\">"; 
-          colsToDisplay.forEach(function(idx) { var val = fila[idx] || ""; var est = String(val).toLowerCase().includes("susp") ? "color:#ef4444; font-weight:bold;" : ""; htmlBody += "<td style='"+est+"'>" + val + "</td>"; }); 
-          htmlBody += "</tr>"; matchCount++;
-        }
-      });
+      var workAddress = "", homeAddress = "";
+      if (u.addresses) {
+        u.addresses.forEach(function(a) {
+          if (a.type === "work") workAddress = a.formatted || a.streetAddress || "";
+          else if (a.type === "home") homeAddress = a.formatted || a.streetAddress || "";
+        });
+      }
+      
+      var empId = "", empType = "", manager = "", dept = "", costCenter = "", title = "", desc = "", bId = "", floor = "", sec = "";
+      if (u.organizations && u.organizations.length > 0) {
+        var org = u.organizations[0];
+        title = org.title || "";
+        dept = org.department || "";
+        costCenter = org.costCenter || "";
+        desc = org.description || "";
+      }
+      if (u.externalIds) {
+        u.externalIds.forEach(function(e) { if (e.type === "organization") empId = e.value; });
+      }
+      if (u.relations) {
+        u.relations.forEach(function(r) { if (r.type === "manager") manager = r.value; });
+      }
+      if (u.locations && u.locations.length > 0) {
+        bId = u.locations[0].buildingId || "";
+        floor = u.locations[0].floorName || "";
+        sec = u.locations[0].floorSection || "";
+      }
+      
+      filas.push([
+        nombre, apellidos, email, "****", "", ou, "",
+        u.recoveryEmail || "", "", "", "", workPhone, homePhone, mobilePhone,
+        workAddress, homeAddress, empId, empType, manager, dept, costCenter,
+        bId, floor, sec, title, desc, "False", "Active"
+      ]);
     }
-    pintarMetricasSalud(locTotal, locCon, locSin, locSusp, query); 
+    paginaToken = res.nextPageToken;
+  } while (paginaToken);
+  
+  return filas;
+}
+
+function procesarSubidaRRHHBackend(filasCSV) {
+  verificarPermisoAdmin();
+  var resultados = { exitosos: 0, errores: 0, detalle: [] };
+  
+  for (var i = 1; i < filasCSV.length; i++) {
+    var c = filasCSV[i];
+    var email = c[2] ? c[2].toString().trim().toLowerCase() : "";
+    if (!email || !email.includes("@")) continue;
     
-    if(matchCount > 0) { 
-      document.getElementById('titulo-panel-dinamico').innerText = "📂 " + query + " (" + matchCount + ")";
-      document.getElementById('head-cuentas-dinamicas').innerHTML = htmlHead; 
-      document.getElementById('body-cuentas-dinamicas').innerHTML = htmlBody; 
-      document.getElementById('card-cuentas-desglose').classList.remove('collapsed'); 
-      if (matchCount === 1) seleccionarFila(lastCat, lastCorreo);
-    } else { 
-      document.getElementById('card-cuentas-desglose').classList.add('collapsed');
+    var payload = {};
+    
+    if (c[24] !== "" || c[19] !== "" || c[20] !== "" || c[25] !== "") {
+      payload.organizations = [{
+        primary: true,
+        title: c[24] ? c[24].toString().trim() : "",
+        department: c[19] ? c[19].toString().trim() : "",
+        costCenter: c[20] ? c[20].toString().trim() : "",
+        description: c[25] ? c[25].toString().trim() : ""
+      }];
     }
+    
+    var telefonos = [];
+    if (c[11] && c[11].toString().trim() !== "") telefonos.push({ type: "work", value: c[11].toString().trim() });
+    if (c[13] && c[13].toString().trim() !== "") telefonos.push({ type: "mobile", value: c[13].toString().trim() });
+    if (telefonos.length > 0) payload.phones = telefonos;
+    
+    if (c[14] && c[14].toString().trim() !== "") {
+      payload.addresses = [{ primary: true, type: "work", formatted: c[14].toString().trim() }];
+    }
+    
+    if (c[18] && c[18].toString().trim() !== "") {
+      payload.relations = [{ type: "manager", value: c[18].toString().trim() }];
+    }
+    
+    if (c[16] && c[16].toString().trim() !== "") {
+      payload.externalIds = [{ type: "organization", value: c[16].toString().trim() }];
+    }
+    
+    if (Object.keys(payload).length === 0) continue;
+    
+    try {
+      AdminDirectory.Users.patch(payload, email);
+      resultados.exitosos++;
+    } catch(e) {
+      resultados.errores++;
+      resultados.detalle.push("Fallo en " + email + ": " + e.message);
+    }
+  }
+  
+  return resultados;
+}
 
-    // --- 2. FILTRADO DE LISTAS (GIGAS + ONI) UNIFICADO ---
-    var filasPrincipalesListas = document.querySelectorAll('#tabla-listas-gigas-body tr.main-row, #tabla-listas-oni-body tr.main-row');
-    var listasEncontradas = 0;
+function crearCuentaGoogleEnriquecida(datos) {
+  verificarPermisoEjecucion();
 
-    filasPrincipalesListas.forEach(function(row) {
-      var subRow = row.nextElementSibling;
-      var hasSubRow = subRow && subRow.classList.contains('sub-member-row');
+  // 🚥 INYECTAMOS EL SEMÁFORO DE ESCRITURA
+  var semaforo = LockService.getScriptLock();
+  try {
+    semaforo.waitLock(30000); 
+  } catch (e) {
+    return { exito: false, error: "⚠️ El sistema está muy ocupado sincronizando. Espera unos segundos y vuelve a pulsar el botón de crear." };
+  }
 
-      var textoPrincipal = row.innerText.toLowerCase();
-      var textoSubRow = hasSubRow ? subRow.innerText.toLowerCase() : "";
-
-      if (textoPrincipal.includes(query) || textoSubRow.includes(query)) {
-        row.style.display = '';
-        listasEncontradas++;
+  try {
+    var aliasLimpio = datos.alias.trim().toLowerCase().replace(/\s+/g, '');
+    var emailCompleto = aliasLimpio + "@" + datos.dominio.trim().toLowerCase();
+    var passwordGenerada = Math.random().toString(36).slice(-8) + "Gigs26!";
+    var given = datos.nombre ? datos.nombre.trim() : aliasLimpio;
+    var family = datos.apellido ? datos.apellido.trim() : datos.tipo;
+    var ouDestino = datos.ou ? datos.ou.trim() : "/";
+    var nuevoUsuario = { primaryEmail: emailCompleto, name: { givenName: given, familyName: family }, password: passwordGenerada, changePasswordAtNextLogin: true, orgUnitPath: ouDestino };
+    if (datos.manager) nuevoUsuario.relations = [{ type: "manager", value: datos.manager.trim() }];
+    
+    AdminDirectory.Users.insert(nuevoUsuario);
+    registrarEnHistorial("ALTA USUARIO", "Cuenta: " + emailCompleto + " | Tipo: " + datos.tipo + " | Licencia asignada: " + datos.licencia + " | OU Destino: " + ouDestino);
+    
+    var msgLicencia = "✅ Licencia asignada correctamente";
+    
+    if (datos.licencia && datos.licencia !== "Cloud Identity Free") {
+      try {
+        var skuMap = {
+          "Google Workspace Business Starter": "1010020027",
+          "Google Workspace Enterprise Standard": "1010020026",
+          "Google Workspace Enterprise Plus": "1010020020"
+        };
         
-        if (hasSubRow) {
-          if (textoSubRow.includes(query) && !textoPrincipal.includes(query)) {
-            subRow.style.display = 'table-row';
-          } else {
-            subRow.style.display = 'none'; 
+        var skuId = skuMap[datos.licencia];
+        if (!skuId) {
+          throw new Error("El nombre de la licencia no coincide con el skuMap: " + datos.licencia);
+        }
+
+        var asignado = false;
+        var ultimoError = "";
+        
+        for (var i = 0; i < 4; i++) {
+          Utilities.sleep(3000); 
+          try {
+            AdminLicenseManager.LicenseAssignments.insert({ userId: emailCompleto }, "Google-Apps", skuId);
+            asignado = true;
+            break; 
+          } catch(err) {
+            ultimoError = err.message;
           }
         }
-      } else {
-        row.style.display = 'none';
-        if (hasSubRow) subRow.style.display = 'none';
-      }
-    });
-
-    var cardListas = document.getElementById('card-listas');
-    if (listasEncontradas > 0 && cardListas && cardListas.classList.contains('collapsed')) {
-      cardListas.classList.remove('collapsed');
-    }
-
-    // 3. AVISO SI NO HAY NADA EN ABSOLUTO
-    if (matchCount === 0 && listasEncontradas === 0) {
-      mostrarPopUpBuscador("No se han encontrado usuarios ni listas para: <b>" + query + "</b>");
-    }
-  }
-
-  function filtrarCuentasPorCategoria() {
-    var rawFilter = document.getElementById('selector-origen-dinamico').value; 
-    var pref = langDict[document.getElementById('lang-selector').value].card_desglose || "📂 Desglose Completo";
-    if(!rawFilter) { document.getElementById('global-search').value = ""; document.getElementById('titulo-panel-dinamico').innerText = pref; document.getElementById('head-cuentas-dinamicas').innerHTML = "<tr><th>...</th></tr>"; document.getElementById('body-cuentas-dinamicas').innerHTML = "<tr><td>...</td></tr>"; pintarMetricasSalud(window.gTotal, window.gCon, window.gSin, window.gSusp, "Global"); return; }
-    
-    document.getElementById('global-search').value = ""; 
-    var partes = rawFilter.split(":"); var tipoFiltro = partes[0];
-    var valorFiltro = partes[1];
-    document.getElementById('titulo-panel-dinamico').innerText = "📂 " + valorFiltro;
-
-    var htmlHead = "<tr>"; var htmlBody = "";
-    var locTotal = 0; var locCon = 0; var locSin = 0; var locSusp = 0;
-    if (baseCuentasGlobal && baseCuentasGlobal.rows) {
-      var idxEmail = -1; var idxStatus = -1;
-      var idxOrigen = -1; var idxManager = -1; var idxMotivo = -1; var idxLogin = -1; var idxLicencia = -1;
-      var idxOu = -1;
-      for(var c=0; c<baseCuentasGlobal.headers.length; c++) { 
-        var hL = String(baseCuentasGlobal.headers[c]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        if(hL.includes("email")) idxEmail = c; else if(hL.includes("status") || hL.includes("estado")) idxStatus = c; else if(hL.includes("origen") || hL.includes("tipo")) idxOrigen = c;
-        else if(hL.includes("manager") || hL.includes("responsable")) idxManager = c; else if(hL.includes("motivo")) idxMotivo = c; else if(hL.includes("ultimo inicio") || hL.includes("logon")) idxLogin = c;
-        else if(hL.includes("licencia")) idxLicencia = c; else if(hL === "ou" || hL.indexOf("unidad") > -1 || hL.indexOf("org") > -1) idxOu = c;
-      }
-      
-      var colsToDisplay = [0, 1];
-      if(idxEmail > -1) colsToDisplay.push(idxEmail); if(idxStatus > -1) colsToDisplay.push(idxStatus); if(idxOrigen > -1) colsToDisplay.push(idxOrigen);
-      if(idxManager > -1) colsToDisplay.push(idxManager); if(idxLicencia > -1) colsToDisplay.push(idxLicencia);
-      if(idxOu > -1) colsToDisplay.push(idxOu); if(idxMotivo > -1) colsToDisplay.push(idxMotivo); if(idxLogin > -1) colsToDisplay.push(idxLogin);
-      colsToDisplay.forEach(function(idx) { htmlHead += "<th>" + (baseCuentasGlobal.headers[idx] || "Columna") + "</th>"; }); htmlHead += "</tr>";
-      baseCuentasGlobal.rows.forEach(function(fila) { 
-        var coincide = false;
-        if (tipoFiltro === "origen") {
-          var filaOrigen = idxOrigen > -1 ? String(fila[idxOrigen]||"").toLowerCase() : "";
-          if (filaOrigen === valorFiltro.toLowerCase() || (valorFiltro.toLowerCase().includes("servicio") && filaOrigen.includes("servicio"))) coincide = true;
-        } else if (tipoFiltro === "licencia") {
-          var filaLicencia = idxLicencia > -1 ? String(fila[idxLicencia]||"").toLowerCase().trim() : "";
-          if (filaLicencia === valorFiltro.toLowerCase().trim()) coincide = true;
-        } else if (tipoFiltro === "ou") {
-          var filaOu = idxOu > -1 ? String(fila[idxOu]||"").trim() : "";
-          if (filaOu === valorFiltro) coincide = true;
-        } 
-        // --- 🟢 NUEVA LÓGICA DE SUSPENDIDOS ---
-        else if (tipoFiltro === "estado") {
-          var filaEstado = idxStatus > -1 ? String(fila[idxStatus]||"").toLowerCase() : "";
-          if (filaEstado.includes(valorFiltro.toLowerCase())) coincide = true;
-        }
-        // --------------------------------------
-
-        if (coincide) { 
-          locTotal++; var mVal = idxManager > -1 ? String(fila[idxManager]).trim() : ""; if(mVal.includes("@")) locCon++; else locSin++;
-          var eVal = idxStatus > -1 ? String(fila[idxStatus]).toLowerCase() : ""; if(eVal.includes("susp")) locSusp++;
-          htmlBody += "<tr class='main-row' onclick=\"seleccionarFila('"+(idxOrigen>-1?fila[idxOrigen]:"Cuenta")+"', '"+(idxEmail > -1 ? fila[idxEmail] : "")+"', event)\">";
-          colsToDisplay.forEach(function(idx) { var val = fila[idx] || ""; var est = String(val).toLowerCase().includes("susp") ? "color:#ef4444; font-weight:bold;" : ""; htmlBody += "<td style='"+est+"'>" + val + "</td>"; });
-          htmlBody += "</tr>"; 
-        } 
-      });
-    }
-    pintarMetricasSalud(locTotal, locCon, locSin, locSusp, valorFiltro);
-    document.getElementById('head-cuentas-dinamicas').innerHTML = htmlHead; document.getElementById('body-cuentas-dinamicas').innerHTML = htmlBody; document.getElementById('card-cuentas-desglose').classList.remove('collapsed');
-  }
-
-  function lanzarCambioLicencia() {
-    if(!verificarFiltroVisualHtml()) return;
-    var u = document.getElementById('target-user').value.trim();
-    var lic = document.getElementById('target-licencia').value;
-    if(!u || !lic) return errAction("Debes seleccionar un usuario y elegir una licencia en el desplegable superior.");
-    if(!confirm("💼 ¿ASIGNAR O CAMBIAR LICENCIA?\n\nUsuario: " + u + "\nNueva Licencia: " + lic)) return;
-    showLog("⏳ Procesando cambio en Workspace...");
-    google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webCambiarLicencia(u, lic);
-  }
-
-  function lanzarCambioOU() {
-    if(!verificarFiltroVisualHtml()) return;
-    var u = document.getElementById('target-user').value.trim();
-    var ou = document.getElementById('target-ou').value;
-    if(!u || !ou) return errAction("Debes seleccionar un usuario y elegir una OU de destino.");
-    if(!confirm("📂 ¿MOVER DE UNIDAD ORGANIZATIVA?\n\nUsuario: " + u + "\nDestino: " + ou)) return;
-    showLog("⏳ Moviendo a " + ou + " en Workspace...");
-    google.script.run.withSuccessHandler(function(msg){
-       endAction(msg);
-       var boxOu = document.getElementById('ou-actual-box');
-       if(boxOu) { boxOu.innerText = "📋 OU actual: " + ou; boxOu.style.color = "#10b981"; }
-    }).withFailureHandler(function(e){ errAction(e.message); }).webMoverUsuarioOU(u, ou);
-  }
-
-  function lanzarBypass2FA() {
-    if(!verificarFiltroVisualHtml()) return;
-    var u = document.getElementById('target-user').value.trim();
-    if(!u) return errAction("Selecciona un usuario para generar el código.");
-    
-    if(!confirm("🆘 ¿GENERAR CÓDIGO DE EMERGENCIA?\n\nEsto creará códigos de respaldo para " + u + " y te mostrará uno para que pueda entrar saltándose el 2FA.")) return;
-    showLog("⏳ Generando código de emergencia...");
-    google.script.run
-      .withSuccessHandler(function(msg) {
-        var l = document.getElementById('log');
-        l.innerHTML = getCloseBtn() + "<br><strong style='font-size:16px;'>" + msg + "</strong>";
-        l.style.backgroundColor = "#10b981";
-        l.style.display = 'block';
-        cargarTodoElDashboard(true);
-      })
-      .withFailureHandler(function(e) { errAction(e.message); })
-      .webGenerarCodigoBypass2FA(u);
-  }
-
-  function lanzarFlujoBajaTotal() {
-    if(!verificarFiltroVisualHtml()) return;
-    var u = document.getElementById('target-user').value;
-    var mAutodetectado = document.getElementById('target-manager').value;
-    
-    if(!u) return errAction("Selecciona una cuenta.");
-    if(!confirm("🛑 ¿EJECUTAR FLUJO DE BAJA?\n\n👉 " + u)) return;
-    
-    var mSugerido = (mAutodetectado && mAutodetectado.includes("@")) ? mAutodetectado : "";
-    var mDestino = prompt("🔄 ¿ALIAS EN EL MÁNAGER?\n\nBlanco para borrar sin alias:", mSugerido);
-    if (mDestino === null) { showLog("Cancelado."); return; }
-    
-    var mFinal = mDestino.trim().toLowerCase();
-    var activarAlias = mFinal.includes("@");
-
-    var emailResponsableDrive = mFinal || mSugerido;
-    var promptDrive = prompt("💾 ¿TRANSFERIR GOOGLE DRIVE?\n\nIntroduce el correo de la persona que recibirá los archivos.\n\n• Si NO quieres transferir el Drive, borra el texto y pulsa Aceptar (o Cancelar).", emailResponsableDrive);
-
-    var transferirDrive = false;
-    var destinoDrive = "";
-
-    if (promptDrive !== null && promptDrive.trim() !== "") {
-        transferirDrive = true;
-        destinoDrive = promptDrive.trim().toLowerCase();
-    }
-
-    showLog("⏳ Procesando baja" + (transferirDrive ? (" y transfiriendo Drive a " + destinoDrive + "...") : "..."));
-    
-    google.script.run
-      .withSuccessHandler(endAction)
-      .withFailureHandler(function(e){ errAction(e.message); })
-      .webEjecutarFlujoBajaTotal(u, mFinal, activarAlias, transferirDrive, destinoDrive);
-  }
-
-  function getTimestamp() { var d = new Date(); return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)+":"+("0"+d.getSeconds()).slice(-2); }
-  
-  function appendToLogHistory(texto, tipo) {
-    var cleanText = texto.replace(/<[^>]*>?/gm, ''); var cssClass = "log-info";
-    if (tipo === "ERROR") cssClass = "log-error"; else if (tipo === "SUCCESS") cssClass = "log-success";
-    var div = document.createElement("div");
-    div.className = "log-entry " + cssClass; div.innerHTML = "<span class='log-time'>[" + getTimestamp() + "]</span> " + cleanText;
-    document.getElementById("log-modal-body").prepend(div);
-  }
-
-  function getCloseBtn() { return "<span class='log-close-btn' onclick=\"this.parentElement.style.display='none'\" title='Cerrar'>✖</span>"; }
-  
-  function showLog(texto) { var l = document.getElementById('log');
-    l.innerHTML = getCloseBtn() + texto.replace(/\n/g, '<br>'); l.style.backgroundColor = "#0284c7";
-    l.style.display = 'block'; appendToLogHistory(texto, "INFO");
-  }
-  
-  function endAction(mensaje) { var l = document.getElementById('log');
-    l.innerHTML = getCloseBtn() + "✅ " + mensaje.replace(/\n/g, '<br>');
-    l.style.backgroundColor = "#10b981"; l.style.display = 'block'; cargarTodoElDashboard(true);
-    if (!mensaje.includes("CLAVE") && !mensaje.includes("CREADO") && !mensaje.includes("Snippet") && !mensaje.includes("Bypass")) setTimeout(function() { l.style.display = 'none'; }, 6000);
-    appendToLogHistory(mensaje, "SUCCESS");
-  }
-    
-  function errAction(errorMsg) { var l = document.getElementById('log'); var msg = errorMsg.message || errorMsg;
-    l.innerHTML = getCloseBtn() + "⚠️ Alerta: " + msg.replace(/\n/g, '<br>'); l.style.backgroundColor = "#ef4444"; l.style.display = 'block'; appendToLogHistory(msg, "ERROR");
-  }
-
-  function redibujarGrafica() { 
-    var isDark = document.body.classList.contains('dark-mode'); var txtColor = isDark ? '#cbd5e1' : '#475569';
-    if(datosGraficaGlobal && datosGraficaGlobal.length > 0) {
-      var node = document.getElementById('chart_div');
-      if(node && node.offsetWidth > 0) { try { new google.visualization.PieChart(node).draw(google.visualization.arrayToDataTable([['Concepto', 'Total']].concat(datosGraficaGlobal)), { pieHole: 0.4, chartArea: {width: '90%', height: '85%'}, legend: {position: 'right', textStyle: {color: txtColor}}, backgroundColor: 'transparent' }); } catch(e){} }
-    }
-    if(historicoCrecimientoGlobal && historicoCrecimientoGlobal.length > 0) {
-      var nodeCrec = document.getElementById('chart_crecimiento');
-      if(nodeCrec) {
-        nodeCrec.style.display = 'block';
-        if(nodeCrec.offsetWidth > 0) {
-          try { 
-            var dt = new google.visualization.DataTable();
-            dt.addColumn('string', 'Mes'); dt.addColumn('number', 'Altas'); dt.addRows(historicoCrecimientoGlobal); 
-            new google.visualization.ColumnChart(nodeCrec).draw(dt, { legend: 'none', colors: ['#8b5cf6'], chartArea: {width: '90%', height: '70%'}, hAxis: { textStyle: {color: txtColor} }, vAxis: { textStyle: {color: txtColor}, gridlines: {color: isDark ? '#334155' : '#f1f5f9'} }, backgroundColor: 'transparent', animation: {startup: true, duration: 1000} });
-          } catch(e){}
-        }
-      }
-    }
-  }
-  
-  function verificarFiltroVisualHtml() { if(!IS_ADMIN_AUTHORIZED) { errAction({message: "No tienes permisos."}); return false; } return true; }
-  
-  function copiarClaveAlPortapapeles() { var copyText = document.getElementById("pass-temp-input"); copyText.select(); copyText.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(copyText.value).then(function() { var toast = document.getElementById("copy-toast"); toast.style.display = "block"; setTimeout(function() { toast.style.display = "none"; }, 3000); });
-  }
-  
-  function asignarOwnerDirecto(grupo, miembro, event) { if(event) event.stopPropagation(); if(!verificarFiltroVisualHtml()) return;
-    if(!confirm("👑 ¿Promover a " + miembro + " como OWNER de " + grupo + "?")) return; showLog("Promoviendo...");
-    google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webHacerOwnerLista(grupo, miembro); }
-    
-  function lanzarRefrescarSoloListas(event) { 
-  if(event) event.stopPropagation(); 
-  if(!verificarFiltroVisualHtml()) return; 
-  showLog("🔄 Sincronizando módulo...");
-  
-  google.script.run.withSuccessHandler(function(res) { 
-    var data = JSON.parse(res);
-    renderizarDashboard(data); 
-    
-    if(data.metricasGigas) {
-      var tG = data.metricasGigas.total || 0;
-      var cG = data.metricasGigas.conOwner || 0;
-      var sG = data.metricasGigas.sinOwner || 0;
-      document.getElementById('m-total-gigas').innerText = tG;
-      document.getElementById('m-con-gigas').innerHTML = cG + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + (tG > 0 ? Math.round((cG / tG) * 100) : 0) + "%)</span>";
-      document.getElementById('m-sin-gigas').innerHTML = sG + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + (tG > 0 ? Math.round((sG / tG) * 100) : 0) + "%)</span>";
-    }
-    
-    if(data.metricasOni) {
-      var tO = data.metricasOni.total || 0;
-      var cO = data.metricasOni.conOwner || 0;
-      var sO = data.metricasOni.sinOwner || 0;
-      document.getElementById('m-total-oni').innerText = tO;
-      document.getElementById('m-con-oni').innerHTML = cO + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + (tO > 0 ? Math.round((cO / tO) * 100) : 0) + "%)</span>";
-      document.getElementById('m-sin-oni').innerHTML = sO + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + (tO > 0 ? Math.round((sO / tO) * 100) : 0) + "%)</span>";
-    }
-    
-    endAction("Módulo de listas refrescado."); 
-  }).withFailureHandler(function(e){ 
-    errAction(e.message); 
-  }).webRefrescarSoloListas();
-}
-    
-  function toggleSubTablaMiembros(index, emailGrupo, owner) { document.getElementById('target-group').value = emailGrupo;
-    document.getElementById('target-user').value = String(owner).toLowerCase().includes("asignar") ? "" : owner; var sf = document.getElementById('subrow-' + index); sf.style.display = (sf.style.display === "none") ? "table-row" : "none";
-  }
-    
-  function lanzarEscanerMaestra() { if(!verificarFiltroVisualHtml()) return; showLog("🔍 Escaneando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webEscanearManagersMaestra(); }
-  
-  function lanzarActualizarManager() { 
-    if(!verificarFiltroVisualHtml()) return; 
-    var u = document.getElementById('target-user').value.trim();
-    var m = document.getElementById('target-manager').value.trim(); 
-    if(!u || !m) return errAction("Debes seleccionar un usuario y escribir el correo del mánager en los campos superiores.");
-    if(u.toLowerCase() === m.toLowerCase()) return errAction("El usuario no puede ser su propio mánager.");
-    if(!confirm("👤 ¿ASIGNAR MÁNAGER?\n\nSe asignará a: " + m + "\nComo responsable de: " + u)) return;
-    showLog("⏳ Actualizando en Workspace y Maestra..."); 
-    google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webActualizarManager(u, m); 
-  }
-
-  function lanzarEscanerServicios() { if(!verificarFiltroVisualHtml()) return; showLog("🔍 Escaneando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webEscanearCuentasServicio(); }
-  function lanzarRastreadorServicios() { if(!verificarFiltroVisualHtml()) return; showLog("📩 Rastreando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webProcesarRespuestasServicios(); }
-  function lanzarAuditoriaEnviosServicios() { if(!verificarFiltroVisualHtml()) return; showLog("🛡️ Auditando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webAuditarEnviosAnterioresServicios(); }
-  function lanzarCampanaServicios() { if(!verificarFiltroVisualHtml()) return;
-    if(!confirm("📢 ¿LANZAR CAMPAÑA INTELIGENTE?")) return; showLog("Enviando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webEnviarCampanaServicios(); }
-  function lanzarRecordatorioServicios() { if(!verificarFiltroVisualHtml()) return; if(!confirm("🔔 ¿LANZAR RECORDATORIOS?")) return;
-    showLog("Enviando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webEnviarRecordatorioCampanaServicios(); }
-  function lanzarCampanaHuerfanas() { if(!verificarFiltroVisualHtml()) return; if(!confirm("📢 ¿LANZAR AUDITORÍA MASIVA?")) return; showLog("Enviando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webEnviarCampanaHuerfanas(); }
-  function lanzarProcesarRespuestas() { if(!verificarFiltroVisualHtml()) return; showLog("Rastreando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webProcesarRespuestasHuerfanas(); }
-  
-  function ejecutarActualizarGrupos() { 
-    if(!verificarFiltroVisualHtml()) return;
-    
-    // BLOQUEO VISUAL DEL BOTÓN DE ALTA PARA EVITAR CORRUPCIÓN EN EXCEL
-    var btnCrear = document.getElementById('btn-accion-identidad');
-    var txtCrearOriginal = "";
-    if(btnCrear) {
-      txtCrearOriginal = btnCrear.innerHTML;
-      btnCrear.disabled = true;
-      btnCrear.style.backgroundColor = "#475569";
-      btnCrear.style.cursor = "not-allowed";
-      btnCrear.innerHTML = "⏳ Sincronización masiva en curso...";
-    }
-
-    var l = document.getElementById('log');
-    l.innerHTML = getCloseBtn() + "<strong>⏳ Sincronización en curso...</strong><br>" +
-                  "<span id='sync-fase' style='font-size:12px; color:#bae6fd; font-style:italic;'>Iniciando conexión segura...</span>" +
-                  "<div style='width:100%; background:#0f172a; border-radius:4px; height:8px; margin-top:8px; overflow:hidden; border:1px solid #334155;'>" +
-                  "<div id='sync-prog-bar' style='width:0%; height:100%; background:#38bdf8; transition:width 0.5s ease;'></div></div>" +
-                  "<div id='sync-prog-text' style='font-size:11px; margin-top:4px; text-align:right; font-weight:bold;'>0%</div>";
-    l.style.backgroundColor = "#0284c7";
-    l.style.display = 'block';
-    var bar = document.getElementById('sync-prog-bar');
-    var txt = document.getElementById('sync-prog-text');
-    var fase = document.getElementById('sync-fase');
-    var progress = 0;
-    var syncInterval = setInterval(function() {
-      if (progress < 95) {
-        var inc = progress < 40 ? 3.5 : (progress < 75 ? 1.5 : 0.5);
-        progress += inc;
-        if (progress > 95) progress = 95;
-        if(bar) bar.style.width = progress + "%";
-        if(txt) txt.innerText = Math.floor(progress) + "%";
-        if(fase) {
-          if (progress > 5 && progress < 30) fase.innerText = "Descargando identidades Workspace...";
-          else if (progress >= 30 && progress < 55) fase.innerText = "Auditando licencias asignadas...";
-          else if (progress >= 55 && progress < 85) fase.innerText = "Escaneando listas de distribución...";
-          else if (progress >= 85) fase.innerText = "Escribiendo en Hoja Maestra (657)...";
-        }
-      }
-    }, 1000);
-    
-    google.script.run.withSuccessHandler(function(res) {
-      clearInterval(syncInterval);
-      if(bar) bar.style.width = "100%";
-      if(txt) txt.innerText = "100%";
-      if(fase) fase.innerText = "¡Completado!";
-      
-      // DESBLOQUEAMOS EL BOTÓN AL TERMINAR CON ÉXITO
-      if(btnCrear) {
-        btnCrear.disabled = false;
-        btnCrear.style.backgroundColor = ""; // Vuelve al color original del CSS
-        btnCrear.style.cursor = "pointer";
-        btnCrear.innerHTML = txtCrearOriginal;
-      }
-
-      setTimeout(function() { endAction(res); }, 600);
-    }).withFailureHandler(function(e){ 
-      clearInterval(syncInterval);
-      
-      // DESBLOQUEAMOS EL BOTÓN SI FALLA
-      if(btnCrear) {
-        btnCrear.disabled = false;
-        btnCrear.style.backgroundColor = "";
-        btnCrear.style.cursor = "pointer";
-        btnCrear.innerHTML = txtCrearOriginal;
-      }
-
-      errAction(e.message); 
-    }).webBotonActualizarGrupos();
-  }
-  function lanzarMailAdvertenciaBaja() { if(!verificarFiltroVisualHtml()) return; var u = document.getElementById('target-user').value; var m = document.getElementById('target-manager').value;
-    if(!u || !m) return errAction("Faltan datos."); showLog("Enviando aviso..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webEnviarMailAdvertenciaBaja(u, m); }
-  function lanzarTakeout() { if(!verificarFiltroVisualHtml()) return;
-    var u = document.getElementById('target-user').value; var m = document.getElementById('target-manager').value; if(!u || !m) return errAction("Faltan datos."); showLog("Enviando TakeOut...");
-    google.script.run.withSuccessHandler(function(msg) { endAction(msg); }).withFailureHandler(function(e){ errAction(e.message); }).webEnviarInstruccionesTakeoutPREMIUM(u, m); }
-  
-  function lanzarResetClaveOlvido() { if(!verificarFiltroVisualHtml()) return; var u = document.getElementById('target-user').value;
-    if(!u) return errAction("Selecciona usuario."); if(!confirm("⚠️ ¿RESETEAR CLAVE? ⚠️")) return; showLog("Generando...");
-    google.script.run.withSuccessHandler(function(resultadoClave) { var claveLimpia = resultadoClave.replace("🔑 NUEVA CLAVE: ", "").trim(); var l = document.getElementById('log'); l.style.backgroundColor = "#10b981"; l.innerHTML = "<strong>✅ CLAVE:</strong><br><br><div style='display:flex; gap:8px; align-items:center; margin-bottom:12px; background:#0f172a; padding:10px; border-radius:6px; border:1px solid #334155;'><input type='text' id='pass-temp-input' value='" + claveLimpia + "' readonly style='background:transparent; color:#38bdf8; border:none; font-family:monospace; font-size:15px; font-weight:bold; width:100%; outline:none; pointer-events:all;' /><button onclick='copiarClaveAlPortapapeles()' style='background:#0284c7; color:white; border:none; padding:6px 10px; border-radius:4px; font-size:12px; cursor:pointer; font-weight:bold; width:auto; margin:0;'>📋 Copiar</button></div><button onclick=\"document.getElementById('log').style.display='none'\" style='background:#334155; color:white; border:none; padding:8px 14px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:bold; width:100%;'>Cerrar</button>"; l.style.display = 'block'; appendToLogHistory("Clave reseteada para: " + u, "SUCCESS"); }).withFailureHandler(function(e){ errAction(e.message); }).webResetearClavePorOlvido(u); }
-  
-  function lanzarBorradoLista() { if(!verificarFiltroVisualHtml()) return; var g = document.getElementById('target-group').value; var u = document.getElementById('target-user').value; showLog("Borrando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webBorrarMiembroLista(g, u); }
-  function lanzarEstado(suspender) { if(!verificarFiltroVisualHtml()) return; var u = document.getElementById('target-user').value; showLog("Modificando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webCambiarEstadoCuenta(u, suspender); }
-  function lanzarRecuperacionCuenta() { 
-    if(!verificarFiltroVisualHtml()) return; 
-    var u = document.getElementById('target-user').value;
-    var targetOu = document.getElementById('target-ou').value || "/";
-    
-    if(!u) return errAction("Selecciona correo en la papelera.");
-    if(!confirm("♻️ ¿Confirmas la recuperação de " + u + " a la OU: " + targetOu + "?")) return;
-    showLog("Consultando ID y recuperando..."); 
-    google.script.run
-      .withSuccessHandler(endAction)
-      .withFailureHandler(function(e){ errAction(e.message); })
-      .webComprobarYRecuperar(u, targetOu);
-  }
-  function lanzarAltaEnLista() { if(!verificarFiltroVisualHtml()) return; var g = document.getElementById('target-group').value;
-    var u = document.getElementById('target-user').value; showLog("Añadiendo..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webAñadirMiembroLista(g, u);
-  }
-  
-  function lanzarAñadirMiembroInline(grupo, inputId, event) {
-    if(event) event.stopPropagation(); // Evita que se cierre la fila al pulsar
-    if(!verificarFiltroVisualHtml()) return;
-    
-    var inputEl = document.getElementById(inputId);
-    var usuariosNuevos = inputEl.value.trim().toLowerCase();
-    
-    if(!usuariosNuevos || !usuariosNuevos.includes("@")) {
-      return errAction("Por favor, escribe un correo válido para añadir a la lista.");
-    }
-    
-    showLog("⏳ Añadiendo a la lista " + grupo + "...");
-    
-    google.script.run
-      .withSuccessHandler(function(res) {
-        inputEl.value = ""; // Vaciamos la cajita
-        endAction(res);
-        // Refrescamos silenciosamente las listas para que aparezcan las etiquetas nuevas
-        setTimeout(function() { lanzarRefrescarSoloListas(); }, 1500);
-      })
-      .withFailureHandler(function(e){ errAction(e.message); })
-      .webAñadirMiembroLista(grupo, usuariosNuevos);
-  }
-  function forzarBajaMiembro(g, u, event) { if(!verificarFiltroVisualHtml()) return; if(event) event.stopPropagation();
-    showLog("Borrando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webBorrarMiembroLista(g, u);
-  }
-  function lanzarOwner() { if(!verificarFiltroVisualHtml()) return; var g = document.getElementById('target-group').value; var u = document.getElementById('target-user').value;
-    showLog("Asignando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webHacerOwnerLista(g, u);
-  }
-  function lanzarBorradoListaTotal() { var g = document.getElementById('target-group').value;
-    if (!g || !g.includes("@")) return errAction("Selecciona una lista.");
-    if (!confirm("🚨 DESTUCCIÓN DEFINITIVA DE: " + g + "?")) return;
-    showLog("⏳ Destruyendo grupo..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webBorrarListaTotal(g);
-  }
-
-  function lanzarRenombrarLista() {
-    if(!verificarFiltroVisualHtml()) return;
-    var g = document.getElementById('target-group').value.trim();
-    if(!g || !g.includes("@")) return errAction("Selecciona una lista actual primero (campo 'Origen / Grupo Activo').");
-    var nuevoEmail = prompt("✏️ RENOMBRAR LISTA\n\nIntroduce el nuevo correo para la lista:", g);
-    if(nuevoEmail === null || nuevoEmail.trim() === g || !nuevoEmail.includes("@")) return;
-    showLog("⏳ Renombrando lista a " + nuevoEmail + "...");
-    google.script.run.withSuccessHandler(function(res) {
-      endAction(res);
-      document.getElementById('target-group').value = nuevoEmail.trim().toLowerCase(); 
-    }).withFailureHandler(function(e){ errAction(e.message); }).webRenombrarLista(g, nuevoEmail);
-  }
-
-  function lanzarPurgaMasiva() {
-    if(!verificarFiltroVisualHtml()) return;
-    var u = document.getElementById('target-user').value.trim();
-    if(!u || !u.includes("@")) return errAction("Selecciona un usuario primero en el campo 'Usuario Objetivo'.");
-    if(!confirm("🔥 ¿PURGA MASIVA DE LISTAS?\n\nSe escaneará Workspace buscando TODOS los grupos a los que pertenece:\n👉 " + u + "\n\nY será expulsado de todos ellos de forma automática. ¿Proceder?")) return;
-    showLog("⏳ Ejecutando purga iterativa...");
-    google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webExpulsionMasivaListas(u);
-  }
-
-  function descargarTablaExcel() {
-    var tabla = document.getElementById("tabla-usuarios-gigas");
-    if (!tabla) return alert("Tabla no inicializada.");
-    var filas = tabla.querySelectorAll("tr"); if (filas.length <= 1) return alert("No hay datos visibles.");
-    var csv = []; csv.push("\uFEFF");
-    for (var i = 0; i < filas.length; i++) {
-      var filaData = [];
-      var celdas = filas[i].querySelectorAll("th, td"); if(celdas.length === 1 && celdas[0].id === "msg-cuentas") continue;
-      for (var j = 0; j < celdas.length; j++) { var texto = celdas[j].innerText.trim().replace(/"/g, '""'); filaData.push('"' + texto + '"'); } csv.push(filaData.join(";")); 
-    }
-    var blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" }); var enlace = document.createElement("a"); enlace.href = URL.createObjectURL(blob); enlace.setAttribute("download", "Gigas_Auditoria.csv"); document.body.appendChild(enlace); enlace.click(); document.body.removeChild(enlace);
-  }
-
-  function lanzarAlternarPermisos() {
-    if(!verificarFiltroVisualHtml()) return;
-    
-    var correo = prompt("🛡️ GESTIÓN DE PERMISOS DEL PANEL\n\nIntroduce el correo electrónico (Gigas, Oni, dominio externo...) al que deseas OTORGAR o REVOCAR acceso:", "");
-    
-    if(!correo) return;
-    
-    correo = correo.trim().toLowerCase();
-    
-    if(!correo.includes("@") || !correo.includes(".")) {
-      return errAction("⚠️ El texto introducido no parece una dirección de correo válida.");
-    }
-    
-    if(!confirm("🛡️ ¿Confirmas que deseas cambiar los permisos de operación en el panel para esta cuenta?\n\n👉 " + correo)) return;
-    
-    showLog("⏳ Procesando permisos de seguridad para " + correo + "...");
-    
-    google.script.run
-      .withSuccessHandler(endAction)
-      .withFailureHandler(function(e){ errAction(e.message); })
-      .webAlternarPermisosPanel(correo);
-}
-
-  function cargarPapeleraEliminados() {
-    var tbody = document.getElementById('tabla-papelera-body');
-    if(!tbody) return;
-    
-    google.script.run.withSuccessHandler(function(resJSON) {
-      var usuarios = JSON.parse(resJSON);
-      if(!usuarios || usuarios.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='3' style='color:#10b981; font-weight:bold; text-align:center; padding: 15px;'>✅ No hay cuentas eliminadas en la papelera (0 cuentas en peligro de purga).</td></tr>";
-        return;
-      }
-      var html = "";
-      usuarios.forEach(function(u) {
-        var badgeStyle = u.diasRestantes <= 5 ? "background:#ef4444; color:white; padding:3px 6px; border-radius:4px; font-weight:bold;" : "color:#f59e0b; font-weight:bold;";
         
-        html += "<tr class='main-row' style='cursor:pointer;' onclick=\"seleccionarFila('Papelera', '" + u.email + "', event)\">";
-        html += "<td style='font-weight:bold; color:#38bdf8;'>" + u.email + "</td>";
-        html += "<td>" + u.fechaBaja + "</td>";
-        html += "<td><span style='" + badgeStyle + "'>⏳ " + u.diasRestantes + " dias restantes</span></td>";
-        html += "</tr>";
-      });
-      tbody.innerHTML = html;
-    }).withFailureHandler(function(e) {
-      tbody.innerHTML = "<tr><td colspan='3' style='color:#ef4444; font-weight:bold; text-align:center;'>⚠️ Falló al conectar con la papelera de Google.</td></tr>";
-    }).webObtenerUsuariosEliminadosRecuperables();
-  }
+        if (!asignado) {
+          msgLicencia = "⚠️ Cuenta creada, pero falló la asignación tras 4 intentos: " + ultimoError;
+        }
 
-  document.addEventListener('DOMContentLoaded', function() {
-    var styleOrdenacion = document.createElement('style');
-    styleOrdenacion.innerHTML = ".excel-table th { cursor: pointer; user-select: none; } .excel-table th:hover { background-color: #e2e8f0; } body.dark-mode .excel-table th:hover { background-color: #334155; }";
-    document.head.appendChild(styleOrdenacion);
-  });
-
-  document.addEventListener('click', function(e) {
-    if (e.target.tagName === 'TH' && e.target.closest('.excel-table')) {
-      var th = e.target;
-      var tabla = th.closest('.excel-table');
-      var tbody = tabla.querySelector('tbody');
-      var headersRow = th.closest('tr');
-      var headers = Array.from(headersRow.children);
-      var indice = headers.indexOf(th);
-      
-      var esTablaCompleja = tabla.id === 'tabla-listas-gigas' || tabla.id === 'tabla-listas-oni'; 
-
-      var ordenActual = th.getAttribute('data-orden') || 'desc';
-      var nuevoOrden = ordenActual === 'asc' ? 'desc' : 'asc';
-      
-      headers.forEach(function(h) { 
-        h.removeAttribute('data-orden');
-        h.innerText = h.innerText.replace(' 🔼', '').replace(' 🔽', '');
-      });
-   
-      th.setAttribute('data-orden', nuevoOrden);
-      th.innerText = th.innerText + (nuevoOrden === 'asc' ? ' 🔼' : ' 🔽');
-
-      var multiplicador = nuevoOrden === 'asc' ? 1 : -1;
-
-      if (esTablaCompleja) {
-        var mainRows = Array.from(tbody.querySelectorAll('tr.main-row'));
-        var grupos = mainRows.map(function(mainRow) {
-          var subRow = mainRow.nextElementSibling;
-          if (subRow && !subRow.classList.contains('sub-member-row')) subRow = null;
-          return { main: mainRow, sub: subRow, valor: mainRow.cells[indice].innerText.trim() };
-        });
-        grupos.sort(function(a, b) {
-          var valA = a.valor.toLowerCase(); var valB = b.valor.toLowerCase();
-          var numA = parseFloat(valA.replace(/[^0-9.-]+/g,"")); var numB = parseFloat(valB.replace(/[^0-9.-]+/g,""));
-          if (!isNaN(numA) && !isNaN(numB) && valA.match(/^\d/) && valB.match(/^\d/)) return (numA - numB) * multiplicador;
-          return valA.localeCompare(valB) * multiplicador;
-        });
-
-        grupos.forEach(function(grupo) {
-          tbody.appendChild(grupo.main);
-          if (grupo.sub) tbody.appendChild(grupo.sub);
-        });
-      } else {
-        var filas = Array.from(tbody.querySelectorAll('tr'));
-        if (filas.length <= 1 && filas[0].cells.length === 1) return;
-        filas.sort(function(a, b) {
-          var valA = a.cells[indice] ? a.cells[indice].innerText.trim().toLowerCase() : "";
-          var valB = b.cells[indice] ? b.cells[indice].innerText.trim().toLowerCase() : "";
-          var numA = parseFloat(valA.replace(/[^0-9.-]+/g,"")); var numB = parseFloat(valB.replace(/[^0-9.-]+/g,""));
-          if (!isNaN(numA) && !isNaN(numB) && valA.match(/^\d/) && valB.match(/^\d/)) return (numA - numB) * multiplicador;
-          return valA.localeCompare(valB) * multiplicador;
-        });
-        filas.forEach(function(fila) { tbody.appendChild(fila); });
+      } catch(eLic) {
+        msgLicencia = "⚠️ Error crítico de licencia: " + eLic.message;
       }
-    }
-  });
-  
-  function exportarTablaCSV(tipo) {
-    var idTabla = (tipo === 'gigas') ? 'tabla-listas-gigas' : 'tabla-listas-oni';
-    var nombreArchivo = (tipo === 'gigas') ? 'Listas_Gigas_Completo.csv' : 'Listas_ONI_Completo.csv';
-    var tabla = document.getElementById(idTabla);
-    
-    if (!tabla) {
-        alert("No se ha encontrado la tabla para descargar.");
-        return;
-    }
-    
-    var filas = tabla.querySelectorAll('tr.main-row');
-    if (filas.length === 0) {
-        alert("No hay datos cargados para descargar en este momento.");
-        return;
-    }
-    
-    var csv = [];
-    csv.push("Lista / Grupo;Email Corporativo;Volumen;Owner / Estado;Miembros");
-    
-    filas.forEach(function(fila) {
-        var celdas = fila.querySelectorAll('td');
-        if (celdas.length >= 4) {
-            var nombre = celdas[0].innerText.replace(/"/g, '""').trim();
-            var email  = celdas[1].innerText.replace(/"/g, '""').trim();
-            var vol    = celdas[2].innerText.replace(/"/g, '""').trim();
-            var owner  = celdas[3].innerText.replace(/"/g, '""').trim();
-            
-            var miembros = "";
-            var subFila = fila.nextElementSibling;
-            if (subFila && subFila.classList.contains('sub-member-row')) {
-                var tags = subFila.querySelectorAll('.member-tag span:first-child');
-                var listaMiembros = [];
-                tags.forEach(function(tag) {
-                    if (tag.innerText && tag.innerText.trim() !== "") {
-                        listaMiembros.push(tag.innerText.trim());
-                    }
-                });
-                miembros = listaMiembros.join(", ").replace(/"/g, '""');
-            }
-            
-            csv.push('"' + nombre + '";"' + email + '";"' + vol + '";"' + owner + '";"' + miembros + '"');
-        }
-    });
-    
-    var blob = new Blob(["\uFEFF" + csv.join("\n")], { type: 'text/csv;charset=utf-8;' });
-    var url = URL.createObjectURL(blob);
-    var link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", nombreArchivo);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-function exportarPlantillaCuentas() {
-    var csv = ["\uFEFFEmail Corporativo;Teléfono Trabajo;Departamento;Puesto / Título;Dirección Trabajo"];
-    csv.push('"usuario@tudominio.com";"+34 600000000";"IT";"Sistemas";"Calle Principal 1, Madrid"');
-    
-    var blob = new Blob([csv.join("\n")], { type: 'text/csv;charset=utf-8;' });
-    var url = URL.createObjectURL(blob);
-    var link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", "Plantilla_Actualizar_Cuentas.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-function procesarSubidaCSV(input) {
-    var archivo = input.files[0];
-    if (!archivo) return;
-    
-    var lector = new FileReader();
-    lector.onload = function(e) {
-        var contenido = e.target.result;
-        var lineas = contenido.split(/\r\n|\n/);
-        var datosParaSubir = [];
-        
-        for (var i = 1; i < lineas.length; i++) {
-            var linea = lineas[i].trim();
-            if (!linea) continue;
-            
-            var separador = linea.includes(";") ? ";" : ",";
-            var celdas = linea.split(separador).map(function(c) {
-                return c.replace(/^"|"$/g, '').trim();
-            });
-            
-            var email = celdas[0] || "";
-            if (email.includes("@")) {
-                datosParaSubir.push({
-                    email: email,
-                    telefono: celdas[1] || "",
-                    departamento: celdas[2] || "",
-                    puesto: celdas[3] || "",
-                    direccion: celdas[4] || ""
-                });
-            }
-        }
-        
-        if (datosParaSubir.length === 0) {
-            alert("⚠️ No se han encontrado correos válidos en el archivo CSV.");
-            input.value = "";
-            return;
-        }
-        
-        if (confirm("🔄 Se van a actualizar " + datosParaSubir.length + " cuentas en Google Workspace.\n\n¿Deseas continuar?")) {
-            document.body.style.cursor = "wait";
-            
-            google.script.run
-                .withSuccessHandler(function(res) {
-                    document.body.style.cursor = "default";
-                    input.value = ""; 
-                    var mensaje = "✅ Proceso terminado:\n\n- Cuentas actualizadas: " + res.exitosos + "\n- Errores: " + res.errores;
-                    if (res.errores > 0) {
-                        mensaje += "\n\nDetalle de errores:\n" + res.detalle.join("\n");
-                    }
-                    alert(mensaje);
-                })
-                .withFailureHandler(function(err) {
-                    document.body.style.cursor = "default";
-                    input.value = "";
-                    alert("❌ Error de comunicación con el servidor: " + err);
-                })
-                .actualizarCuentasMasivo(datosParaSubir);
-        } else {
-            input.value = "";
-        }
-    };
-    lector.readAsText(archivo, "UTF-8");
-}
-
-function descargarFotoRRHH() {
-    document.body.style.cursor = "wait";
-    var btn = document.getElementById("btn-dl-rrhh");
-    if(btn) btn.innerText = "⏳ Extrayendo datos de Google...";
-    
-    google.script.run
-        .withSuccessHandler(function(filas) {
-            document.body.style.cursor = "default";
-            if(btn) btn.innerText = "📥 1. Descargar Foto Completa RRHH (Excel)";
-            
-            var csv = [];
-            filas.forEach(function(f) {
-                var filaLimpiada = f.map(function(celda) {
-                    return '"' + String(celda || "").replace(/"/g, '""') + '"';
-                });
-                csv.push(filaLimpiada.join(";"));
-            });
-            
-            var blob = new Blob(["\uFEFF" + csv.join("\n")], { type: 'text/csv;charset=utf-8;' });
-            var url = URL.createObjectURL(blob);
-            var link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", "Cuentas_Workspace_Foto_RRHH.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        })
-        .withFailureHandler(function(err) {
-            document.body.style.cursor = "default";
-            if(btn) btn.innerText = "📥 1. Descargar Foto Completa RRHH (Excel)";
-            alert("❌ Error al extraer los datos: " + err);
-        })
-        .generarDatosRRHHCompleto();
-}
-
-function procesarSubidaRRHH(input) {
-    var archivo = input.files[0];
-    if (!archivo) return;
-    
-    var lector = new FileReader();
-    lector.onload = function(e) {
-        var contenido = e.target.result;
-        var lineas = contenido.split(/\r\n|\n/);
-        var datosParaSubir = [];
-        
-        for (var i = 0; i < lineas.length; i++) {
-            var linea = lineas[i].trim();
-            if (!linea) continue;
-            
-            var separador = linea.includes(";") ? ";" : ",";
-            var celdas = linea.match(/(".*?"|[^";,]+)(?=\s*[;,]|\s*$)/g) || [];
-            var celdasLimpias = celdas.map(function(c) {
-                return c.replace(/^"|"$/g, '').replace(/""/g, '"').trim();
-            });
-            
-            datosParaSubir.push(celdasLimpias);
-        }
-        
-        if (datosParaSubir.length <= 1) {
-            alert("⚠️ El archivo parece estar vazio ou não tem o formato correto.");
-            input.value = "";
-            return;
-        }
-        
-        var totalUsuarios = datosParaSubir.length - 1;
-        if (confirm("🔄 Se van a revisar y sincronizar com la nube " + totalUsuarios + " cuentas desde el arquivo de RRHH.\n\n¿Confirmas la actualización en Google Workspace?")) {
-            document.body.style.cursor = "wait";
-            var btn = document.getElementById("btn-up-rrhh");
-            if(btn) btn.innerText = "⏳ Subiendo y aplicando cambios...";
-            
-            google.script.run
-                .withSuccessHandler(function(res) {
-                    document.body.style.cursor = "default";
-                    if(btn) btn.innerText = "📤 2. Subir Excel de RRHH y Actualizar";
-                    input.value = ""; 
-                    var msg = "✅ Sincronización con RRHH finalizada:\n\n- Perfiles actualizados con éxito: " + res.exitosos + "\n- Fallos / Sin cambios necesarios: " + res.errores;
-                    if (res.errores > 0 && res.detalle.length > 0) {
-                        msg += "\n\nDetalle de errores:\n" + res.detalle.slice(0, 10).join("\n") + (res.detalle.length > 10 ? "\n...(y más)" : "");
-                    }
-                    alert(msg);
-                })
-                .withFailureHandler(function(err) {
-                    document.body.style.cursor = "default";
-                    if(btn) btn.innerText = "📤 2. Subir Excel de RRHH y Actualizar";
-                    input.value = "";
-                    alert("❌ Error de servidor durante la subida: " + err);
-                })
-                .procesarSubidaRRHHBackend(datosParaSubir);
-        } else {
-            input.value = "";
-        }
-    };
-    lector.readAsText(archivo, "UTF-8");
-}
-
-let MODO_PANEL_IDENTIDADES = 'CREAR'; 
-let EMAIL_USUARIO_EN_EDICION = null;
-
-function cambiarModoPanelIdentidades(modo, datos = {}) {
-  MODO_PANEL_IDENTIDADES = modo;
-  const btnAccion = document.getElementById('btn-accion-identidad');
-  
-  if (modo === 'EDITAR') {
-    EMAIL_USUARIO_EN_EDICION = datos.email;
-    
-    if (btnAccion) {
-      btnAccion.innerText = "💾 Guardar Cambios de " + datos.email;
-      btnAccion.style.background = "linear-gradient(135deg, #059669 0%, #0284c7 100%)";
-    }
-    
-    if (document.getElementById('creador-manager')) document.getElementById('creador-manager').value = datos.manager || '';
-    if (document.getElementById('creador-puesto')) document.getElementById('creador-puesto').value = datos.puesto || '';
-    if (document.getElementById('creador-departamento')) document.getElementById('creador-departamento').value = datos.departamento || '';
-    if (document.getElementById('creador-telefono')) document.getElementById('creador-telefono').value = datos.telefono || '';
-    if (document.getElementById('creador-pais')) document.getElementById('creador-pais').value = datos.pais || 'Spain';
-    if (document.getElementById('creador-email-personal')) document.getElementById('creador-email-personal').value = datos.emailPersonal || '';
-    if (document.getElementById('creador-grupo')) document.getElementById('creador-grupo').value = datos.grupo || '';
-    
-  } else {
-    EMAIL_USUARIO_EN_EDICION = null;
-    if (btnAccion) {
-      btnAccion.innerText = "🚀 Crear Cuenta en Workspace y Excel";
-      btnAccion.style.background = "";
-    }
-    
-    if (document.getElementById('creador-manager')) document.getElementById('creador-manager').value = '';
-    if (document.getElementById('creador-puesto')) document.getElementById('creador-puesto').value = '';
-    if (document.getElementById('creador-departamento')) document.getElementById('creador-departamento').value = '';
-    if (document.getElementById('creador-telefono')) document.getElementById('creador-telefono').value = '';
-    if (document.getElementById('creador-pais')) document.getElementById('creador-pais').value = 'Spain';
-    if (document.getElementById('creador-email-personal')) document.getElementById('creador-email-personal').value = '';
-    if (document.getElementById('creador-grupo')) document.getElementById('creador-grupo').value = '';
-  }
-}
-
-function ejecutarAccionIdentidad() {
-    var btn = document.getElementById('btn-crear-identidad');
-    var txtOriginal = btn ? btn.innerHTML : "Procesando...";
-    if (btn) { btn.innerHTML = "⏳ Trabajando en Workspace..."; btn.disabled = true; }
-
-    var paqueteDatos = {
-      email: EMAIL_USUARIO_EN_EDICION || (document.getElementById('creador-correo') ? document.getElementById('creador-correo').value.trim() : ""),
-      nombre: document.getElementById('creador-nombre') ? document.getElementById('creador-nombre').value.trim() : "",
-      apellidos: document.getElementById('creador-apellidos') ? document.getElementById('creador-apellidos').value.trim() : "",
-      puesto: document.getElementById('creador-puesto') ? document.getElementById('creador-puesto').value.trim() : "",
-      departamento: document.getElementById('creador-departamento') ? document.getElementById('creador-departamento').value.trim() : "",
-      telefono: document.getElementById('creador-telefono') ? document.getElementById('creador-telefono').value.trim() : "",
-      emailPersonal: document.getElementById('creador-recovery') ? document.getElementById('creador-recovery').value.trim() : "",
-      grupo: document.getElementById('creador-grupo') ? document.getElementById('creador-grupo').value.trim() : ""
-    };
-
-    if (MODO_PANEL_IDENTIDADES === 'EDITAR') {
-      google.script.run
-        .withSuccessHandler(function(res) {
-          if (btn) { btn.innerHTML = txtOriginal; btn.disabled = false; }
-          alert("✅ ¡Cambios y listas guardados con éxito para " + paqueteDatos.email + "!");
-          cambiarModoPanelIdentidades('CREAR');
-        })
-        .withFailureHandler(function(err) {
-          if (btn) { btn.innerHTML = txtOriginal; btn.disabled = false; }
-          alert("❌ Error al modificar: " + err);
-        })
-        .actualizarUsuarioGoogleEnriquecido(paqueteDatos);
-
     } else {
-      if (typeof ejecutarCreacionAvanzada === "function") {
-        ejecutarCreacionAvanzada();
+      msgLicencia = "☁️ Se asignó Cloud Identity Free (Por defecto)";
+    }
+    
+    var libro = SpreadsheetApp.getActiveSpreadsheet(); 
+    var hojaDestino = libro.getSheetByName("Hoja Maestra (657)") || libro.getSheetByName("HOJA MAESTRA 657") || libro.getSheets()[0];
+    
+    if (hojaDestino) {
+      var allData = hojaDestino.getDataRange().getValues();
+      var cabeceras = allData[0]; 
+      var nuevaFila = new Array(cabeceras.length).fill("");
+      var colOrigenIdx = -1;
+
+      var origenText = "";
+      var palabraClave = "";
+      if (datos.tipo === "Nominativa") { origenText = "Cuentas nominativas de Gigas"; palabraClave = "nominativa"; }
+      else if (datos.tipo === "TPartner") { origenText = "Cuentas TPartner"; palabraClave = "tpartner"; }
+      else if (datos.tipo === "Kayako") { origenText = "Cuentas Kayako"; palabraClave = "kayako"; }
+      else if (datos.tipo === "Externa") { origenText = "Cuentas asesorgigas"; palabraClave = "asesorgigas"; }
+      else if (datos.tipo === "Onmovil") { origenText = "Cuentas Onmovil"; palabraClave = "onmovil"; }
+      else if (datos.tipo === "Servicio") { origenText = "Cuentas de servicio Gigas"; palabraClave = "servicio"; }
+      else { origenText = datos.tipo; palabraClave = datos.tipo.toLowerCase(); }
+
+      for (var c = 0; c < cabeceras.length; c++) {
+        var head = String(cabeceras[c]).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if (head.includes("email") || head.includes("correo")) nuevaFila[c] = emailCompleto;
+        else if (head.includes("manager") || head.includes("responsable")) nuevaFila[c] = datos.manager.trim();
+        else if (head.includes("status") || head.includes("estado")) nuevaFila[c] = "Active"; 
+        else if (head.includes("origen") || head.includes("hoja de origen")) { nuevaFila[c] = origenText; colOrigenIdx = c; }
+        else if (head.includes("first name") || head.includes("firstname") || head === "nombre") nuevaFila[c] = given;
+        else if (head.includes("last name") || head.includes("lastname") || head === "apellido" || head.includes("apellidos")) nuevaFila[c] = family;
+        else if (head.includes("motivo") || head.includes("servicio") || head.includes("dedicacion")) nuevaFila[c] = datos.motivo || "";
+        else if (head === "ou" || head.includes("unidad") || head.includes("orgunit")) nuevaFila[c] = ouDestino;
+        else if (head.includes("licencia")) nuevaFila[c] = datos.licencia;
       }
 
-      setTimeout(function() {
-        var correoNuevo = document.getElementById('creador-correo') ? document.getElementById('creador-correo').value.trim() : "";
-        if (correoNuevo && correoNuevo.includes("@")) {
-          paqueteDatos.email = correoNuevo;
-          google.script.run.actualizarUsuarioGoogleEnriquecido(paqueteDatos);
+      var filaInsercion = -1;
+      if (colOrigenIdx !== -1) {
+        for (var f = allData.length - 1; f >= 1; f--) {
+          if (String(allData[f][colOrigenIdx]).toLowerCase().includes(palabraClave)) { filaInsercion = f + 1; break; }
         }
-      }, 2500);
-    }
-  }
-
-function filtrarInventarioPorUsuario(correo) {
-  const filasPrincipales = document.querySelectorAll('#tabla-listas-gigas-body .main-row, #tabla-listas-oni-body .main-row');
-  
-  if (!correo || correo.trim() === "") {
-    filasPrincipales.forEach(fila => {
-      fila.style.display = "";
-      const filaMiembros = fila.nextElementSibling;
-      if (filaMiembros && filaMiembros.classList.contains('sub-member-row')) {
-        filaMiembros.style.display = "none"; 
       }
-    });
-    return;
-  }
-  
-  const emailBuscado = correo.toLowerCase().trim();
-  
-  filasPrincipales.forEach(fila => {
-    const filaMiembros = fila.nextElementSibling;
-    const textoTotal = (fila.textContent + " " + (filaMiembros ? filaMiembros.textContent : "")).toLowerCase();
-    
-    if (textoTotal.includes(emailBuscado)) {
-      fila.style.display = ""; 
-    } else {
-      fila.style.display = "none"; 
-      if (filaMiembros) filaMiembros.style.display = "none"; 
-    }
-  });
-}
-
-window.addEventListener('DOMContentLoaded', function() {
-  setTimeout(function() {
-    if (typeof refrescarListas === "function") {
-      refrescarListas();
-    } else if (typeof cargarInventario === "function") {
-      cargarInventario();
-    }
-  }, 1000);
-});
-
-function ejecutarTraspasoDrive() {
-  var origen = document.getElementById('traspaso-origen') ? document.getElementById('traspaso-origen').value.trim() : "";
-  var destino = document.getElementById('traspaso-destino') ? document.getElementById('traspaso-destino').value.trim() : "";
-  var btn = document.getElementById('btn-traspaso-drive');
-  var txtOriginal = btn ? btn.innerHTML : "🔀 Iniciar Traspaso de Drive";
-
-  if (!origen || !destino) {
-    alert("⚠️ Por favor, escribe el correo de origen y el de destino.");
-    return;
-  }
-
-  if (confirm("¿Confirmas el traspaso de TODOS los archivos de Drive de:\n\n👤 ORIGEN: " + origen + "\n🎯 DESTINO: " + destino + "?\n\n(Es un proceso seguro: los archivos no se borran, solo cambian de propietario en segundo plano).")) {
-    if (btn) { btn.innerHTML = "⏳ Procesando en Google..."; btn.disabled = true; }
-    google.script.run
-      .withSuccessHandler(function(res) {
-        if (btn) { btn.innerHTML = txtOriginal; btn.disabled = false; }
-        if (res.exito) { alert("✅ ¡ÉXITO!\n\n" + res.mensaje); } 
-        else { alert("❌ ERROR: " + res.error); }
-      })
-      .withFailureHandler(function(err) {
-        if (btn) { btn.innerHTML = txtOriginal; btn.disabled = false; }
-        alert("❌ Error de comunicación con el servidor: " + err);
-      })
-      .traspasarPropiedadDrive(origen, destino);
-  }
-}
-
-function cerrarYLimpiarPanel(evento, idPanel) {
-  if (evento) evento.stopPropagation();
-  
-  var panel = document.getElementById(idPanel);
-  if (!panel) return;
-
-  panel.classList.add('collapsed');
-
-  var inputs = panel.querySelectorAll('input');
-  inputs.forEach(function(input) {
-    input.value = '';
-  });
-}
-
-window.addEventListener('load', function() {
-  var vigilarPermisos = setInterval(function() {
-    if (typeof IS_ADMIN_AUTHORIZED !== 'undefined' && IS_ADMIN_AUTHORIZED === true) {
-      clearInterval(vigilarPermisos); 
-      lanzarRefrescarSoloListas();   
-    }
-  }, 300); 
-});
-
-function mostrarPopUpBuscador(texto) {
-  var viejoPop = document.getElementById('pop-buscador-flotante');
-  if(viejoPop) viejoPop.remove();
-
-  var pop = document.createElement('div');
-  pop.id = 'pop-buscador-flotante';
-  pop.innerHTML = "⚠️ " + texto;
-  
-  pop.style.cssText = "position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background-color: #ef4444; color: white; padding: 12px 24px; border-radius: 8px; z-index: 9999; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); font-family: sans-serif; font-size: 14px; font-weight: 500; transition: opacity 0.4s ease;";
-  
-  document.body.appendChild(pop);
-
-  setTimeout(function() {
-    pop.style.opacity = '0';
-    setTimeout(function() { 
-      if(pop.parentNode) pop.remove(); 
-    }, 400); 
-  }, 3000);
-}
-
-  // ========================================================
-  // 🛡️ CARGA DE SEGURIDAD Y PANTALLA DE BLOQUEO
-  // ========================================================
-  document.addEventListener("DOMContentLoaded", function() {
-    
-    google.script.run.withSuccessHandler(function(usuario) {
       
-      if (!usuario.autorizado) {
-        var escudo = document.createElement("div");
-        escudo.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:#0f172a; z-index:999999; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px;";
-        escudo.innerHTML = "<h1 style='color:#ef4444; font-family:sans-serif; margin-bottom:10px; font-size: 32px;'>⚠️ ACCESO DENEGADO</h1><h3 style='color:#cbd5e1; font-family:sans-serif; font-weight:normal;'>El sistema ha detectado el correo:<br><br><b style='color:#38bdf8; font-size:24px; padding: 10px; background:#1e293b; border-radius:8px; border:1px solid #334155;'>" + usuario.email + "</b><br><br>y no tiene permisos operativos.</h3><p style='color:#64748b; margin-top:20px;'>Si el correo es correcto, contacta con el SuperAdministrador para que te dé de alta.</p>";
-        document.body.appendChild(escudo);
-        return; 
+      if (filaInsercion !== -1) {
+        hojaDestino.insertRowAfter(filaInsercion);
+        hojaDestino.getRange(filaInsercion + 1, 1, 1, cabeceras.length).setValues([nuevaFila]);
+        var rule = hojaDestino.getRange(filaInsercion, 1, 1, cabeceras.length).getDataValidations();
+        hojaDestino.getRange(filaInsercion + 1, 1, 1, cabeceras.length).setDataValidations(rule);
+        hojaDestino.getRange(filaInsercion, 1, 1, cabeceras.length).copyTo(hojaDestino.getRange(filaInsercion + 1, 1, 1, cabeceras.length), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
+      } else {
+        hojaDestino.appendRow(nuevaFila);
       }
+    }
+    return { exito: true, email: emailCompleto, pass: passwordGenerada, msgLic: msgLicencia, hoja: hojaDestino.getName() };
+  } catch (error) { 
+    return { exito: false, error: error.message }; 
+  } finally {
+    // 🚥 IMPORTANTE: Liberamos el semáforo
+    semaforo.releaseLock();
+  }
+}
 
-      var contenedorUsuario = document.getElementById("display-user-email"); 
-      if (contenedorUsuario) {
-        var colorBadge = (usuario.rol === "ADMIN") ? "#e11d48" : "#2563eb"; 
-        contenedorUsuario.innerHTML = usuario.email + 
-          " <span style='background-color:" + colorBadge + "; color:white; padding:2px 6px; margin-left:8px; border-radius:4px; font-size:11px; font-weight:bold;'>" 
-          + usuario.rol + "</span>";
-      }
+function actualizarUsuarioGoogleEnriquecido(datos) {
+  verificarPermisoEjecucion();
+  try {
+    var correo = datos.email.toLowerCase().trim();
+    
+    var userPatch = {};
+    if (datos.puesto || datos.departamento) {
+      userPatch.organizations = [{
+        title: datos.puesto || "",
+        department: datos.departamento || "",
+        primary: true
+      }];
+    }
+    if (datos.telefono) {
+      userPatch.phones = [{ value: datos.telefono, type: "work", primary: true }];
+    }
+    if (datos.emailPersonal) {
+      userPatch.recoveryEmail = datos.emailPersonal;
+    }
+    if (datos.nombre || datos.apellidos) {
+      userPatch.name = {
+        givenName: datos.nombre || "",
+        familyName: datos.apellidos || ""
+      };
+    }
+    
+    if (Object.keys(userPatch).length > 0) {
+      AdminDirectory.Users.update(userPatch, correo);
+    }
+    
+    var advertencias = "";
 
-      // 🔒 3. APLICAR LOS "CANDADOS" A OPERADORES
-      if (usuario.rol === "OPERADOR") {
-        console.log("🔒 Perfil OPERADOR: Ocultando módulos críticos.");
-        
-        var menuBajas = document.getElementById("seccion-bajas");
-        if (menuBajas) menuBajas.style.display = "none";
-
-        var menuServicio = document.getElementById("seccion-servicios");
-        if (menuServicio) menuServicio.style.display = "none";
-        
-        var btnPermisos = document.getElementById("btn-seguridad-panel");
-        if (btnPermisos) btnPermisos.style.display = "none";
-
-        // 🔥 OCULTAR LOS BOTONES DEL TERCER PANTALLAZO Y OTROS PODERES ADMIN
-        var botonesAdmin = [
-          "lanzarCampanaHuerfanas()", 
-          "lanzarProcesarRespuestas()", 
-          "lanzarEscanerMaestra()", 
-          "lanzarBorradoListaTotal()"
-        ];
-        botonesAdmin.forEach(function(accion) {
-          var btn = document.querySelector('button[onclick="' + accion + '"]');
-          if (btn) btn.style.display = "none";
-        });
-
-        // 🔥 OCULTAR TAMBIÉN EL BLOQUE DE SINCRONIZACIÓN CON RRHH
-        var btnDLRRHH = document.getElementById("btn-dl-rrhh");
-        if (btnDLRRHH) {
-          var contenedorRRHH = btnDLRRHH.closest("div[style*='margin: 16px 0']");
-          if (contenedorRRHH) contenedorRRHH.style.display = "none";
+    if (datos.grupo && datos.grupo.trim() !== "") {
+      var listas = datos.grupo.split(",");
+      
+      // ⏳ PAUSA INTELIGENTE: 7 segundos para que Google asimile la nueva cuenta
+      Utilities.sleep(7000); 
+      
+      for (var i = 0; i < listas.length; i++) {
+        var emailLista = listas[i].trim().toLowerCase();
+        if (emailLista.includes("@")) {
+          var insertado = false;
+          
+          // Intentamos insertarlo hasta 2 veces si hay lag en Google
+          for (var intento = 0; intento < 2; intento++) {
+            try {
+              AdminDirectory.Members.insert({
+                email: correo,
+                role: "MEMBER"
+              }, emailLista);
+              insertado = true;
+              break; 
+            } catch(eGrupo) {
+              if (intento === 0) Utilities.sleep(3000); // Pausa extra si el primer intento falla
+            }
+          }
+          
+          if (!insertado) {
+            advertencias += "⚠️ Fallo propagación en: " + emailLista;
+          }
         }
       }
-
-    }).obtenerDetalleUsuarioActivo();
-  });
-
-  // ========================================================
-  // 🛡️ ESCUDO ANTI-CURIOSOS (Solo para Operadores)
-  // ========================================================
-  document.addEventListener('contextmenu', function(e) {
-    if (!IS_ADMIN_AUTHORIZED) {
-      e.preventDefault(); 
     }
-  });
+    
+    return { exito: true, mensaje: advertencias };
+  } catch(e) {
+    return { exito: false, error: e.toString() };
+  }
+}
 
-  document.addEventListener('keydown', function(e) {
-    if (IS_ADMIN_AUTHORIZED) return;
-
-    if (e.key === 'F12' || e.keyCode === 123) {
-      e.preventDefault();
-      return false;
+function traspasarPropiedadDrive(correoOrigen, correoDestino) {
+  verificarPermisoAdmin();
+  try {
+    if (!correoOrigen || !correoDestino) {
+      return { exito: false, error: "⚠️ Debes rellenar tanto el correo de origen como el de destino." };
     }
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
-      e.preventDefault();
-      return false;
+    
+    let idOrigen = correoOrigen;
+    let idDestino = correoDestino;
+    
+    try {
+      if (typeof AdminDirectory !== 'undefined') {
+        idOrigen = AdminDirectory.Users.get(correoOrigen).id;
+        idDestino = AdminDirectory.Users.get(correoDestino).id;
+      }
+    } catch (errDir) {
+      return { 
+        exito: false, 
+        error: "❌ No se ha encontrado a uno de los usuarios en tu directorio de Google. Asegúrate de que los correos están bien escritos, pertenecen a tu empresa y la cuenta de origen NO ha sido borrada todavía." 
+      };
     }
-    if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
-      e.preventDefault();
-      return false;
+    
+    const token = ScriptApp.getOAuthToken();
+    
+    const DRIVE_APP_ID = "435070579839"; 
+    const payload = {
+      oldOwnerUserId: idOrigen,
+      newOwnerUserId: idDestino,
+      applicationDataTransfers: [
+        {
+          applicationId: DRIVE_APP_ID,
+          applicationTransferParams: [
+            {
+              key: "PRIVACY_LEVEL",
+              value: "SHARED,PRIVATE"
+            }
+          ]
+        }
+      ]
+    };
+    
+    const url = "https://admin.googleapis.com/admin/datatransfer/v1/transfers";
+    const opciones = {
+      method: "post",
+      contentType: "application/json",
+      headers: {
+        "Authorization": "Bearer " + token
+      },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    };
+    
+    const respuesta = UrlFetchApp.fetch(url, opciones);
+    const codigoEstado = respuesta.getResponseCode();
+    const textoRespuesta = respuesta.getContentText();
+    
+    if (codigoEstado === 200 || codigoEstado === 201) {
+      return { 
+        exito: true, 
+        mensaje: "✅ ¡ORDEN RECIBIDA Y EN PROCESO!\n\nLos archivos de " + correoOrigen + " han empezado a transferirse en segundo plano hacia " + correoDestino + ". Google os enviará un correo electrónico automático al finalizar." 
+      };
+    } else {
+      let errorLimpio = textoRespuesta;
+      try {
+        const jsonError = JSON.parse(textoRespuesta);
+        if (jsonError.error && jsonError.error.message) {
+          errorLimpio = jsonError.error.message;
+        }
+      } catch (ex) { }
+      
+      return { 
+        exito: false, 
+        error: "❌ El servidor de Google ha rechazado la orden (" + codigoEstado + "): " + errorLimpio 
+      };
     }
-  });
-</script>
-</body>
-</html>
+    
+  } catch (e) {
+    return { exito: false, error: "Fallo de conexión: " + (e.message || e.toString()) };
+  }
+}
