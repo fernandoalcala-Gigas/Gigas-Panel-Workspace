@@ -59,6 +59,7 @@
     .email-preview { font-family: monospace; font-size: 16px; color: #0284c7; background: #e0f2fe; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; border: 1px dashed #bae6fd; transition: background-color 0.3s; }
     .creator-btn { background: #10b981; color: white; border: none; padding: 14px; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; transition: all 0.2s; margin-top: 10px; }
     .creator-btn:hover { background: #059669; }
+    .creator-btn:disabled { opacity: 0.7; cursor: not-allowed; }
     .category-selector-container { display: flex; align-items: center; gap: 16px; background: white; padding: 16px 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px; transition: background-color 0.3s, border-color 0.3s; }
     .select-style { padding: 9px 16px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc; color: #0f172a; font-weight: 600; font-size: 13px; min-width: 280px; outline: none; transition: all 0.3s; }
     .table-container { width: 100%; max-height: 60vh; overflow-y: auto; overflow-x: auto; position: relative; border-radius: 4px;}
@@ -147,6 +148,23 @@
     body.dark-mode .nav-btn-icon:hover { background: #334155; }
     .lang-select { background: transparent; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 8px; font-size: 13px; cursor: pointer; margin-right: 15px; color: inherit; outline: none; font-weight: 600; }
     body.dark-mode .lang-select { border-color: #475569; background: #1e293b; color: white; }
+    
+    /* ⚡ FASE 6: ESTILOS ACCIONES MASIVAS */
+    .action-bar-masiva {
+      position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
+      background: #1e293b; color: white; padding: 14px 24px; border-radius: 8px 8px 0 0;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.3); z-index: 1000;
+      display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center;
+      transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid #334155; border-bottom: none; width: 90%; max-width: 1000px;
+    }
+    body.dark-mode .action-bar-masiva { background: #0f172a; border-color: #475569; }
+    .action-bar-masiva.visible { bottom: 0; }
+    .action-btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: transform 0.1s, filter 0.2s; white-space: nowrap; }
+    .action-btn:hover { filter: brightness(1.1); }
+    .action-btn:active { transform: scale(0.96); }
+    .chk-container { text-align: center !important; width: 40px; padding: 0 !important; cursor: default; }
+    .user-checkbox, #master-chk { width: 16px; height: 16px; cursor: pointer; accent-color: #38bdf8; }
   </style>
 </head>
 <body>
@@ -169,11 +187,11 @@
           <div id="takeout-status-box" class="takeout-badge-info" data-i18n="txt_takeout">🔍 Pulse un usuario para ver Takeout.</div>
         </div>
         <div class="form-group">
-          <label style="color:#f59e0b;">🏷️ Módulo de Alias (En vivo):</label>
+          <label style="color:#f59e0b;" data-i18n="lbl_mod_alias">🏷️ Módulo de Alias (En vivo):</label>
           <div class="alias-live-container">
-            <div id="alias-live-list" style="font-size:12px; color:#94a3b8; text-align:center; padding:4px 0;">Selecciona un usuario...</div>
+            <div id="alias-live-list" style="font-size:12px; color:#94a3b8; text-align:center; padding:4px 0;" data-i18n="txt_sel_usuario">Selecciona un usuario...</div>
             <div style="display:flex; gap:6px; margin-top:8px;">
-              <input type="text" id="nuevo-alias-input" placeholder="nuevo.alias" style="flex:1; padding:6px; font-size:12px; background:#1e293b; border-color:#475569; color:white; outline:none; border-radius:4px;" />
+              <input type="text" id="nuevo-alias-input" data-i18n="ph_nuevo_alias" placeholder="nuevo.alias" style="flex:1; padding:6px; font-size:12px; background:#1e293b; border-color:#475569; color:white; outline:none; border-radius:4px;" />
               <button onclick="lanzarAñadirAlias()" style="width:auto; padding:6px 10px; margin:0; font-size:12px; background:#f59e0b; color:white; font-weight:bold; border-radius:4px; border:none; cursor:pointer;">➕</button>
             </div>
           </div>
@@ -181,20 +199,20 @@
         <div class="form-group">
           <label style="color:#10b981;" data-i18n="lbl_target_lic">💼 Licencia (Asignar/Cambiar):</label>
           <select id="target-licencia" style="border-color: #10b981; width:100%; padding:10px 12px; font-size:13px; border-radius:6px; background:#0f172a; color:white; outline:none; box-sizing:border-box;">
-            <option value="">Selecciona...</option>
+            <option value="" data-i18n="opt_seleciona">-- Selecciona --</option>
           </select>
-          <div id="licencia-actual-box" style="font-size: 11px; margin-top: 6px; padding: 6px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; color: #10b981; font-weight: bold;">🔍 Licencia actual: Selecciona un usuario...</div>
+          <div id="licencia-actual-box" style="font-size: 11px; margin-top: 6px; padding: 6px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; color: #10b981; font-weight: bold;" data-i18n="txt_lic_actual">🔍 Licencia actual: Selecciona un usuario...</div>
         </div>
         <div class="form-group">
           <label style="color:#8b5cf6;" data-i18n="lbl_target_ou">📂 Unidad Organizativa (Mover):</label>
           <select id="target-ou" style="border-color: #8b5cf6; width:100%; padding:10px 12px; font-size:13px; border-radius:6px; background:#0f172a; color:white; outline:none; box-sizing:border-box;">
-            <option value="">Cargando OUs...</option>
+            <option value="" data-i18n="opt_destino">-- Selecciona destino --</option>
           </select>
-          <div id="ou-actual-box" style="font-size: 11px; margin-top: 6px; padding: 6px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; color: #8b5cf6; font-weight: bold;">🔍 OU actual: Selecciona un usuario...</div>
-          <button class="creator-btn" style="background:#8b5cf6; padding:8px; margin-top:8px; font-size:12px;" onclick="lanzarCambioOU()">📦 Mover de OU</button>
+          <div id="ou-actual-box" style="font-size: 11px; margin-top: 6px; padding: 6px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; color: #8b5cf6; font-weight: bold;" data-i18n="txt_ou_actual">🔍 OU actual: Selecciona un usuario...</div>
+          <button class="creator-btn" style="background:#8b5cf6; padding:8px; margin-top:8px; font-size:12px;" onclick="lanzarCambioOU()" data-i18n="btn_mover_ou">📦 Mover de OU</button>
         </div>
         <button class="btn-primary" onclick="ejecutarActualizarGrupos()" data-i18n="btn_sync" data-i18n-title="tt_sync">🔄 Sincronizar Cuentas</button>
-        <button class="btn-secondary" style="border: 1px solid #38bdf8; color: #e0f2fe; margin-top: 6px;" onclick="generarComandoAD()">💻 Comandos PowerShell (AD)</button>
+        <button class="btn-secondary" style="border: 1px solid #38bdf8; color: #e0f2fe; margin-top: 6px;" onclick="generarComandoAD()" data-i18n="btn_cmd_ad">💻 Comandos PowerShell (AD)</button>
       </div>
     </div>
 
@@ -209,7 +227,7 @@
         <button class="btn-success" onclick="lanzarEstado(false)" data-i18n="btn_reactivar" data-i18n-title="tt_reactivar">▶️ Reactivar Workspace</button>
         <button class="btn-danger" onclick="lanzarEstado(true)" data-i18n="btn_suspender" data-i18n-title="tt_suspender">⏸️ Suspender Workspace</button>
         <button class="btn-secondary" onclick="lanzarResetClaveOlvido()" data-i18n="btn_clave" data-i18n-title="tt_clave">🔑 Reseteo Clave (Olvido)</button>
-        <button class="btn-danger" style="background:#dc2626;" onclick="lanzarBypass2FA()" title="Genera un código de emergencia para saltarse el 2FA">🆘 Bypass 2FA (Emergencia)</button>
+        <button class="btn-danger" style="background:#dc2626;" onclick="lanzarBypass2FA()" title="Genera un código de emergencia para saltarse el 2FA" data-i18n="btn_bypass">🆘 Bypass 2FA (Emergencia)</button>
       </div>
     </div>
 
@@ -252,8 +270,8 @@
         <button class="btn-primary" onclick="lanzarCampanaHuerfanas()" data-i18n="btn_camp_listas" data-i18n-title="tt_camp_listas">📢 Campaña Listas Huérfanas</button>
         <button class="btn-secondary" onclick="lanzarProcesarRespuestas()" data-i18n="btn_rast_listas" data-i18n-title="tt_rast_listas">🔍 Rastrear Respuestas</button>
         <button class="btn-danger" style="font-weight:bold;" onclick="lanzarBorradoListaTotal()" data-i18n="btn_del_lista" data-i18n-title="tt_del_lista">🚫 BORRAR LISTA ENTERA</button>
-        <button class="btn-secondary" onclick="lanzarRenombrarLista()" data-i18n-title="Cambia el alias/email de una lista existente">✏️ Renombrar Lista</button>
-        <button class="btn-danger" style="background:#b91c1c; font-weight:bold;" onclick="lanzarPurgaMasiva()" data-i18n-title="Elimina al usuario de TODOS los grupos a la vez">🔥 Purga Masiva del Usuario</button>
+        <button class="btn-secondary" onclick="lanzarRenombrarLista()" data-i18n-title="Cambia el alias/email de una lista existente" data-i18n="btn_renombrar">✏️ Renombrar Lista</button>
+        <button class="btn-danger" style="background:#b91c1c; font-weight:bold;" onclick="lanzarPurgaMasiva()" data-i18n-title="Elimina al usuario de TODOS los grupos a la vez" data-i18n="btn_purga">🔥 Purga Masiva del Usuario</button>
       </div>
     </div>
 
@@ -267,7 +285,6 @@
         <button class="btn-primary" onclick="lanzarTakeout()" data-i18n="btn_takeout" data-i18n-title="tt_takeout">📩 Enviar Acceso TakeOut</button>
         <button class="btn-danger" style="font-weight:700;" onclick="lanzarFlujoBajaTotal()" data-i18n="btn_baja_total" data-i18n-title="tt_baja_total">🚫 EJECUTAR BAJA TOTAL</button>
         <button class="btn-success" onclick="lanzarRecuperacionCuenta()" data-i18n="btn_recuperar" data-i18n-title="tt_recuperar">♻️ Recuperar Cuenta (Lím. 20d)</button>
-        <!-- ⭐ MÓDULO TRASPASO DE DRIVE (BLOQUE SELLADO) ⭐ -->
         <div style="background: #0f172a; padding: 12px; border-radius: 6px; border: 1px solid #334155; margin-top: 12px; margin-bottom: 4px;">
           <div style="color: #38bdf8; font-size: 12px; font-weight: bold; margin-bottom: 6px;">📦 Traspaso de Drive (TakeOut / Herencia)</div>
           <p style="color: #94a3b8; font-size: 11px; margin: 0 0 8px 0;">Mueve los archivos en segundo plano sin borrarlos.</p>
@@ -323,7 +340,7 @@
                 <select id="creador-ou" style="border-color: #8b5cf6;"><option value="/">Cargando OUs...</option></select>
               </div>
               <div class="creator-group"><label data-i18n="lbl_alias">Alias del Correo</label><input type="text" id="creador-alias" placeholder="..." onkeyup="actualizarPreviewEmail()"></div>
-              <div class="creator-group"><label data-i18n="lbl_dominio">Dominio</label><select id="creador-dominio" onchange="actualizarPreviewEmail()"><option value="gigas.com">@gigas.com</option><option value="onmovil.com">@onmovil.com</option><option value="asesorgigas.com">@asesorgigas.com</option><option value="oni.pt">@oni.pt</option></select></div>
+              <div class="creator-group"><label data-i18n="lbl_dominio">Dominio</label><select id="creador-dominio" onchange="actualizarPreviewEmail()"><option value="gigas.com">@gigas.com</option><option value="onmovil.es">@onmovil.es</option><option value="asesorgigas.com">@asesorgigas.com</option><option value="oni.pt">@oni.pt</option></select></div>
               <div class="creator-group full-width"><div class="email-preview" id="creador-preview">escribe.alias@gigas.com</div></div>
               <div class="creator-group" id="box-nombre"><label data-i18n="lbl_nombre">Nombre Real</label><input type="text" id="creador-nombre" placeholder="..."></div>
               <div class="creator-group" id="box-apellido"><label data-i18n="lbl_apellido">Apellidos</label><input type="text" id="creador-apellido" placeholder="..."></div>
@@ -332,9 +349,6 @@
                 <input type="text" id="creador-motivo" style="border-color:#f59e0b;" placeholder="Ej: Monitorización de telefonía VoIP Asterisk ZeroVoz...">
               </div>
               <div class="creator-group full-width"><label data-i18n="lbl_mail_manager">Correo del Mánager / Responsable</label><input type="text" id="creador-manager" placeholder="..."></div>
-              <!-- ========================================================= -->
-              <!-- CAMPOS ENRIQUECIDOS INTEGRADOS (ESTILO NATIVO CREATOR) -->
-              <!-- ========================================================= -->
               <div style="display: flex; gap: 16px; width: 100%; flex-wrap: wrap;">
                 <div class="creator-group" style="flex: 1; min-width: 200px;">
                   <label>Función / Cargo (Title)</label>
@@ -367,14 +381,10 @@
                   <input type="email" id="creador-grupo" placeholder="all.spain@gigas.com" />
                 </div>
               </div>
-              <!-- ========================================================= -->
-              <!-- FIN CAMPOS ENRIQUECIDOS -->
-              <!-- ========================================================= -->
               <div class="creator-group full-width"><button id="btn-accion-identidad" class="creator-btn" onclick="ejecutarAccionIdentidad()" data-i18n="btn_crear_exe">🚀 Crear Cuenta en Workspace y Excel</button></div>
             </div>
             </div>
           </div>
-        </div>
         
         <div class="card collapsed" id="card-creador-lista" style="border-left: 4px solid #ef4444;">
            <div class="card-header" onclick="toggleCard('card-creador-lista')">
@@ -384,7 +394,7 @@
           <div class="card-body">
             <div class="creator-form">
               <div class="creator-group"><label data-i18n="lbl_list_name">Nombre Público de la Lista</label><input type="text" id="lista-nombre" placeholder="..."></div>
-              <div class="creator-group"><label data-i18n="lbl_list_dom">Dominio de la Lista</label><select id="lista-dominio" onchange="actualizarPreviewLista()"><option value="gigas.com">@gigas.com</option><option value="onmovil.com">@onmovil.com</option><option value="oni.pt">@oni.pt</option></select></div>
+              <div class="creator-group"><label data-i18n="lbl_list_dom">Dominio de la Lista</label><select id="lista-dominio" onchange="actualizarPreviewLista()"><option value="gigas.com">@gigas.com</option><option value="onmovil.es">@onmovil.es</option><option value="oni.pt">@oni.pt</option></select></div>
               <div class="creator-group"><label data-i18n="lbl_list_alias">Alias del Correo (Sufijo)</label><input type="text" id="lista-alias" placeholder="..." onkeyup="actualizarPreviewLista()"></div>
               <div class="creator-group"><label data-i18n="lbl_list_prev">Previsualización Oficial</label><div class="email-preview" id="lista-preview" style="background:#fef2f2; color:#b91c1c; border-color:#fca5a5;">escribe.alias@gigas.com</div></div>
               <div class="creator-group full-width"><label data-i18n="lbl_list_owner">Correo del Owner 👑</label><input type="text" id="lista-owner" placeholder="..."></div>
@@ -396,13 +406,47 @@
         
         <div class="global-search-box"><input type="text" id="global-search" data-i18n="search_box" placeholder="🔍 BUSCADOR INTELIGENTE..." onkeyup="debounceBuscador()"></div>
         
-        <div class="dashboard-grid">
-          <div class="card" id="card-grafica"><div class="card-header" onclick="toggleCard('card-grafica')"><h3 data-i18n="card_dist">📈 Distribución General (Origen)</h3><span class="toggle-icon">▼</span></div><div class="card-body"><div id="chart_div"></div></div></div>
-          <div class="card" id="card-origen"><div class="card-header" onclick="toggleCard('card-origen')"><h3 data-i18n="card_criterio">📋 Cuentas por Criterio (Resumen)</h3><span class="toggle-icon">▼</span></div><div class="card-body"><table class="excel-table"><thead><tr><th data-i18n="th_origen">Origen / Licencia</th><th data-i18n="th_activas">Activas</th><th data-i18n="th_susp">Susp.</th><th data-i18n="th_total">Total</th></tr></thead><tbody id="tabla-origen"></tbody></table></div></div>
+        <div class="card" id="card-cuentas-desglose" style="border-left: 4px solid #0284c7;">
+          <div class="card-header" onclick="toggleCard('card-cuentas-desglose')"><h3 id="titulo-panel-dinamico" data-i18n="card_desglose">📂 Desglose Completo de Usuarios</h3><span class="toggle-icon">▼</span></div>
+          <div class="card-body table-container">
+            <table class="excel-table" id="tabla-usuarios-gigas">
+              <thead id="head-cuentas-dinamicas"><tr><th data-i18n="th_elige">Elige un filtro o busca...</th></tr></thead>
+              <tbody id="body-cuentas-dinamicas"><tr><td id="msg-cuentas" data-i18n="td_esperando">Esperando acción...</td></tr></tbody>
+            </table>
+          </div>
         </div>
 
-        <div class="card collapsed" id="card-licencias"><div class="card-header" onclick="toggleCard('card-licencias')"><h3 data-i18n="card_lic">💼 Stock de Licencias</h3><span class="toggle-icon">▼</span></div><div class="card-body"><table class="excel-table"><thead><tr><th data-i18n="th_prod">Producto</th><th data-i18n="th_estado">Estado</th><th data-i18n="th_asig">Asignadas</th><th data-i18n="th_libres">Plan de Pagos / Libres</th></tr></thead><tbody id="tabla-licencias"></tbody></table></div></div>
-        
+        <div class="category-selector-container">
+          <label data-i18n="lbl_filtrar">📂 Filtrar / Agrupar por:</label>
+
+          <div style="margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); font-family: sans-serif;">
+            <div onclick="var body = document.getElementById('cuerpo-rrhh-collapse'); var arrow = document.getElementById('flecha-rrhh-collapse'); if(body.style.display === 'none'){ body.style.display = 'flex'; arrow.innerText = '▲'; } else { body.style.display = 'none'; arrow.innerText = '▼'; }" style="padding: 12px 16px; background: #1e293b; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; border-bottom: 1px solid transparent; transition: background 0.2s;">
+              <span style="color: #38bdf8; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                👥 Herramientas de Sincronización Oficial con RRHH
+              </span>
+              <span id="flecha-rrhh-collapse" style="color: #94a3b8; font-size: 14px; font-weight: bold;">▼</span>
+            </div>
+            
+            <div id="cuerpo-rrhh-collapse" style="display: none; padding: 16px; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; border-top: 1px solid #334155; background: #0f172a;">
+              <span style="color: #cbd5e1; font-size: 13px; flex: 1; min-width: 280px; line-height: 1.4;">
+                💡 **Modo de uso:** Descarga la fotografía actual en Excel, envíala a Recursos Humanos para que completen los teléfonos, puestos o departamentos que falten, y sube el archivo devuelto aquí para inyectar los cambios en Google Workspace.
+              </span>
+              
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <input type="file" id="input-csv-rrhh" accept=".csv" style="display: none;" onchange="procesarSubidaRRHH(this)" />
+                <button id="btn-dl-rrhh" onclick="descargarFotoRRHH()" style="background: #0284c7; color: white; border: none; padding: 9px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                  📥 1. Descargar Foto (Excel)
+                </button>
+                <button id="btn-up-rrhh" onclick="document.getElementById('input-csv-rrhh').click()" style="background: #7c3aed; color: white; border: none; padding: 9px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                  📤 2. Subir Excel y Actualizar
+                </button>
+              </div>
+            </div>
+          </div>
+          <select id="selector-origen-dinamico" class="select-style" onchange="filtrarCuentasPorCategoria()"><option value="">Cargando...</option></select>
+          <button class="btn-download-excel" onclick="descargarTablaExcel()" data-i18n="btn_descargar" data-i18n-title="tt_descargar">📥 Download Vista (Excel/CSV)</button>
+        </div>
+
         <div class="dashboard-grid">
           <div class="card" id="card-metricas-huerfanas" style="border-left: 4px solid #f59e0b; margin-bottom: 0;">
             <div class="card-header" onclick="toggleCard('card-metricas-huerfanas')"><h3 id="titulo-salud" data-i18n="card_salud">🛡️ Salud de Identidades (Global)</h3><span class="toggle-icon">▼</span></div>
@@ -412,6 +456,7 @@
                 <div class="metric-item" style="color: #10b981;"><span data-i18n="met_man">Con Mánager</span><strong id="mu-con">0</strong></div>
                 <div class="metric-item" style="color: #f59e0b;"><span data-i18n="met_hue">Huérfanas</span><strong id="mu-sin">0</strong></div>
                 <div class="metric-item" style="color: #ef4444;"><span data-i18n="met_sus">Suspendidas</span><strong id="mu-susp">0</strong></div>
+                <div class="metric-item" style="color: #8b5cf6;"><span data-i18n="met_inac">Inactivas >90d</span><strong id="mu-inac">0</strong></div>
               </div>
             </div>
           </div>
@@ -428,60 +473,33 @@
             </div>
           </div>
         </div>
-
-        <div class="category-selector-container">
-          <label data-i18n="lbl_filtrar">📂 Filtrar / Agrupar por:</label>
-          <!-- ========================================================================= -->
-
-
-
-          <!-- ACORDEÓN DESPLEGABLE DE RRHH (LIMPIO Y COMPACTO) -->
-<div style="margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); font-family: sans-serif;">
-  <!-- Cabecera colapsable (Haz clic para desplegar u ocultar) -->
-  <div onclick="var body = document.getElementById('cuerpo-rrhh-collapse'); var arrow = document.getElementById('flecha-rrhh-collapse'); if(body.style.display === 'none'){ body.style.display = 'flex'; arrow.innerText = '▲'; } else { body.style.display = 'none'; arrow.innerText = '▼'; }" style="padding: 12px 16px; background: #1e293b; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; border-bottom: 1px solid transparent; transition: background 0.2s;">
-    <span style="color: #38bdf8; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 8px;">
-      👥 Herramientas de Sincronización Oficial con RRHH
-    </span>
-    <span id="flecha-rrhh-collapse" style="color: #94a3b8; font-size: 14px; font-weight: bold;">▼</span>
-  </div>
-  
-  <!-- Cuerpo oculto por defecto (display: none) -->
-  <div id="cuerpo-rrhh-collapse" style="display: none; padding: 16px; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; border-top: 1px solid #334155; background: #0f172a;">
-    <span style="color: #cbd5e1; font-size: 13px; flex: 1; min-width: 280px; line-height: 1.4;">
-      💡 **Modo de uso:** Descarga la fotografía actual en Excel, envíala a Recursos Humanos para que completen los teléfonos, puestos o departamentos que falten, y sube el archivo devuelto aquí para inyectar los cambios en Google Workspace.
-    </span>
-    
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-      <!-- Input invisible para subir -->
-      <input type="file" id="input-csv-rrhh" accept=".csv" style="display: none;" onchange="procesarSubidaRRHH(this)" />
-      
-      <!-- Botón 1: Descargar -->
-      <button id="btn-dl-rrhh" onclick="descargarFotoRRHH()" style="background: #0284c7; color: white; border: none; padding: 9px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-        📥 1. Descargar Foto (Excel)
-      </button>
-      
-      <!-- Botón 2: Subir -->
-      <button id="btn-up-rrhh" onclick="document.getElementById('input-csv-rrhh').click()" style="background: #7c3aed; color: white; border: none; padding: 9px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-        📤 2. Subir Excel y Actualizar
-      </button>
-    </div>
-  </div>
-</div>
-<!-- FIN ACORDEÓN RRHH -->
-          <select id="selector-origen-dinamico" class="select-style" onchange="filtrarCuentasPorCategoria()"><option value="">Cargando...</option></select>
-          <button class="btn-download-excel" onclick="descargarTablaExcel()" data-i18n="btn_descargar" data-i18n-title="tt_descargar">📥 Download Vista (Excel/CSV)</button>
-        </div>
- 
-        <div class="card" id="card-cuentas-desglose" style="border-left: 4px solid #0284c7;">
-          <div class="card-header" onclick="toggleCard('card-cuentas-desglose')"><h3 id="titulo-panel-dinamico" data-i18n="card_desglose">📂 Desglose Completo de Usuarios</h3><span class="toggle-icon">▼</span></div>
+        <!-- ⚡ FASE 7: TARJETA DE AUDITORÍA -->
+        <div class="card collapsed" id="card-auditoria" style="border-left: 4px solid #64748b;">
+          <div class="card-header" onclick="toggleCard('card-auditoria'); if(this.getAttribute('data-loaded')!=='yes') { cargarAuditoriaLogs(); this.setAttribute('data-loaded','yes'); }">
+            <h3>📜 Registro de Auditoría (Últimos 100 eventos)</h3>
+            <div style="display:flex; gap:10px;">
+              <button class="btn-header-inline" onclick="event.stopPropagation(); cargarAuditoriaLogs();">🔄 Refrescar</button>
+              <button class="btn-header-inline" onclick="event.stopPropagation(); descargarAuditoriaCompleta();" style="background:#10b981 !important; color:white !important;">📥 Descargar Historial Completo</button>
+            </div>
+          </div>
           <div class="card-body table-container">
-            <table class="excel-table" id="tabla-usuarios-gigas">
-              <thead id="head-cuentas-dinamicas"><tr><th data-i18n="th_elige">Elige un filtro o busca...</th></tr></thead>
-              <tbody id="body-cuentas-dinamicas"><tr><td id="msg-cuentas" data-i18n="td_esperando">Esperando acción...</td></tr></tbody>
+            <table class="excel-table">
+              <thead>
+                <tr>
+                  <th>Fecha y Hora</th>
+                  <th>Operador</th>
+                  <th>Acción</th>
+                  <th>Detalles</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-auditoria-body">
+                <tr><td colspan="4" style="text-align:center; color:#64748b; font-style:italic;">Haz clic en Refrescar para ver los eventos...</td></tr>
+              </tbody>
             </table>
           </div>
         </div>
-        
+        <!-- --------------------------------- -->
+
         <div class="card collapsed" id="card-papelera-recuperacion" style="border-left: 4px solid #f59e0b;">
           <div class="card-header" onclick="toggleCard('card-papelera-recuperacion')">
             <h3 style="color: #ef4444;">♻️ Papelera: Cuentas Eliminadas Recuperables</h3>
@@ -541,6 +559,50 @@
                   </table>
                 </div>
               </div>
+
+        <div class="dashboard-grid">
+          <div class="card" id="card-grafica"><div class="card-header" onclick="toggleCard('card-grafica')"><h3 data-i18n="card_dist">📈 Distribución General (Origen)</h3><span class="toggle-icon">▼</span></div><div class="card-body"><div id="chart_div"></div></div></div>
+          <div class="card" id="card-origen"><div class="card-header" onclick="toggleCard('card-origen')"><h3 data-i18n="card_criterio">📋 Cuentas por Criterio (Resumen)</h3><span class="toggle-icon">▼</span></div><div class="card-body"><table class="excel-table"><thead><tr><th data-i18n="th_origen">Origen / Licencia</th><th data-i18n="th_activas">Activas</th><th data-i18n="th_susp">Susp.</th><th data-i18n="th_total">Total</th></tr></thead><tbody id="tabla-origen"></tbody></table></div></div>
+        </div>
+
+        <div class="card collapsed" id="card-licencias"><div class="card-header" onclick="toggleCard('card-licencias')"><h3 data-i18n="card_lic">💼 Stock de Licencias</h3><span class="toggle-icon">▼</span></div><div class="card-body"><table class="excel-table"><thead><tr><th data-i18n="th_prod">Produto</th><th data-i18n="th_estado">Estado</th><th data-i18n="th_asig">Asignadas</th><th data-i18n="th_libres">Plan de Pagos / Libres</th></tr></thead><tbody id="tabla-licencias"></tbody></table></div></div>
+
+      </div> 
+    </div> 
+  </div> 
+
+  <!-- ⚡ FASE 6: BARRA FLOTANTE ACCIONES MASIVAS -->
+  <div class="action-bar-masiva" id="barra-acciones-masivas">
+    <span id="contador-seleccionados" style="font-weight: bold; color: #38bdf8; font-size: 15px; margin-right: 10px;">0 seleccionados</span>
+    <button class="action-btn" style="background:#10b981; color:white;" onclick="lanzarAccionMasiva('ACTIVAR')">▶️ Activar</button>
+    <button class="action-btn" style="background:#ef4444; color:white;" onclick="lanzarAccionMasiva('SUSPENDER')">⏸️ Suspender</button>
+    
+    <div style="border-left: 1px solid #475569; height: 30px; margin: 0 4px;"></div>
+    
+    <select id="select-ou-masivo" style="padding:8px; border-radius:4px; border:1px solid #8b5cf6; background:#0f172a; color:white; outline:none; max-width: 150px;">
+      <option value="">-- Destino OU --</option>
+    </select>
+    <button class="action-btn" style="background:#8b5cf6; color:white;" onclick="lanzarAccionMasiva('MOVER_OU')">📦 Mover</button>
+
+    <div style="border-left: 1px solid #475569; height: 30px; margin: 0 4px;"></div>
+
+    <select id="select-lic-masivo" style="padding:8px; border-radius:4px; border:1px solid #f59e0b; background:#0f172a; color:white; outline:none; max-width: 150px;">
+      <option value="">-- Licencia --</option>
+      <option value="Google Workspace Business Starter">Business Starter</option>
+      <option value="Google Workspace Enterprise Standard">Enterprise Standard</option>
+      <option value="Google Workspace Enterprise Plus">Enterprise Plus</option>
+      <option value="Cloud Identity Free">Cloud Identity Free</option>
+    </select>
+    <button class="action-btn" style="background:#f59e0b; color:white;" onclick="lanzarAccionMasiva('ASIGNAR_LICENCIA')">💼 Asignar</button>
+
+    <div style="border-left: 1px solid #475569; height: 30px; margin: 0 4px;"></div>
+    
+    <input type="text" id="input-grupo-masivo" placeholder="ejemplo@gigas.com" style="padding:8px; border-radius:4px; border:1px solid #0ea5e9; background:#0f172a; color:white; outline:none; width: 140px;">
+    <button class="action-btn" style="background:#0ea5e9; color:white;" onclick="lanzarAccionMasiva('ANADIR_GRUPO')">👥 Meter en Lista</button>
+
+    <button class="action-btn" style="background:transparent; color:#94a3b8; text-decoration:underline; border: 1px solid transparent; margin-left: auto;" onclick="limpiarSeleccionMasiva()">Cancelar</button>
+  </div>
+  <!-- ----------------------------------------- -->
   
   <div id="log">Iniciando aplicación...</div>
 
@@ -555,11 +617,7 @@
       </div>
     </div>
   </div>
-
-<script>
-  // =========================================================
-  // 🌟 SISTEMA DE AVISOS FLOTANTES (TOAST)
-  // =========================================================
+  <script>
   function mostrarAvisoFlotante(mensaje, tipo = "exito") {
     var toastId = "notificacion-global-toast";
     var toast = document.getElementById(toastId);
@@ -598,10 +656,10 @@
       top_title: "Identidades Workspace", card_creator: "✨ Centro de Creación de Identidades", btn_cerrar_panel: "✖ Cerrar Panel", btn_cerrar_panel2: "✖ Cerrar Panel", lbl_tipo: "Tipo de Cuenta", lbl_licencia: "Licencia Asignada", lbl_alias: "Alias del Correo", lbl_dominio: "Dominio", lbl_nombre: "Nombre Real", lbl_apellido: "Apellidos", lbl_mail_manager: "Correo del Mánager / Responsable", btn_crear_exe: "🚀 Crear Cuenta en Workspace y Excel",
       card_creator_list: "👥 Centro de Creación de Listas de Distribución", lbl_list_name: "Nombre Público de la Lista", lbl_list_dom: "Dominio de la Lista", lbl_list_alias: "Alias del Correo (Sufijo)", lbl_list_prev: "Previsualización Oficial", lbl_list_owner: "Correo del Owner 👑", lbl_list_members: "Miembros Iniciales", btn_crear_lista_exe: "🚀 Crear Lista Activa",
       search_box: "🔍 BUSCADOR INTELIGENTE...", card_dist: "📈 Distribución General (Origen)", card_criterio: "📋 Cuentas por Criterio (Resumen)", th_origen: "Origen / Licencia", th_activas: "Activas", th_susp: "Susp.", th_total: "Total", card_lic: "💼 Stock de Licencias", th_prod: "Producto", th_estado: "Status", th_asig: "Asignadas", th_libres: "Libres / Límite",
-      card_salud: "🛡️ Salud de Identidades (Global)", met_eval: "Cuentas Evaluadas", met_man: "Con Mánager", met_hue: "Huérfanas", met_sus: "Suspendidas", card_crec: "🌱 Crecimiento de Identidades", met_mes: "Altas Este Mes", met_ant: "Mes Anterior", met_ten: "Tendencia",
+      card_salud: "🛡️ Salud de Identidades (Global)", met_eval: "Cuentas Evaluadas", met_man: "Con Mánager", met_hue: "Huérfanas", met_sus: "Suspendidas", met_inac: "Inactivas >90d", card_crec: "🌱 Crecimiento de Identidades", met_mes: "Altas Este Mes", met_ant: "Mes Anterior", met_ten: "Tendencia",
       lbl_filtrar: "📂 Filtrar / Agrupar por:", btn_descargar: "📥 Descargar Vista (Excel/CSV)", card_desglose: "📂 Desglose Completo de Usuarios", th_elige: "Elige un filtro o busca...", td_esperando: "Waiting for action...",
       card_inventario: "👥 Inventario de Listas", btn_ref_listas: "🔄 Refrescar Listas", met_tot_list: "Total Listas", met_con_own: "Con Owner", met_sin_own: "Sin Owner", th_lista: "Lista / Grupo", th_email: "Email Corporativo", th_vol: "Volumen", th_own_est: "Owners / Estado", td_cargando: "Loading remote data...",
-      tt_sync: "Sincroniza estados reales y licencias individuales desde Workspace hacia el Excel.", tt_comandos: "Ver Script AD para el usuario/grupo seleccionado.", tt_alta: "Abre el formulario para dar de alta a un nuevo usuario en Google y Excel.", tt_licencia: "Asigna o cambia la licencia seleccionada al usuario en Workspace.", tt_reactivar: "Reactiva un usuario que haya sido suspendido previamente.", tt_suspender: "Suspende temporalmente el acceso del usuario seleccionado.", tt_clave: "Genera una nueva contraseña aleatoria para el usuario y la muestra en pantalla.", tt_escanear_m: "Comprueba si los mánagers indicados en el Excel existen realmente.", tt_upd_manager: "Aplica el mánager escrito arriba directamente en Google Workspace y en la Hoja Maestra (657).", tt_escanear_s: "Hace un barrido y auditoría de las cuentas de servicio.", tt_rastrear: "Lee las respuestas a las campañas enviadas a cuentas de servicio.", tt_auditar: "Comprueba si ya se enviaron avisos previos a estos usuarios.", tt_campana_s: "Lanza la campaña principal a los responsables de cuentas de servicio.", tt_recordatorio: "Envía un segundo aviso a quienes no respondieron la campaña.", tt_crear_lista: "Abre el panel para configurar y crear una lista de distribución nueva.", tt_add_member: "Añade al usuario seleccionado como miembro del grupo indicado.", tt_owner: "Convierte al usuario seleccionado en propietario (Owner) del grupo.", tt_del_member: "Expulsa al usuario seleccionado de la lista.", tt_camp_listas: "Inicia la auditoría preguntando a los miembros quién es el nuevo dueño de las listas huérfanas.", tt_rast_listas: "Procesa las respuestas y asigna automáticamente a los dueños voluntarios.", tt_del_lista: "Destruye y borra por completo el grupo de Workspace.", tt_aviso_baja: "Manda un correo al manager avisando que este empleado será dado de baja.", tt_takeout: "Envía las instrucciones al mánager para que descargue el histórico de correos.", tt_baja_total: "Borra la cuenta permanentemente y crea su alias de redirección.", tt_recuperar: "Restaura una cuenta que fue eliminada por error (Límite: 20 días).", tt_ref_listas: "Lee rápidamente el archivo Excel y actualiza las listas en el panel visual.", tt_actualizar_excel: "Ejecuta el proceso pesado de leer Google Workspace y volcar los bloques actualizados en el Excel.", tt_descargar: "Descarga en Excel la vista actual que tengas filtrada en pantalla."
+      tt_sync: "Sincroniza estados reales y licencias individuales desde Workspace hacia el Excel.", tt_comandos: "Ver Script AD para el usuario/grupo seleccionado.", tt_alta: "Abre el formulario para dar de alta a un nuevo usuario en Google y Excel.", tt_licencia: "Asigna o cambia la licencia seleccionada al usuario en Workspace.", tt_reactivar: "Reactiva un usuario que haya sido suspendido previamente.", tt_suspender: "Suspende temporalmente el acceso del usuario seleccionado.", tt_clave: "Genera una nueva contraseña aleatoria para el usuario y la muestra en pantalla.", tt_escanear_m: "Comprueba si los mánagers indicados en el Excel existen realmente.", tt_upd_manager: "Aplica el mánager escrito arriba directamente en Google Workspace y en la Hoja Maestra (657).", tt_escanear_s: "Hace un barrido y auditoría de las cuentas de servicio.", tt_rastrear: "Lee las respuestas a las campañas enviadas a cuentas de servicio.", tt_auditar: "Comprueba si ya se enviaron avisos previos a estos usuarios.", tt_campana_s: "Lanza la campaña principal a los responsables de cuentas de servicio.", tt_recordatorio: "Envía un segundo aviso a quienes no respondieron la campaña.", tt_crear_lista: "Abre el panel para configurar y crear una lista de distribución nueva.", tt_add_member: "Añade al usuario seleccionado como miembro del grupo indicado.", tt_owner: "Convierte al usuario seleccionado en propietario (Owner) del grupo.", tt_del_member: "Expulsa al usuario seleccionado de la lista.", tt_camp_listas: "Inicia la auditoría preguntando a los miembros quién es el nuevo dueño de las listas huérfanas.", tt_rast_listas: "Procesa las respuestas y asigna automáticamente a los dueños voluntarios.", tt_del_lista: "Destruye y borra por completo el grupo de Workspace.", tt_aviso_baja: "Manda un correo al manager avisando que este empleado será dado de baja.", tt_takeout: "Envía las instrucciones al mánager para que descargue el histórico de correos.", tt_baja_total: "Borra la cuenta permanentemente y crea su alias de redirección.", tt_recuperar: "Restaura una cuenta que fue eliminada por error (Límite: 20 días).", tt_ref_listas: "Lee rápidamente el archivo Excel y actualiza las listas en el panel visual.", tt_actualizar_excel: "Ejecuta el proceso pesado de leer Google Workspace y volcar los bloques actualizados en el Excel.", tt_descargar: "Descarga en Excel la vista actual que tengas filtrada en pantalla.", lbl_mod_alias: "🏷️ Módulo de Alias (En vivo):", txt_sel_usuario: "Selecciona un usuario...", txt_lic_actual: "🔍 Licencia actual: Selecciona un usuario...", txt_ou_actual: "🔍 OU actual: Selecciona un usuario...", btn_mover_ou: "📦 Mover de OU", btn_cmd_ad: "💻 Comandos PowerShell (AD)", btn_bypass: "🆘 Bypass 2FA (Emergencia)", ph_nuevo_alias: "nuevo.alias", lbl_target_ou: "📂 Unidad Organizativa (Mover):", btn_renombrar: "✏️ Renombrar Lista", btn_purga: "🔥 Purga Masiva del Usuario", opt_seleciona: "-- Selecciona --", opt_destino: "-- Selecciona destino --"
     },
     en: {
       lbl_ou_creador: "Organizational Unit (OU)",
@@ -613,25 +671,25 @@
       top_title: "Workspace Identities", card_creator: "✨ Identity Creation Center", btn_cerrar_panel: "✖ Close Panel", btn_cerrar_panel2: "✖ Close Panel", lbl_tipo: "Account Type", lbl_licencia: "Assigned License", lbl_alias: "Email Alias", lbl_dominio: "Domain", lbl_nombre: "First Name", lbl_apellido: "Last Name", lbl_mail_manager: "Manager Email", btn_crear_exe: "🚀 Create Account (Workspace & Excel)",
       card_creator_list: "👥 Distribution List Creation Center", lbl_list_name: "Public List Name", lbl_list_dom: "List Domain", lbl_list_alias: "Email Alias (Suffix)", lbl_list_prev: "Official Preview", lbl_list_owner: "Owner Email 👑", lbl_list_members: "Initial Members", btn_crear_lista_exe: "🚀 Create Active List",
       search_box: "🔍 SMART SEARCH...", card_dist: "📈 General Distribution (Source)", card_criterio: "📋 Accounts by Criteria", th_origen: "Source / License", th_activas: "Active", th_susp: "Susp.", th_total: "Total", card_lic: "💼 License Stock", th_prod: "Product", th_estado: "Status", th_asig: "Assigned", th_libres: "Available / Limit",
-      card_salud: "🛡️ Identity Health (Global)", met_eval: "Accounts Evaluated", met_man: "With Manager", met_hue: "Orphaned", met_sus: "Suspended", card_crec: "🌱 Identity Growth", met_mes: "New This Month", met_ant: "Previous Month", met_ten: "Trend",
+      card_salud: "🛡️ Identity Health (Global)", met_eval: "Accounts Evaluated", met_man: "With Manager", met_hue: "Orphaned", met_sus: "Suspended", met_inac: "Inactive >90d", card_crec: "🌱 Identity Growth", met_mes: "New This Month", met_ant: "Previous Month", met_ten: "Trend",
       lbl_filtrar: "📂 Filter / Group by:", btn_descargar: "📥 Download View (Excel/CSV)", card_desglose: "📂 Complete User Breakdown", th_elige: "Choose a filter or search...", td_esperando: "Waiting for action...",
       card_inventario: "👥 List Inventory", btn_ref_listas: "🔄 Refresh Lists", met_tot_list: "Total Lists", met_con_own: "With Owner", met_sin_own: "No Owner", th_lista: "List / Group", th_email: "Corporate Email", th_vol: "Volume", th_own_est: "Owners / Status", td_cargando: "Loading remote data...",
-      tt_sync: "Sync real states and individual licenses from Workspace to Excel.", tt_comandos: "View AD Script for the selected user/group.", tt_alta: "Open form to register a new user.", tt_licencia: "Assigns or changes the selected license for the user in Workspace.", tt_reactivar: "Reactivate a suspended user.", tt_suspender: "Temporarily suspend selected user.", tt_clave: "Generate a new random password.", tt_escanear_m: "Check if managers in Excel actually exist.", tt_upd_manager: "Applies the manager written above directly in Google Workspace and Master Sheet (657).", tt_escanear_s: "Audit service accounts.", tt_rastrear: "Read responses to service account campaigns.", tt_auditar: "Check for previously sent notices.", tt_campana_s: "Launch main campaign to service account owners.", tt_recordatorio: "Send a reminder notice.", tt_crear_lista: "Open panel to create a new list.", tt_add_member: "Add user to the selected group.", tt_owner: "Make selected user Owner of the group.", tt_del_member: "Remove user from the list.", tt_camp_listas: "Start audit for orphaned lists.", tt_rast_listas: "Process responses and assign new owners.", tt_del_lista: "Completely delete the Workspace group.", tt_aviso_baja: "Email manager about upcoming deletion.", tt_takeout: "Send TakeOut instructions to manager.", tt_baja_total: "Permanently delete account and redirect alias.", tt_recuperar: "Restore a deleted account (20-day limit).", tt_ref_listas: "Quickly refresh lists from Excel.", tt_actualizar_excel: "Read Workspace and sync data to Excel.", tt_descargar: "Download the current filtered view."
+      tt_sync: "Sync real states and individual licenses from Workspace to Excel.", tt_comandos: "View AD Script for the selected user/group.", tt_alta: "Open form to register a new user.", tt_licencia: "Assigns or changes the selected license for the user in Workspace.", tt_reactivar: "Reactivate a suspended user.", tt_suspender: "Temporarily suspend selected user.", tt_clave: "Generate a new random password.", tt_escanear_m: "Check if managers in Excel actually exist.", tt_upd_manager: "Applies the manager written above directly in Google Workspace and Master Sheet (657).", tt_escanear_s: "Audit service accounts.", tt_rastrear: "Read responses to service account campaigns.", tt_auditar: "Check for previously sent notices.", tt_campana_s: "Launch main campaign to service account owners.", tt_recordatorio: "Send a reminder notice.", tt_crear_lista: "Open panel to create a new list.", tt_add_member: "Add user to the selected group.", tt_owner: "Make selected user Owner of the group.", tt_del_member: "Remove user from the list.", tt_camp_listas: "Start audit for orphaned lists.", tt_rast_listas: "Process responses and assign new owners.", tt_del_lista: "Completely delete the Workspace group.", tt_aviso_baja: "Email manager about upcoming deletion.", tt_takeout: "Send TakeOut instructions to manager.", tt_baja_total: "Permanently delete account and redirect alias.", tt_recuperar: "Restore a deleted account (20-day limit).", tt_ref_listas: "Quickly refresh lists from Excel.", tt_actualizar_excel: "Read Workspace and sync data to Excel.", tt_descargar: "Download the current filtered view.", lbl_mod_alias: "🏷️ Alias Module (Live):", txt_sel_usuario: "Select a user...", txt_lic_actual: "🔍 Current license: Select a user...", txt_ou_actual: "🔍 Current OU: Select a user...", btn_mover_ou: "📦 Move OU", btn_cmd_ad: "💻 PowerShell Commands (AD)", btn_bypass: "🆘 Bypass 2FA (Emergency)", ph_nuevo_alias: "new.alias", lbl_target_ou: "📂 Organizational Unit (Move):", btn_renombrar: "✏️ Rename List", btn_purga: "🔥 Massive User Purge", opt_seleciona: "-- Select --", opt_destino: "-- Select destination --"
     },
     pt: {
       lbl_ou_creador: "Unidade Organizacional (OU)",
-      side_title: "⚙️ Módulos Operacionais", lbl_origen: "Origem / Grupo Ativo:", lbl_user: "Usuário / Email Alvo:", lbl_manager: "👤 Manager (Edição manual):", txt_takeout: "🔍 Clique num usuário para ver o Takeout.", lbl_target_lic: "💼 Licença (Atribuir/Mudar):", btn_licencia: "💼 Mudar Licença WS",
-      btn_sync: "🔄 Sincronizar Contas", lbl_altas: "CRIAÇÃO E MANUTENÇÃO", btn_alta: "✨ Criar Novo Usuário", btn_reactivar: "▶️ Reativar Workspace", btn_suspender: "⏸️ Suspender Workspace", btn_clave: "🔑 Reset de Senha",
-      lbl_maestra: "CONTAS GERAIS (MASTER)", btn_escanear_m: "🔎 Escanear Managers (657)", btn_upd_manager: "👤 Atribuir Manager no WS", lbl_servicios: "CONTAS DE SERVIÇO", btn_escanear_s: "🔎 Escanear Workspace", btn_rastrear: "📩 Rastrear Respostas", btn_auditar: "🛡️ Auditar Envios Anteriores", btn_campana_s: "📢 Lançar Primeira Campanha", btn_recordatorio: "🔔 Enviar Lembrete",
+      side_title: "⚙️ Módulos Operacionais", lbl_origen: "Origem / Grupo Ativo:", lbl_user: "Utilizador / Email Alvo:", lbl_manager: "👤 Manager (Edição manual):", txt_takeout: "🔍 Clique num utilizador para ver o Takeout.", lbl_target_lic: "💼 Licença (Atribuir/Mudar):", btn_licencia: "💼 Mudar Licença WS",
+      btn_sync: "🔄 Sincronizar Contas", lbl_altas: "CRIAÇÃO E MANUTENÇÃO", btn_alta: "✨ Criar Novo Utilizador", btn_reactivar: "▶️ Reativar Workspace", btn_suspender: "⏸️ Suspender Workspace", btn_clave: "🔑 Reset de Palavra-passe",
+      lbl_maestra: "CONTAS GERAIS (MASTER)", btn_escanear_m: "🔎 Verificar Managers (657)", btn_upd_manager: "👤 Atribuir Manager no WS", lbl_servicios: "CONTAS DE SERVIÇO", btn_escanear_s: "🔎 Verificar Workspace", btn_rastrear: "📩 Rastrear Respostas", btn_auditar: "🛡️ Auditar Envios Anteriores", btn_campana_s: "📢 Lançar Primeira Campanha", btn_recordatorio: "🔔 Enviar Lembrete",
       lbl_listas: "LISTAS DE DISTRIBUIÇÃO", btn_crear_lista: "✨ Criar Nova Lista", btn_add_member: "➕ Adicionar Membro", btn_owner: "👑 Atribuir Owner", btn_del_member: "❌ Remover Membro", btn_camp_listas: "📢 Campanha Listas Órfãs", btn_rast_listas: "🔍 Rastrear Respostas", btn_del_lista: "🚫 APAGAR LISTA INTEIRA",
       lbl_bajas: "🔥 AÇÕES CRÍTICAS DE EXCLUSÃO", btn_aviso_baja: "📋 Enviar Aviso de Saída", btn_takeout: "📩 Enviar Acesso TakeOut", btn_baja_total: "🚫 EXECUTAR EXCLUSÃO TOTAL", btn_recuperar: "♻️ Recuperar Conta (limite 20d)",
-      top_title: "Identidades Workspace", card_creator: "✨ Centro de Criação de Identidades", btn_cerrar_panel: "✖ Fechar Painel", btn_cerrar_panel2: "✖ Fechar Painel", lbl_tipo: "Tipo de Conta", lbl_licencia: "Licença Atribuída", lbl_alias: "Alias de Email", lbl_dominio: "Domínio", lbl_nombre: "Nome", lbl_apellido: "Sobrenome", lbl_mail_manager: "Email do Manager", btn_crear_exe: "🚀 Criar Conta (Workspace e Excel)",
-      card_creator_list: "👥 Centro de Criação de Listas", lbl_list_name: "Nome Público da Lista", lbl_list_dom: "Domínio da Lista", lbl_list_alias: "Alias de Email (Sufixo)", lbl_list_prev: "Pré-visualização Oficial", lbl_list_owner: "Email do Owner 👑", lbl_list_members: "Membros Iniciais", btn_crear_lista_exe: "🚀 Criar Lista Activa",
-      search_box: "🔍 BUSCA INTELIGENTE...", card_dist: "📈 Distribución Geral (Origem)", card_criterio: "📋 Contas por Critério", th_origen: "Origem / Licença", th_activas: "Ativas", th_susp: "Susp.", th_total: "Total", card_lic: "💼 Stock de Licenças", th_prod: "Produto", th_estado: "Status", th_asig: "Atribuídas", th_libres: "Livres / Limite",
-      card_salud: "🛡️ Saúde de Identidades (Global)", met_eval: "Contas Avaliadas", met_man: "Com Manager", met_hue: "Órfãs", met_sus: "Suspensas", card_crec: "🌱 Crescimento de Identidades", met_mes: "Novas este Mês", met_ant: "Mês Anterior", met_ten: "Tendência",
-      lbl_filtrar: "📂 Filtrar / Agrupar por:", btn_descargar: "📥 Descarregar Vista (Excel/CSV)", card_desglose: "📂 Detalhamento Completo", th_elige: "Escolha um filtro ou busque...", td_esperando: "Esperando ação...",
-      card_inventario: "👥 Inventário de Listas", btn_ref_listas: "🔄 Atualizar Listas", met_tot_list: "Total de Listas", met_con_own: "Com Owner", met_sin_own: "Sem Owner", th_lista: "Lista / Grupo", th_email: "Email Corporativo", th_vol: "Volume", th_own_est: "Owners / Status", td_cargando: "Carregando dados remotos...",
-      tt_sync: "Sincroniza estados e licenças do Workspace para o Excel.", tt_comandos: "Ver Script AD para o usuário/grupo.", tt_alta: "Abre o formulário para criar um novo usuário.", tt_licencia: "Atribui ou altera a licença selecionada para o usuário no Workspace.", tt_reactivar: "Reativa um usuário suspenso.", tt_suspender: "Temporarily suspend selected user.", tt_clave: "Gera uma nova senha aleatória.", tt_escanear_m: "Verifica se os managers no Excel existem.", tt_upd_manager: "Aplica o manager escrito acima no Google Workspace e na Planilha Mestra (657).", tt_escanear_s: "Audita contas de serviço.", tt_rastrear: "Lê respostas de campanhas de contas de serviço.", tt_auditar: "Verifica avisos anteriores.", tt_campana_s: "Lança campanha para donos de contas de serviço.", tt_recordatorio: "Envia um lembrete.", tt_crear_lista: "Abre painel para criar nova lista.", tt_add_member: "Adiciona usuário ao grupo.", tt_owner: "Torna o usuário dono do grupo.", tt_del_member: "Remove o usuário da lista.", tt_camp_listas: "Inicia auditoria para listas órfãs.", tt_rast_listas: "Processa respostas e atribui novos donos.", tt_del_lista: "Apaga completamente o grupo.", tt_aviso_baja: "Avisa o manager sobre exclusão.", tt_takeout: "Envia instruções de TakeOut.", tt_baja_total: "Apaga a conta permanentemente.", tt_recuperar: "Restaura conta apagada (limite 20 dias).", tt_ref_listas: "Atualiza listas rapidamente do Excel.", tt_actualizar_excel: "Lê o Workspace e updates o Excel.", tt_descargar: "Baixa a visão filtrada atual."
+      top_title: "Identidades Workspace", card_creator: "✨ Centro de Criação de Identidades", btn_cerrar_panel: "✖ Fechar Painel", btn_cerrar_panel2: "✖ Fechar Painel", lbl_tipo: "Tipo de Conta", lbl_licencia: "Licença Atribuída", lbl_alias: "Alias de Email", lbl_dominio: "Domínio", lbl_nombre: "Nome", lbl_apellido: "Apelido", lbl_mail_manager: "Email do Manager", btn_crear_exe: "🚀 Criar Conta (Workspace e Excel)",
+      card_creator_list: "👥 Centro de Criação de Listas", lbl_list_name: "Nome Público da Lista", lbl_list_dom: "Domínio da Lista", lbl_list_alias: "Alias de Email (Sufixo)", lbl_list_prev: "Pré-visualização Oficial", lbl_list_owner: "Email do Owner 👑", lbl_list_members: "Membros Iniciais", btn_crear_lista_exe: "🚀 Criar Lista Ativa",
+      search_box: "🔍 PESQUISA INTELIGENTE...", card_dist: "📈 Distribuição Geral (Origem)", card_criterio: "📋 Contas por Critério", th_origen: "Origem / Licença", th_activas: "Ativas", th_susp: "Susp.", th_total: "Total", card_lic: "💼 Stock de Licenças", th_prod: "Produto", th_estado: "Estado", th_asig: "Atribuídas", th_libres: "Livres / Limite",
+      card_salud: "🛡️ Saúde de Identidades (Global)", met_eval: "Contas Avaliadas", met_man: "Com Manager", met_hue: "Órfãs", met_sus: "Suspensas", met_inac: "Inativas >90d", card_crec: "🌱 Crescimento de Identidades", met_mes: "Novas este Mês", met_ant: "Mês Anterior", met_ten: "Tendência",
+      lbl_filtrar: "📂 Filtrar / Agrupar por:", btn_descargar: "📥 Descarregar Vista (Excel/CSV)", card_desglose: "📂 Detalhamento Completo", th_elige: "Escolha um filtro ou pesquise...", td_esperando: "A aguardar ação...",
+      card_inventario: "👥 Inventário de Listas", btn_ref_listas: "🔄 Atualizar Listas", met_tot_list: "Total de Listas", met_con_own: "Com Owner", met_sin_own: "Sem Owner", th_lista: "Lista / Grupo", th_email: "Email Corporativo", th_vol: "Volume", th_own_est: "Owners / Estado", td_cargando: "A carregar dados remotos...",
+      tt_sync: "Sincroniza estados e licenças do Workspace para o Excel.", tt_comandos: "Ver Script AD para o utilizador/grupo.", tt_alta: "Abre o formulário para criar um novo utilizador.", tt_licencia: "Atribui ou altera a licença selecionada no Workspace.", tt_reactivar: "Reativa um utilizador suspenso.", tt_suspender: "Suspende temporariamente o acesso.", tt_clave: "Gera uma nova palavra-passe aleatória.", tt_escanear_m: "Verifica se os managers no Excel existem.", tt_upd_manager: "Aplica o manager selecionado no Google Workspace e na Folha Mestra (657).", tt_escanear_s: "Audita contas de serviço.", tt_rastrear: "Lê respostas de campanhas de contas de serviço.", tt_auditar: "Verifica avisos anteriores.", tt_campana_s: "Lança campanha para donos de contas de serviço.", tt_recordatorio: "Envia um lembrete.", tt_crear_lista: "Abre painel para criar nova lista.", tt_add_member: "Adiciona o utilizador ao grupo.", tt_owner: "Torna o utilizador dono do grupo.", tt_del_member: "Remove o utilizador da lista.", tt_camp_listas: "Inicia auditoria para listas órfãs.", tt_rast_listas: "Processa respostas e atribui novos donos.", tt_del_lista: "Apaga completamente o grupo.", tt_aviso_baja: "Avisa o manager sobre exclusão.", tt_takeout: "Envia instruções de TakeOut.", tt_baja_total: "Apaga a conta permanentemente.", tt_recuperar: "Restaura conta apagada (limite 20 dias).", tt_ref_listas: "Atualiza listas rapidamente do Excel.", tt_actualizar_excel: "Lê o Workspace e atualiza o Excel.", tt_descargar: "Descarrega a vista filtrada atual.", lbl_mod_alias: "🏷️ Módulo de Alias (Ao vivo):", txt_sel_usuario: "Selecione um utilizador...", txt_lic_actual: "🔍 Licença atual: Selecione um utilizador...", txt_ou_actual: "🔍 OU atual: Selecione um utilizador...", btn_mover_ou: "📦 Mover de OU", btn_cmd_ad: "💻 Comandos PowerShell (AD)", btn_bypass: "🆘 Bypass 2FA (Emergência)", ph_nuevo_alias: "novo.alias", lbl_target_ou: "📂 Unidade Organizacional (Mover):", btn_renombrar: "✏️ Renomear Lista", btn_purga: "🔥 Purga Massiva do Utilizador", opt_seleciona: "-- Selecionar --", opt_destino: "-- Selecionar destino --"
     }
   };
   function changeLanguage(lang) {
@@ -669,7 +727,6 @@
       if(btn) btn.innerText = '☀️';
     }
     
-    // 🎯 INYECTAR LA LÓGICA DE APERTURA/CIERRE DE SECCIONES ACORDEÓN EN LA SIDEBAR
     document.querySelectorAll('.sidebar-section-header').forEach(function(header) {
       header.addEventListener('click', function() {
         header.parentElement.classList.toggle('collapsed');
@@ -680,7 +737,10 @@
     google.script.run.withSuccessHandler(function(ous) {
       var ouSelect = document.getElementById('target-ou');
       var ouCreador = document.getElementById('creador-ou');
-      var html = "<option value=''>-- Selecciona destino --</option>";
+      var ouMasivo = document.getElementById('select-ou-masivo');
+      
+      var html = "<option value='' data-i18n='opt_destino'>-- Selecciona destino --</option>";
+      
       var htmlCreador = "";
       ous.forEach(function(ou) { 
         html += "<option value='" + ou + "'>" + ou + "</option>"; 
@@ -689,6 +749,11 @@
  
       if (ouSelect) ouSelect.innerHTML = html;
       if (ouCreador) ouCreador.innerHTML = htmlCreador;
+      if (ouMasivo) ouMasivo.innerHTML = "<option value=''>-- Destino OU --</option>" + htmlCreador;
+      
+      var lang = document.getElementById('lang-selector') ? document.getElementById('lang-selector').value : 'es';
+      changeLanguage(lang);
+      
     }).withFailureHandler(function(e){ 
       console.error("Fallo cargando OUs", e); 
     }).webObtenerOUs();
@@ -732,10 +797,11 @@
 
   function refrescarAliasEnPantalla(correo) {
     var listDiv = document.getElementById('alias-live-list');
-    listDiv.innerHTML = "⏳ Consultando alias in Workspace...";
+    var lang = document.getElementById('lang-selector') ? document.getElementById('lang-selector').value : 'es';
+    listDiv.innerHTML = lang === 'pt' ? "⏳ Consultando alias no Workspace..." : (lang === 'en' ? "⏳ Checking aliases in Workspace..." : "⏳ Consultando alias en Workspace...");
     google.script.run.withSuccessHandler(function(arrayAlias) {
       if (!arrayAlias || arrayAlias.length === 0) {
-        listDiv.innerHTML = "<span style='color:#64748b; font-style:italic;'>Ningún alias configurado</span>";
+        listDiv.innerHTML = lang === 'pt' ? "<span style='color:#64748b; font-style:italic;'>Nenhum alias configurado</span>" : (lang === 'en' ? "<span style='color:#64748b; font-style:italic;'>No alias configured</span>" : "<span style='color:#64748b; font-style:italic;'>Ningún alias configurado</span>");
         return;
       }
       var html = "";
@@ -813,7 +879,94 @@
     google.script.run.withSuccessHandler(function(res) { if (res.exito) { endAction(res.msg); document.getElementById('lista-nombre').value = ""; document.getElementById('lista-alias').value = ""; document.getElementById('lista-owner').value = ""; document.getElementById('lista-miembros').value = ""; document.getElementById('card-creador-lista').classList.add('collapsed'); lanzarRefrescarSoloListas(); } else { errAction(res.error); } }).withFailureHandler(function(e){ errAction(e.message); }).webCrearListaDistribucion(datos);
   }
 
-  function ejecutarCreacionAvanzada() {
+  // ⚡ FASE 6: ACCIONES MASIVAS CONTROLES JS ⚡
+  function toggleAllCheckboxes(masterCheckbox) {
+      var chks = document.querySelectorAll('.user-checkbox');
+      chks.forEach(function(chk) { chk.checked = masterCheckbox.checked; });
+      checkSelection();
+  }
+
+  function checkSelection() {
+      var seleccionados = document.querySelectorAll('.user-checkbox:checked');
+      var barra = document.getElementById('barra-acciones-masivas');
+      var cont = document.getElementById('contador-seleccionados');
+      
+      var master = document.getElementById('master-chk');
+      if (master) {
+          var allChks = document.querySelectorAll('.user-checkbox');
+          master.checked = (allChks.length > 0 && seleccionados.length === allChks.length);
+      }
+
+      if (seleccionados.length > 0) {
+          cont.innerText = seleccionados.length + " seleccionados";
+          barra.classList.add('visible');
+      } else {
+          barra.classList.remove('visible');
+      }
+  }
+
+  function limpiarSeleccionMasiva() {
+      var chks = document.querySelectorAll('.user-checkbox');
+      chks.forEach(function(chk) { chk.checked = false; });
+      var master = document.getElementById('master-chk');
+      if(master) master.checked = false;
+      checkSelection();
+  }
+
+  function lanzarAccionMasiva(accion) {
+      if(!verificarFiltroVisualHtml()) return;
+      var seleccionados = document.querySelectorAll('.user-checkbox:checked');
+      if(seleccionados.length === 0) return;
+      
+      var correos = Array.from(seleccionados).map(function(chk) { return chk.value; });
+      var param = "";
+      
+      if (accion === "MOVER_OU") {
+          param = document.getElementById('select-ou-masivo').value;
+          if(!param) return errAction("Debes seleccionar una OU de destino en el desplegable de la barra flotante.");
+      }
+      else if (accion === "ASIGNAR_LICENCIA") {
+          param = document.getElementById('select-lic-masivo').value;
+          if(!param) return errAction("Debes seleccionar una licencia de destino en el desplegable de la barra flotante.");
+      }
+      else if (accion === "ANADIR_GRUPO") {
+          param = document.getElementById('input-grupo-masivo').value.trim();
+          if(!param || !param.includes("@")) return errAction("Debes escribir el correo electrónico completo del grupo/lista de destino.");
+      }
+      
+      var msjConfirm = "";
+      if(accion === "SUSPENDER") msjConfirm = "⏸️ ¿SUSPENDER " + correos.length + " cuentas seleccionadas?";
+      if(accion === "ACTIVAR") msjConfirm = "▶️ ¿ACTIVAR " + correos.length + " cuentas seleccionadas?";
+      if(accion === "MOVER_OU") msjConfirm = "📦 ¿MOVER " + correos.length + " cuentas a la OU: " + param + "?";
+      if(accion === "ASIGNAR_LICENCIA") msjConfirm = "💼 ¿ASIGNAR LICENCIA: " + param + " a las " + correos.length + " cuentas seleccionadas?";
+      if(accion === "ANADIR_GRUPO") msjConfirm = "👥 ¿METER " + correos.length + " usuarios seleccionados en el grupo: " + param + "?";
+      
+      if(!confirm(msjConfirm + "\n\nSe aplicará el cambio en bloque en Google Workspace y Hoja Maestra. Esta acción no se puede deshacer de golpe.")) return;
+      
+      showLog("⏳ Procesando acción masiva en " + correos.length + " cuentas... (Esto puede tardar un poco)");
+      document.getElementById('barra-acciones-masivas').classList.remove('visible');
+      
+      var loteDatos = { correos: correos, accion: accion, parametro: param };
+      
+      google.script.run
+          .withSuccessHandler(function(res) {
+              var msg = "Acción masiva completada.\n- Éxitos: " + res.exitosos + "\n- Errores: " + res.errores;
+              if(res.errores > 0) msg += "\n\nDetalles:\n" + res.detalles.slice(0,10).join("\n");
+              endAction(msg);
+              limpiarSeleccionMasiva();
+              // Refrescamos la tabla actual
+              var globalSearchInput = document.getElementById('global-search').value;
+              if (globalSearchInput) debounceBuscador(); else filtrarCuentasPorCategoria();
+          })
+          .withFailureHandler(function(e) {
+              errAction(e.message);
+              checkSelection(); // Volver a mostrar la barra si falla para poder reintentar
+          })
+          .webEjecutarAccionMasiva(loteDatos);
+  }
+  // ----------------------------------------------------
+
+  function ejecutarAccionIdentidad() {
     if(!verificarFiltroVisualHtml()) return;
     var datos = { 
       tipo: document.getElementById('creador-tipo').value, 
@@ -828,37 +981,26 @@
     };
     if (!datos.alias || datos.alias.trim() === "") return errAction("Escribe un alias para el correo.");
     
-    // Mostramos aviso flotante de carga en amarillo
     mostrarAvisoFlotante("⏳ Desplegando cuenta en Google Workspace...", "info");
     
     google.script.run.withSuccessHandler(function(res) {
       if (res.exito) {
         
-        // 1. Mostrar tu caja del LOG clásico para poder copiar la clave
         var l = document.getElementById('log'); l.style.backgroundColor = "#10b981"; 
         var mLic = res.msgLic ? "<span style='display:block; margin-top:8px; font-size:12px; color:#fef3c7;'> " + res.msgLic + "</span>" : "";
-        l.innerHTML = "<strong>✅ USUARIO CREADO</strong><br><br><b>Email:</b> " + res.email + "<br><b>Destino:</b> " + res.hoja + mLic + "<br><div style='display:flex; gap:8px; align-items:center; margin-bottom:12px; background:#0f172a; padding:10px; border-radius:6px; border:1px solid #334155;'><input type='text' id='pass-temp-input' value='" + res.pass + "' readonly style='background:transparent; color:#38bdf8; border:none; font-family:monospace; font-size:15px; font-weight:bold; width:100%; outline:none; pointer-events:all;' /><button onclick='copiarClaveAlPortapapeles()' style='background:#0284c7; color:white; border:none; padding:6px 10px; border-radius:4px; font-size:12px; cursor:pointer; font-weight:bold; width:auto; margin:0;'>📋 Copiar</button></div><span id='copy-toast' style='display:none; font-size:12px; color:#34d399; font-weight:bold;'>¡Copiado! 🚀<br><br></span><button onclick=\"document.getElementById('log').style.display='none'; document.getElementById('card-creador').classList.add('collapsed'); ejecutarActualizarGrupos();\" style='background:#334155; color:white; border:none; padding:8px 14px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:bold; width:100%;'>Cerrar y Refrescar</button>";
+        
+        // BOTONES DE DECISIÓN AL CREAR CUENTA
+        var btnCrearOtra = "<button onclick=\"document.getElementById('log').style.display='none'; document.getElementById('creador-alias').value=''; document.getElementById('creador-nombre').value=''; document.getElementById('creador-apellido').value=''; document.getElementById('creador-alias').focus();\" style='background:#f59e0b; color:white; border:none; padding:8px 14px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:bold; width:100%; margin-bottom:8px; transition: opacity 0.2s;'>➕ Crear otra cuenta (Sin sincronizar aún)</button>";
+        
+        var btnSinc = "<button onclick=\"document.getElementById('log').style.display='none'; document.getElementById('card-creador').classList.add('collapsed'); ejecutarActualizarGrupos();\" style='background:#334155; color:white; border:none; padding:8px 14px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:bold; width:100%; transition: background 0.2s;'>🔄 Sincronizar BBDD ahora (~5 min)</button>";
+        
+        l.innerHTML = "<strong>✅ USUARIO CREADO</strong><br><br><b>Email:</b> " + res.email + "<br><b>Destino:</b> " + res.hoja + mLic + "<br><div style='display:flex; gap:8px; align-items:center; margin-bottom:12px; background:#0f172a; padding:10px; border-radius:6px; border:1px solid #334155;'><input type='text' id='pass-temp-input' value='" + res.pass + "' readonly style='background:transparent; color:#38bdf8; border:none; font-family:monospace; font-size:15px; font-weight:bold; width:100%; outline:none; pointer-events:all;' /><button onclick='copiarClaveAlPortapapeles()' style='background:#0284c7; color:white; border:none; padding:6px 10px; border-radius:4px; font-size:12px; cursor:pointer; font-weight:bold; width:auto; margin:0;'>📋 Copiar</button></div><span id='copy-toast' style='display:none; font-size:12px; color:#34d399; font-weight:bold;'>¡Copiado! 🚀<br><br></span>" + btnCrearOtra + btnSinc;
         l.style.display = 'block';
         appendToLogHistory("Usuario creado: " + res.email + ". " + (res.msgLic||""), "SUCCESS");
 
-        // 2. ⭐ LA NOTIFICACIÓN FLOTANTE DEFINITIVA ⭐
         mostrarAvisoFlotante("✅ Usuario creado: " + res.email + " (Clave en pantalla)", "exito");
         
-        // 3. ⭐ LIMPIAR LAS CAJAS DEL FORMULARIO PARA OTRA ALTA ⭐
-        document.getElementById('creador-alias').value = "";
-        document.getElementById('creador-nombre').value = "";
-        document.getElementById('creador-apellido').value = "";
-        document.getElementById('creador-manager').value = "";
-        document.getElementById('creador-motivo').value = "";
-        document.getElementById('creador-puesto').value = "";
-        document.getElementById('creador-departamento').value = "";
-        document.getElementById('creador-telefono').value = "";
-        document.getElementById('creador-email-personal').value = "";
-        document.getElementById('creador-grupo').value = "";
-        document.getElementById('creador-preview').innerText = "escribe.alias@gigas.com";
-        
-
-        // INYECCIÓN DE PERFIL ENRIQUECIDO (Se queda como lo tenías)
+        // 1. PRIMERO CAPTURAMOS LOS DATOS EXTRAS (Antes de vaciar)
         var datosExtra = {
           email: res.email, 
           nombre: document.getElementById('creador-nombre') ? document.getElementById('creador-nombre').value.trim() : "",
@@ -870,15 +1012,41 @@
           grupo: document.getElementById('creador-grupo') ? document.getElementById('creador-grupo').value.trim() : ""
         };
         
+        // 2. ENVIAMOS A ENRIQUECER Y METER EN LA LISTA
         if (datosExtra.puesto || datosExtra.departamento || datosExtra.telefono || datosExtra.emailPersonal || datosExtra.grupo) {
+          console.log("Enviando datos extra al servidor: ", datosExtra);
+          
           google.script.run
-            .withSuccessHandler(function() { 
-              // Avisamos de que el perfil extra se ha guardado bien
-              mostrarAvisoFlotante("✅ Perfil de " + res.email + " enriquecido correctamente.", "info");
-              console.log("✅ Perfil enriquecido y listas asignadas con éxito para " + res.email); 
+            .withSuccessHandler(function(resUpdate) { 
+              console.log("Respuesta del servidor: ", resUpdate);
+              
+              if (resUpdate && resUpdate.error) {
+                mostrarAvisoFlotante("❌ Error de Google al añadir a lista: " + resUpdate.error, "error");
+              } else if (resUpdate && resUpdate.mensaje && resUpdate.mensaje.includes("⚠️")) {
+                mostrarAvisoFlotante("⚠️ " + resUpdate.mensaje, "error");
+              } else {
+                mostrarAvisoFlotante("✅ Perfil de " + res.email + " enriquecido y añadido a listas correctamente.", "info");
+              }            })
+            .withFailureHandler(function(err) {
+              mostrarAvisoFlotante("❌ Error crítico en backend: " + err.message, "error");
             })
             .actualizarUsuarioGoogleEnriquecido(datosExtra);
+        } else {
+          console.log("No había datos extra que enviar al servidor.");
         }
+
+        // 3. AHORA SÍ, VACIAMOS LAS CAJITAS PARA DEJAR EL PANEL LIMPIO
+        document.getElementById('creador-alias').value = "";
+        document.getElementById('creador-nombre').value = "";
+        document.getElementById('creador-apellido').value = "";
+        document.getElementById('creador-manager').value = "";
+        document.getElementById('creador-motivo').value = "";
+        document.getElementById('creador-puesto').value = "";
+        document.getElementById('creador-departamento').value = "";
+        document.getElementById('creador-telefono').value = "";
+        document.getElementById('creador-email-personal').value = "";
+        document.getElementById('creador-grupo').value = "";
+        document.getElementById('creador-preview').innerText = "escribe.alias@gigas.com";
 
       } else { 
         errAction(res.error); 
@@ -916,9 +1084,59 @@
   
   function renderizarDashboard(data) {
     if (!data) return;
+
+    if (document.getElementById('mu-inac')) {
+      document.getElementById('mu-inac').innerText = data.inactivas90 || 0;
+    }
+
+    var langActual = document.getElementById('lang-selector') ? document.getElementById('lang-selector').value : 'es';
+    var traductorCategorias = {
+      pt: {
+        "Cuentas asesorgigas": "Contas asesorgigas",
+        "Cuentas de ONI": "Contas de ONI",
+        "Cuentas de serviço Gigas": "Contas de serviço Gigas",
+        "Cuentas Kayako": "Contas Kayako",
+        "Cuentas nominativas de Gigas": "Contas nominativas de Gigas",
+        "Cuentas Onmovil": "Contas Onmovil",
+        "Cuentas TPartner": "Contas TPartner",
+        "Cuenta General": "Conta Geral"
+      },
+      en: {
+        "Cuentas asesorgigas": "Asesorgigas Accounts",
+        "Cuentas de ONI": "ONI Accounts",
+        "Cuentas de servicio Gigas": "Gigas Service Accounts",
+        "Cuentas Kayako": "Kayako Accounts",
+        "Cuentas nominativas de Gigas": "Gigas Named Accounts",
+        "Cuentas Onmovil": "Onmovil Accounts",
+        "Cuentas TPartner": "TPartner Accounts",
+        "Cuenta General": "General Account"
+      }
+    };
+    
+    function trad(texto) {
+      if (!texto) return texto;
+      var txt = String(texto);
+      if (langActual === 'es') return txt; 
+      
+      if (txt.includes("miembros")) {
+        if (langActual === 'pt') return txt.replace("miembros", "membros");
+        if (langActual === 'en') return txt.replace("miembros", "members");
+      }
+      if (traductorCategorias[langActual] && traductorCategorias[langActual][txt]) {
+        return traductorCategorias[langActual][txt];
+      }
+      return txt;
+    }
+
+    if (typeof datosGraficaGlobal !== 'undefined' && datosGraficaGlobal.length > 0) {
+      for (var k = 0; k < datosGraficaGlobal.length; k++) {
+        if (!datosGraficaGlobal[k]._original) datosGraficaGlobal[k]._original = datosGraficaGlobal[k][0];
+        datosGraficaGlobal[k][0] = trad(datosGraficaGlobal[k]._original);
+      }
+    }
+
     document.getElementById('fecha-actualizacion').innerText = "📅 " + (data.fechaSincro || data.fechaListas || "No sincronizado");
     
-    // Métricas Gigas (ESCUDO: Si el total es 0, está prohibido machacar los números que ya estén en pantalla)
     var mgGigas = data.metricasGigas || { total: (data.listasGigas ? data.listasGigas.length : 0), conOwner: 0, sinOwner: 0 }; 
     if (data.listasGigas && mgGigas.conOwner === 0 && mgGigas.sinOwner === 0) {
       data.listasGigas.forEach(function(l) { if(l.owner && l.owner.includes("@")) mgGigas.conOwner++; else mgGigas.sinOwner++; });
@@ -932,7 +1150,6 @@
       document.getElementById('m-sin-gigas').innerHTML = sG + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + pSG + "%)</span>";
     }
 
-    // Métricas ONI (ESCUDO: Si el total es 0, está prohibido machacar los números que ya estén en pantalla)
     var mgOni = data.metricasOni || { total: (data.listasOni ? data.listasOni.length : 0), conOwner: 0, sinOwner: 0 }; 
     if (data.listasOni && mgOni.conOwner === 0 && mgOni.sinOwner === 0) {
       data.listasOni.forEach(function(l) { if(l.owner && l.owner.includes("@")) mgOni.conOwner++; else mgOni.sinOwner++; });
@@ -969,6 +1186,7 @@
     if (data.licencias) {
       var htmlLic = "";
       var htmlSelect = ""; var foundCI = false; 
+      
       data.licencias.forEach(function(f) { 
         var a = String(f[0]).includes("⚠️"); var producto = String(f[0]).replace("⚠️", "").trim(); var estado = f[1] || "";
         var asignadas = parseInt(String(f[2]).replace(/\D/g, '')) || 0; var limite = parseInt(String(f[4] || "0").replace(/\D/g, '')) || 0; 
@@ -997,7 +1215,13 @@
         htmlSelect += "<option value='Cloud Identity Free'>👤 Cloud Identity Free (Asignadas: 0 | Libres: 50)</option>";
       }
       document.getElementById('tabla-licencias').innerHTML = htmlLic;
-      if(htmlSelect) { document.getElementById('creador-licencia').innerHTML = htmlSelect; document.getElementById('target-licencia').innerHTML = "<option value=''>-- Selecciona --</option>" + htmlSelect; }
+      if(htmlSelect) { 
+        document.getElementById('creador-licencia').innerHTML = htmlSelect; 
+        document.getElementById('target-licencia').innerHTML = "<option value='' data-i18n='opt_seleciona'>-- Selecciona --</option>" + htmlSelect; 
+      }
+      
+      var lang = document.getElementById('lang-selector') ? document.getElementById('lang-selector').value : 'es';
+      changeLanguage(lang);
     }
 
     if (data.origen) {
@@ -1005,8 +1229,9 @@
       var htmlSelectCat = "<option value=''>-- --</option>";
       htmlSelectCat += "<optgroup label='📂 ORIGEN (HOJA)'>";
       data.origen.forEach(function(i) {
-        htmlOri += "<tr><td>"+i.concepto+"</td><td>"+i.activas+"</td><td>"+i.suspendidas+"</td><td>"+i.total+"</td></tr>";
-        htmlSelectCat += "<option value='origen:"+i.concepto+"'>"+i.concepto+" ("+i.total+")</option>";
+        var conceptoTraducido = trad(i.concepto);
+        htmlOri += "<tr><td>"+conceptoTraducido+"</td><td>"+i.activas+"</td><td>"+i.suspendidas+"</td><td>"+i.total+"</td></tr>";
+        htmlSelectCat += "<option value='origen:"+i.concepto+"'>"+conceptoTraducido+" ("+i.total+")</option>";
       });
       htmlSelectCat += "</optgroup>";
 
@@ -1016,6 +1241,12 @@
       htmlSelectCat += "<option value='licencia:Google Workspace Enterprise Plus'>Enterprise Plus</option>";
       htmlSelectCat += "<option value='licencia:Cloud Identity Free'>Cloud Identity Free</option>";
       htmlSelectCat += "</optgroup>";
+      
+      htmlSelectCat += "<optgroup label='🔴 ESTADO Y AUDITORÍA DE ACCESO'>";
+      htmlSelectCat += "<option value='estado:susp'>Mostrar Cuentas Suspendidas</option>";
+      htmlSelectCat += "<option value='inactividad:90'>Mostrar Cuentas Inactivas (>90d)</option>";
+      htmlSelectCat += "</optgroup>";
+
       if (data.baseCuentas && data.baseCuentas.rows) {
         var idxOu = -1;
         for(var c=0; c<data.baseCuentas.headers.length; c++) {
@@ -1041,13 +1272,13 @@
       document.getElementById('selector-origen-dinamico').innerHTML = htmlSelectCat;
     }
 
-    // Renderizado Listas Gigas (con prefijo 'gigas-')
     if (data.listasGigas && document.getElementById('tabla-listas-gigas-body')) {
       var htmlGigas = "";
       data.listasGigas.forEach(function(g, i) {
         var ownerString = g.owner || "⏳ ..."; var huerfana = !ownerString.includes("@"); var ownerSeguro = String(ownerString).replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ").replace(/\r/g, "");
+        var volumenTraducido = trad(g.volumen); 
         htmlGigas += "<tr class='main-row "+(huerfana?"danger-row":"")+"' data-email='"+g.email+"' onclick=\"toggleSubTablaMiembros('gigas-"+i+"', '"+g.email+"', '"+ownerSeguro+"')\">";
-        htmlGigas += "<td>"+g.nombre+"</td><td>"+g.email+"</td><td style='font-weight:bold; color:#64748b;'>"+g.volumen+"</td><td>"+ownerString+"</td></tr>";
+        htmlGigas += "<td>"+g.nombre+"</td><td>"+g.email+"</td><td style='font-weight:bold; color:#64748b;'>"+volumenTraducido+"</td><td>"+ownerString+"</td></tr>";
         htmlGigas += "<tr id='subrow-gigas-"+i+"' class='sub-member-row' style='display:none; background:#f8fafc;'><td colspan='4'><div class='member-details-box'>";
         if(g.miembros && g.miembros.length > 0) { 
           g.miembros.forEach(function(m) { 
@@ -1055,18 +1286,27 @@
             htmlGigas += "<div class='member-tag'><span onclick=\"seleccionarFila('Lista', '"+mClean+"', event)\">" + m + "</span><span style='margin-left:8px; cursor:pointer;' title='Hacer Owner' onclick=\"asignarOwnerDirecto('"+g.email+"', '"+mClean+"', event)\">👑</span><span class='"+crossClass+"' style='color:#ef4444; margin-left:6px; font-weight:bold; cursor:pointer;' title='Eliminar' onclick=\"forzarBajaMiembro('"+g.email+"','"+mClean+"', event)\">×</span></div>"; 
           }); 
         } else { htmlGigas += "<span style='font-size:12px; color:#94a3b8;'>...</span>"; }
-        htmlGigas += "</div></td></tr>";
+        htmlGigas += "</div>";
+        
+        var inputId = 'inline-gigas-' + i;
+        var btnAddClass = IS_ADMIN_AUTHORIZED ? "" : "user-hidden-action";
+        htmlGigas += "<div class='"+btnAddClass+"' style='margin-top: 8px; display: flex; gap: 8px; align-items: center; width: 100%; border-top: 1px dashed #cbd5e1; padding-top: 8px;' onclick='event.stopPropagation();'>";
+        htmlGigas += "<input type='text' id='"+inputId+"' placeholder='Añadir uno o varios correos separados por comas...' style='padding: 8px 12px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; flex: 1; max-width: 400px; background: white;' />";
+        htmlGigas += "<button onclick=\"lanzarAñadirMiembroInline('"+g.email+"', '"+inputId+"', event)\" style='background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s;' onmouseover=\"this.style.background='#059669'\" onmouseout=\"this.style.background='#10b981'\">➕ Añadir Rápido</button>";
+        htmlGigas += "</div>";
+        
+        htmlGigas += "</td></tr>";
       });
       document.getElementById('tabla-listas-gigas-body').innerHTML = htmlGigas; 
     }
 
-    // Renderizado Listas ONI (con prefijo 'oni-')
     if (data.listasOni && document.getElementById('tabla-listas-oni-body')) {
       var htmlOni = "";
       data.listasOni.forEach(function(g, i) {
         var ownerString = g.owner || "⏳ ..."; var huerfana = !ownerString.includes("@"); var ownerSeguro = String(ownerString).replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ").replace(/\r/g, "");
+        var volumenTraducido = trad(g.volumen); 
         htmlOni += "<tr class='main-row "+(huerfana?"danger-row":"")+"' data-email='"+g.email+"' onclick=\"toggleSubTablaMiembros('oni-"+i+"', '"+g.email+"', '"+ownerSeguro+"')\">";
-        htmlOni += "<td>"+g.nombre+"</td><td>"+g.email+"</td><td style='font-weight:bold; color:#64748b;'>"+g.volumen+"</td><td>"+ownerString+"</td></tr>";
+        htmlOni += "<td>"+g.nombre+"</td><td>"+g.email+"</td><td style='font-weight:bold; color:#64748b;'>"+volumenTraducido+"</td><td>"+ownerString+"</td></tr>";
         htmlOni += "<tr id='subrow-oni-"+i+"' class='sub-member-row' style='display:none; background:#f8fafc;'><td colspan='4'><div class='member-details-box'>";
         if(g.miembros && g.miembros.length > 0) { 
           g.miembros.forEach(function(m) { 
@@ -1074,28 +1314,33 @@
             htmlOni += "<div class='member-tag'><span onclick=\"seleccionarFila('Lista', '"+mClean+"', event)\">" + m + "</span><span style='margin-left:8px; cursor:pointer;' title='Hacer Owner' onclick=\"asignarOwnerDirecto('"+g.email+"', '"+mClean+"', event)\">👑</span><span class='"+crossClass+"' style='color:#ef4444; margin-left:6px; font-weight:bold; cursor:pointer;' title='Eliminar' onclick=\"forzarBajaMiembro('"+g.email+"','"+mClean+"', event)\">×</span></div>"; 
           }); 
         } else { htmlOni += "<span style='font-size:12px; color:#94a3b8;'>...</span>"; }
-        htmlOni += "</div></td></tr>";
+        htmlOni += "</div>";
+
+        var inputId = 'inline-oni-' + i;
+        var btnAddClass = IS_ADMIN_AUTHORIZED ? "" : "user-hidden-action";
+        htmlOni += "<div class='"+btnAddClass+"' style='margin-top: 8px; display: flex; gap: 8px; align-items: center; width: 100%; border-top: 1px dashed #cbd5e1; padding-top: 8px;' onclick='event.stopPropagation();'>";
+        htmlOni += "<input type='text' id='"+inputId+"' placeholder='Añadir uno o varios correos separados por comas...' style='padding: 8px 12px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none; flex: 1; max-width: 400px; background: white;' />";
+        htmlOni += "<button onclick=\"lanzarAñadirMiembroInline('"+g.email+"', '"+inputId+"', event)\" style='background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s;' onmouseover=\"this.style.background='#059669'\" onmouseout=\"this.style.background='#10b981'\">➕ Añadir Rápido</button>";
+        htmlOni += "</div>";
+
+        htmlOni += "</td></tr>";
       });
       document.getElementById('tabla-listas-oni-body').innerHTML = htmlOni; 
     }
 
     redibujarGrafica();
-    // =========================================================================
-// 🛡️ CONTROL DE ACCESO A LA PAPELERA (MASCADITO AL 100%)
-// =========================================================================
-if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
-  // 1. Si eres tú (Admin): cargamos los eliminados y dejamos la tarjeta visible
-  cargarPapeleraEliminados();
-  if (document.getElementById('card-papelera-recuperacion')) {
-    document.getElementById('card-papelera-recuperacion').style.display = ''; 
+
+    if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
+      cargarPapeleraEliminados();
+      if (document.getElementById('card-papelera-recuperacion')) {
+        document.getElementById('card-papelera-recuperacion').style.display = ''; 
+      }
+    } else {
+      if (document.getElementById('card-papelera-recuperacion')) {
+        document.getElementById('card-papelera-recuperacion').style.display = 'none'; 
+      }
+    }
   }
-} else {
-  // 2. Si entra alguien sin permisos: ¡Hacemos desaparecer toda la tarjeta! 👻
-  if (document.getElementById('card-papelera-recuperacion')) {
-    document.getElementById('card-papelera-recuperacion').style.display = 'none'; 
-  }
-}
-}
 
   function seleccionarFila(categoria, correo, event) { 
     if(event) event.stopPropagation(); 
@@ -1104,12 +1349,14 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
     document.getElementById('target-manager').value = ""; 
     document.getElementById('target-manager').placeholder = "..."; 
     
-    document.getElementById('licencia-actual-box').innerText = "⏳ Consultando licencia actual...";
+    var lang = document.getElementById('lang-selector') ? document.getElementById('lang-selector').value : 'es';
+    
+    document.getElementById('licencia-actual-box').innerText = lang === 'pt' ? "⏳ Consultando licença atual..." : (lang === 'en' ? "⏳ Checking current license..." : "⏳ Consultando licencia actual...");
     document.getElementById('licencia-actual-box').style.color = "#94a3b8";
    
     var boxOu = document.getElementById('ou-actual-box');
     if (boxOu) {
-      boxOu.innerText = "⏳ Consultando OU actual...";
+      boxOu.innerText = lang === 'pt' ? "⏳ Consultando OU atual..." : (lang === 'en' ? "⏳ Checking current OU..." : "⏳ Consultando OU actual...");
       boxOu.style.color = "#94a3b8";
     }
 
@@ -1118,11 +1365,9 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
 
     refrescarAliasEnPantalla(correo);
 
-    // ⭐ CONEXIÓN DEL FILTRO DE INVENTARIO DE LISTAS ⭐
     if (typeof filtrarInventarioPorUsuario === "function") {
       filtrarInventarioPorUsuario(correo);
     }
-    // ⭐ FIN CONEXIÓN ⭐
 
     google.script.run.withSuccessHandler(function(datosUsuario) {
       if (datosUsuario) { 
@@ -1134,19 +1379,18 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
         
         var boxLic = document.getElementById('licencia-actual-box');
         if (datosUsuario.licenciaActiva) {
-          boxLic.innerText = "📋 Licencia actual: " + datosUsuario.licenciaActiva;
+          boxLic.innerText = (lang === 'pt' ? "📋 Licença atual: " : (lang === 'en' ? "📋 Current license: " : "📋 Licencia actual: ")) + datosUsuario.licenciaActiva;
           boxLic.style.color = "#38bdf8"; 
         } else {
-          boxLic.innerText = "📋 Licencia actual: Ninguna o no detectada";
+          boxLic.innerText = lang === 'pt' ? "📋 Licença atual: Nenhuma ou não detetada" : (lang === 'en' ? "📋 Current license: None or not detected" : "📋 Licencia actual: Ninguna o no detectada");
           boxLic.style.color = "#f87171"; 
         }
         
         if (boxOu) {
-          boxOu.innerText = "📋 OU actual: " + (datosUsuario.ou || "/");
+          boxOu.innerText = (lang === 'pt' ? "📋 OU atual: " : (lang === 'en' ? "📋 Current OU: " : "📋 OU actual: ")) + (datosUsuario.ou || "/");
           boxOu.style.color = "#a78bfa";
         }
 
-        // ⭐ INYECCIÓN CAMALEÓNICA: Activamos Modo Edición en el panel de creación ⭐
         if (typeof cambiarModoPanelIdentidades === "function") {
           cambiarModoPanelIdentidades('EDITAR', {
             email: correo,
@@ -1158,10 +1402,9 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
             telefono: datosUsuario.phone || datosUsuario.telefono || "",
             pais: datosUsuario.country || datosUsuario.pais || "Spain",
             emailPersonal: datosUsuario.recoveryEmail || datosUsuario.recovery || "",
-            grupo: datosUsuario.grupo || datosUsuario.listas || "" // 💡 AQUÍ PASAMOS LAS LISTAS
+            grupo: datosUsuario.grupo || datosUsuario.listas || "" 
           });
         }
-        // ⭐ FIN INYECCIÓN CAMALEÓNICA ⭐
       }
       comprobarRastreadorTakeout(correo);
     }).obtenerDatosExtendidosDeUsuario(correo);
@@ -1175,7 +1418,6 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
     }).webComprobarEstadoTakeout(correo);
   }
 
-  // 🛠️ [MODIFICADO 03/07/2026]: Se ha inyectado la lógica 'debounce' para evitar que el Buscador Inteligente congele la pantalla al teclear rápido.
   var timeoutBuscador = null;
   function debounceBuscador() {
     clearTimeout(timeoutBuscador);
@@ -1190,37 +1432,53 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
       var pref = langDict[document.getElementById('lang-selector').value].card_desglose || "📂 Desglose Completo";
       document.getElementById('titulo-panel-dinamico').innerText = pref;
       document.getElementById('head-cuentas-dinamicas').innerHTML = "<tr><th>...</th></tr>"; document.getElementById('body-cuentas-dinamicas').innerHTML = "<tr><td>...</td></tr>"; document.getElementById('selector-origen-dinamico').selectedIndex = 0; 
-      document.querySelectorAll('#tabla-listas-maestra tbody tr.main-row').forEach(function(r) { r.style.display = ''; });
-      document.querySelectorAll('#tabla-listas-maestra tbody tr.sub-member-row').forEach(function(r) { r.style.display = 'none'; }); 
+      
+      document.querySelectorAll('#tabla-listas-gigas-body tr.main-row, #tabla-listas-oni-body tr.main-row').forEach(function(r) { r.style.display = ''; });
+      document.querySelectorAll('#tabla-listas-gigas-body tr.sub-member-row, #tabla-listas-oni-body tr.sub-member-row').forEach(function(r) { r.style.display = 'none'; }); 
+      
       pintarMetricasSalud(window.gTotal, window.gCon, window.gSin, window.gSusp, "Global"); return;
     }
     
-    var htmlHead = "<tr>"; var htmlBody = ""; var matchCount = 0;
+    var htmlHead = "<tr><th style='width:30px; text-align:center;'><input type='checkbox' id='master-chk' onclick='toggleAllCheckboxes(this)'></th>"; 
+    var htmlBody = ""; var matchCount = 0;
     var lastCat = ""; var lastCorreo = ""; var headDrawn = false; var locTotal = 0; var locCon = 0;
     var locSin = 0; var locSusp = 0; 
 
     if (baseCuentasGlobal && baseCuentasGlobal.rows) {
       var idxEmail = -1;
       var idxStatus = -1; var idxOrigen = -1; var idxManager = -1; var idxMotivo = -1; var idxLogin = -1;
-      var idxLicencia = -1; var idxOu = -1;
+      var idxLicencia = -1; var idxOu = -1; var idxInac = -1;
       for(var c=0; c<baseCuentasGlobal.headers.length; c++) { 
         var hL = String(baseCuentasGlobal.headers[c]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         if(hL.includes("email")) idxEmail = c; else if(hL.includes("status") || hL.includes("estado")) idxStatus = c; else if(hL.includes("origen") || hL.includes("tipo")) idxOrigen = c;
         else if(hL.includes("manager") || hL.includes("responsable")) idxManager = c; else if(hL.includes("motivo")) idxMotivo = c; else if(hL.includes("ultimo inicio") || hL.includes("logon")) idxLogin = c;
         else if(hL.includes("licencia")) idxLicencia = c; else if(hL === "ou" || hL.indexOf("unidad") > -1 || hL.indexOf("org") > -1) idxOu = c;
+        else if(hL.includes("alerta") || hL.includes("inactividad")) idxInac = c;
       }
       
       var colsToDisplay = [0, 1];
       if(idxEmail > -1) colsToDisplay.push(idxEmail); if(idxStatus > -1) colsToDisplay.push(idxStatus); if(idxOrigen > -1) colsToDisplay.push(idxOrigen);
       if(idxManager > -1) colsToDisplay.push(idxManager); if(idxLicencia > -1) colsToDisplay.push(idxLicencia);
       if(idxOu > -1) colsToDisplay.push(idxOu); if(idxMotivo > -1) colsToDisplay.push(idxMotivo); if(idxLogin > -1) colsToDisplay.push(idxLogin);
+      if(idxInac > -1) colsToDisplay.push(idxInac);
+
       baseCuentasGlobal.rows.forEach(function(fila) {
         if(fila.join(" ").toLowerCase().includes(query)) {
           locTotal++; var mVal = idxManager > -1 ? String(fila[idxManager]).trim() : ""; if(mVal.includes("@")) locCon++; else locSin++;
           var eVal = idxStatus > -1 ? String(fila[idxStatus]).toLowerCase() : ""; if(eVal.includes("susp")) locSusp++;
+          
           if(!headDrawn) { colsToDisplay.forEach(function(idx) { htmlHead += "<th>" + (baseCuentasGlobal.headers[idx] || "Columna") + "</th>"; }); htmlHead += "</tr>"; headDrawn = true; }
-          lastCat = idxOrigen > -1 ? fila[idxOrigen] : "Cuenta General"; lastCorreo = idxEmail > -1 ? fila[idxEmail] : "";
-          htmlBody += "<tr class='main-row' onclick=\"seleccionarFila('"+lastCat+"', '"+lastCorreo+"', event)\">"; 
+          
+          lastCat = idxOrigen > -1 ? fila[idxOrigen] : "Cuenta General"; 
+          lastCorreo = idxEmail > -1 ? fila[idxEmail] : "";
+          
+          var esInactiva = idxInac > -1 && String(fila[idxInac]).includes("Inactiva");
+          var rowStyle = esInactiva ? "background:#f3e8ff; color:#6b21a8; font-weight:bold;" : "";
+          
+          htmlBody += "<tr class='main-row' style='"+rowStyle+"' onclick=\"seleccionarFila('"+lastCat+"', '"+lastCorreo+"', event)\">"; 
+          
+          htmlBody += "<td class='chk-container' onclick='event.stopPropagation();'><input type='checkbox' class='user-checkbox' value='" + lastCorreo + "' onclick='checkSelection()'></td>";
+          
           colsToDisplay.forEach(function(idx) { var val = fila[idx] || ""; var est = String(val).toLowerCase().includes("susp") ? "color:#ef4444; font-weight:bold;" : ""; htmlBody += "<td style='"+est+"'>" + val + "</td>"; }); 
           htmlBody += "</tr>"; matchCount++;
         }
@@ -1228,7 +1486,6 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
     }
     pintarMetricasSalud(locTotal, locCon, locSin, locSusp, query); 
     
-    // --- AQUÍ LLAMAMOS AL POP-UP FLOTANTE ---
     if(matchCount > 0) { 
       document.getElementById('titulo-panel-dinamico').innerText = "📂 " + query + " (" + matchCount + ")";
       document.getElementById('head-cuentas-dinamicas').innerHTML = htmlHead; 
@@ -1236,55 +1493,79 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
       document.getElementById('card-cuentas-desglose').classList.remove('collapsed'); 
       if (matchCount === 1) seleccionarFila(lastCat, lastCorreo);
     } else { 
-      // 1. Ocultamos el panel de abajo para que no estorbe
       document.getElementById('card-cuentas-desglose').classList.add('collapsed');
-      // 2. Lanzamos nuestro Pop-up
-      mostrarPopUpBuscador("No se han encontrado resultados para: <b>" + query + "</b>");
     }
-    // ----------------------------------------
 
-    var filasPrincipalesListas = document.querySelectorAll('#tabla-listas-maestra tbody tr.main-row');
+    limpiarSeleccionMasiva();
+
+    var filasPrincipalesListas = document.querySelectorAll('#tabla-listas-gigas-body tr.main-row, #tabla-listas-oni-body tr.main-row');
+    var listasEncontradas = 0;
+
     filasPrincipalesListas.forEach(function(row) {
-      var onClickAttr = row.getAttribute('onclick');
-      if (onClickAttr) {
-        var match = onClickAttr.match(/\d+/);
-        if (match) {
-          var index = match[0]; var subRow = document.getElementById('subrow-' + index);
-          var textoPrincipal = row.innerText.toLowerCase(); var textoSubRow = subRow ? subRow.innerText.toLowerCase() : "";
-          if (textoPrincipal.includes(query) || textoSubRow.includes(query)) { row.style.display = ''; if (textoSubRow.includes(query)) { 
-          if(subRow) subRow.style.display = 'table-row'; } else { if(subRow) subRow.style.display = 'none'; }
-          } else { row.style.display = 'none'; if(subRow) subRow.style.display = 'none'; }
+      var subRow = row.nextElementSibling;
+      var hasSubRow = subRow && subRow.classList.contains('sub-member-row');
+
+      var textoPrincipal = row.innerText.toLowerCase();
+      var textoSubRow = hasSubRow ? subRow.innerText.toLowerCase() : "";
+
+      if (textoPrincipal.includes(query) || textoSubRow.includes(query)) {
+        row.style.display = '';
+        listasEncontradas++;
+        
+        if (hasSubRow) {
+          if (textoSubRow.includes(query) && !textoPrincipal.includes(query)) {
+            subRow.style.display = 'table-row';
+          } else {
+            subRow.style.display = 'none'; 
+          }
         }
+      } else {
+        row.style.display = 'none';
+        if (hasSubRow) subRow.style.display = 'none';
       }
     });
-}
+
+    var cardListas = document.getElementById('card-listas');
+    if (listasEncontradas > 0 && cardListas && cardListas.classList.contains('collapsed')) {
+      cardListas.classList.remove('collapsed');
+    }
+
+    if (matchCount === 0 && listasEncontradas === 0) {
+      mostrarPopUpBuscador("No se han encontrado usuarios ni listas para: <b>" + query + "</b>");
+    }
+  }
+
   function filtrarCuentasPorCategoria() {
     var rawFilter = document.getElementById('selector-origen-dinamico').value; 
     var pref = langDict[document.getElementById('lang-selector').value].card_desglose || "📂 Desglose Completo";
-    if(!rawFilter) { document.getElementById('global-search').value = ""; document.getElementById('titulo-panel-dinamico').innerText = pref; document.getElementById('head-cuentas-dinamicas').innerHTML = "<tr><th>...</th></tr>"; document.getElementById('body-cuentas-dinamicas').innerHTML = "<tr><td>...</td></tr>"; pintarMetricasSalud(window.gTotal, window.gCon, window.gSin, window.gSusp, "Global"); return; }
+    if(!rawFilter) { document.getElementById('global-search').value = ""; document.getElementById('titulo-panel-dinamico').innerText = pref; document.getElementById('head-cuentas-dinamicas').innerHTML = "<tr><th>...</th></tr>"; document.getElementById('body-cuentas-dinamicas').innerHTML = "<tr><td>...</td></tr>"; pintarMetricasSalud(window.gTotal, window.gCon, window.gSin, window.gSusp, "Global"); limpiarSeleccionMasiva(); return; }
     
     document.getElementById('global-search').value = ""; 
     var partes = rawFilter.split(":"); var tipoFiltro = partes[0];
     var valorFiltro = partes[1];
     document.getElementById('titulo-panel-dinamico').innerText = "📂 " + valorFiltro;
 
-    var htmlHead = "<tr>"; var htmlBody = "";
+    var htmlHead = "<tr><th style='width:30px; text-align:center;'><input type='checkbox' id='master-chk' onclick='toggleAllCheckboxes(this)'></th>"; 
+    var htmlBody = "";
     var locTotal = 0; var locCon = 0; var locSin = 0; var locSusp = 0;
     if (baseCuentasGlobal && baseCuentasGlobal.rows) {
       var idxEmail = -1; var idxStatus = -1;
       var idxOrigen = -1; var idxManager = -1; var idxMotivo = -1; var idxLogin = -1; var idxLicencia = -1;
-      var idxOu = -1;
+      var idxOu = -1; var idxInac = -1;
       for(var c=0; c<baseCuentasGlobal.headers.length; c++) { 
         var hL = String(baseCuentasGlobal.headers[c]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         if(hL.includes("email")) idxEmail = c; else if(hL.includes("status") || hL.includes("estado")) idxStatus = c; else if(hL.includes("origen") || hL.includes("tipo")) idxOrigen = c;
         else if(hL.includes("manager") || hL.includes("responsable")) idxManager = c; else if(hL.includes("motivo")) idxMotivo = c; else if(hL.includes("ultimo inicio") || hL.includes("logon")) idxLogin = c;
         else if(hL.includes("licencia")) idxLicencia = c; else if(hL === "ou" || hL.indexOf("unidad") > -1 || hL.indexOf("org") > -1) idxOu = c;
+        else if(hL.includes("alerta") || hL.includes("inactividad")) idxInac = c;
       }
       
       var colsToDisplay = [0, 1];
       if(idxEmail > -1) colsToDisplay.push(idxEmail); if(idxStatus > -1) colsToDisplay.push(idxStatus); if(idxOrigen > -1) colsToDisplay.push(idxOrigen);
       if(idxManager > -1) colsToDisplay.push(idxManager); if(idxLicencia > -1) colsToDisplay.push(idxLicencia);
       if(idxOu > -1) colsToDisplay.push(idxOu); if(idxMotivo > -1) colsToDisplay.push(idxMotivo); if(idxLogin > -1) colsToDisplay.push(idxLogin);
+      if(idxInac > -1) colsToDisplay.push(idxInac);
+
       colsToDisplay.forEach(function(idx) { htmlHead += "<th>" + (baseCuentasGlobal.headers[idx] || "Columna") + "</th>"; }); htmlHead += "</tr>";
       baseCuentasGlobal.rows.forEach(function(fila) { 
         var coincide = false;
@@ -1297,12 +1578,28 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
         } else if (tipoFiltro === "ou") {
           var filaOu = idxOu > -1 ? String(fila[idxOu]||"").trim() : "";
           if (filaOu === valorFiltro) coincide = true;
+        } 
+        else if (tipoFiltro === "estado") {
+          var filaEstado = idxStatus > -1 ? String(fila[idxStatus]||"").toLowerCase() : "";
+          if (filaEstado.includes(valorFiltro.toLowerCase())) coincide = true;
+        }
+        else if (tipoFiltro === "inactividad") {
+          var filaInac = idxInac > -1 ? String(fila[idxInac]||"") : "";
+          if (filaInac.includes("Inactiva")) coincide = true;
         }
 
         if (coincide) { 
           locTotal++; var mVal = idxManager > -1 ? String(fila[idxManager]).trim() : ""; if(mVal.includes("@")) locCon++; else locSin++;
           var eVal = idxStatus > -1 ? String(fila[idxStatus]).toLowerCase() : ""; if(eVal.includes("susp")) locSusp++;
-          htmlBody += "<tr class='main-row' onclick=\"seleccionarFila('"+(idxOrigen>-1?fila[idxOrigen]:"Cuenta")+"', '"+(idxEmail > -1 ? fila[idxEmail] : "")+"', event)\">";
+          
+          var filaEmail = idxEmail > -1 ? fila[idxEmail] : "";
+          var esInactiva = idxInac > -1 && String(fila[idxInac]).includes("Inactiva");
+          var rowStyle = esInactiva ? "background:#f3e8ff; color:#6b21a8; font-weight:bold;" : "";
+
+          htmlBody += "<tr class='main-row' style='"+rowStyle+"' onclick=\"seleccionarFila('"+(idxOrigen>-1?fila[idxOrigen]:"Cuenta")+"', '"+filaEmail+"', event)\">";
+          
+          htmlBody += "<td class='chk-container' onclick='event.stopPropagation();'><input type='checkbox' class='user-checkbox' value='" + filaEmail + "' onclick='checkSelection()'></td>";
+          
           colsToDisplay.forEach(function(idx) { var val = fila[idx] || ""; var est = String(val).toLowerCase().includes("susp") ? "color:#ef4444; font-weight:bold;" : ""; htmlBody += "<td style='"+est+"'>" + val + "</td>"; });
           htmlBody += "</tr>"; 
         } 
@@ -1310,6 +1607,8 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
     }
     pintarMetricasSalud(locTotal, locCon, locSin, locSusp, valorFiltro);
     document.getElementById('head-cuentas-dinamicas').innerHTML = htmlHead; document.getElementById('body-cuentas-dinamicas').innerHTML = htmlBody; document.getElementById('card-cuentas-desglose').classList.remove('collapsed');
+    
+    limpiarSeleccionMasiva();
   }
 
   function lanzarCambioLicencia() {
@@ -1370,7 +1669,6 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
     var mFinal = mDestino.trim().toLowerCase();
     var activarAlias = mFinal.includes("@");
 
-    // LÓGICA REDISEÑADA PARA EL DRIVE CON PROMPT (Más claro y permite editar)
     var emailResponsableDrive = mFinal || mSugerido;
     var promptDrive = prompt("💾 ¿TRANSFERIR GOOGLE DRIVE?\n\nIntroduce el correo de la persona que recibirá los archivos.\n\n• Si NO quieres transferir el Drive, borra el texto y pulsa Aceptar (o Cancelar).", emailResponsableDrive);
 
@@ -1458,7 +1756,6 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
     var data = JSON.parse(res);
     renderizarDashboard(data); 
     
-    // Actualizar contadores de Gigas automáticamente
     if(data.metricasGigas) {
       var tG = data.metricasGigas.total || 0;
       var cG = data.metricasGigas.conOwner || 0;
@@ -1468,7 +1765,6 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
       document.getElementById('m-sin-gigas').innerHTML = sG + " <span style='font-size:14px; font-weight:normal; opacity:0.8;'>(" + (tG > 0 ? Math.round((sG / tG) * 100) : 0) + "%)</span>";
     }
     
-    // Actualizar contadores de ONI automáticamente
     if(data.metricasOni) {
       var tO = data.metricasOni.total || 0;
       var cO = data.metricasOni.conOwner || 0;
@@ -1513,6 +1809,17 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
   
   function ejecutarActualizarGrupos() { 
     if(!verificarFiltroVisualHtml()) return;
+    
+    var btnCrear = document.getElementById('btn-accion-identidad');
+    var txtCrearOriginal = "";
+    if(btnCrear) {
+      txtCrearOriginal = btnCrear.innerHTML;
+      btnCrear.disabled = true;
+      btnCrear.style.backgroundColor = "#475569";
+      btnCrear.style.cursor = "not-allowed";
+      btnCrear.innerHTML = "⏳ Sincronización masiva en curso...";
+    }
+
     var l = document.getElementById('log');
     l.innerHTML = getCloseBtn() + "<strong>⏳ Sincronización en curso...</strong><br>" +
                   "<span id='sync-fase' style='font-size:12px; color:#bae6fd; font-style:italic;'>Iniciando conexión segura...</span>" +
@@ -1540,14 +1847,31 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
         }
       }
     }, 1000);
+    
     google.script.run.withSuccessHandler(function(res) {
       clearInterval(syncInterval);
       if(bar) bar.style.width = "100%";
       if(txt) txt.innerText = "100%";
       if(fase) fase.innerText = "¡Completado!";
+      
+      if(btnCrear) {
+        btnCrear.disabled = false;
+        btnCrear.style.backgroundColor = ""; 
+        btnCrear.style.cursor = "pointer";
+        btnCrear.innerHTML = txtCrearOriginal;
+      }
+
       setTimeout(function() { endAction(res); }, 600);
     }).withFailureHandler(function(e){ 
       clearInterval(syncInterval);
+      
+      if(btnCrear) {
+        btnCrear.disabled = false;
+        btnCrear.style.backgroundColor = "";
+        btnCrear.style.cursor = "pointer";
+        btnCrear.innerHTML = txtCrearOriginal;
+      }
+
       errAction(e.message); 
     }).webBotonActualizarGrupos();
   }
@@ -1569,7 +1893,7 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
     var targetOu = document.getElementById('target-ou').value || "/";
     
     if(!u) return errAction("Selecciona correo en la papelera.");
-    if(!confirm("♻️ ¿Confirmas la recuperación de " + u + " a la OU: " + targetOu + "?")) return;
+    if(!confirm("♻️ ¿Confirmas la recuperação de " + u + " a la OU: " + targetOu + "?")) return;
     showLog("Consultando ID y recuperando..."); 
     google.script.run
       .withSuccessHandler(endAction)
@@ -1578,6 +1902,29 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
   }
   function lanzarAltaEnLista() { if(!verificarFiltroVisualHtml()) return; var g = document.getElementById('target-group').value;
     var u = document.getElementById('target-user').value; showLog("Añadiendo..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webAñadirMiembroLista(g, u);
+  }
+  
+  function lanzarAñadirMiembroInline(grupo, inputId, event) {
+    if(event) event.stopPropagation(); 
+    if(!verificarFiltroVisualHtml()) return;
+    
+    var inputEl = document.getElementById(inputId);
+    var usuariosNuevos = inputEl.value.trim().toLowerCase();
+    
+    if(!usuariosNuevos || !usuariosNuevos.includes("@")) {
+      return errAction("Por favor, escribe un correo válido para añadir a la lista.");
+    }
+    
+    showLog("⏳ Añadiendo a la lista " + grupo + "...");
+    
+    google.script.run
+      .withSuccessHandler(function(res) {
+        inputEl.value = ""; 
+        endAction(res);
+        setTimeout(function() { lanzarRefrescarSoloListas(); }, 1500);
+      })
+      .withFailureHandler(function(e){ errAction(e.message); })
+      .webAñadirMiembroLista(grupo, usuariosNuevos);
   }
   function forzarBajaMiembro(g, u, event) { if(!verificarFiltroVisualHtml()) return; if(event) event.stopPropagation();
     showLog("Borrando..."); google.script.run.withSuccessHandler(endAction).withFailureHandler(function(e){ errAction(e.message); }).webBorrarMiembroLista(g, u);
@@ -1627,28 +1974,22 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
   }
 
   function lanzarAlternarPermisos() {
-    // Mantenemos tu comprobación de seguridad visual de la interfaz
     if(!verificarFiltroVisualHtml()) return;
     
-    // 💡 POP-UP: Abrimos una ventana emergente para que escribas o pegues cualquier correo libremente
     var correo = prompt("🛡️ GESTIÓN DE PERMISOS DEL PANEL\n\nIntroduce el correo electrónico (Gigas, Oni, dominio externo...) al que deseas OTORGAR o REVOCAR acceso:", "");
     
-    // Si pulsas Cancelar o lo dejas vacío, no hacemos nada y cerramos
     if(!correo) return;
     
     correo = correo.trim().toLowerCase();
     
-    // Validación básica de formato (debe tener un @ y un punto, sin importar de qué empresa sea)
     if(!correo.includes("@") || !correo.includes(".")) {
       return errAction("⚠️ El texto introducido no parece una dirección de correo válida.");
     }
     
-    // Confirmación final para evitar errores tipográficos antes de dar acceso
     if(!confirm("🛡️ ¿Confirmas que deseas cambiar los permisos de operación en el panel para esta cuenta?\n\n👉 " + correo)) return;
     
     showLog("⏳ Procesando permisos de seguridad para " + correo + "...");
     
-    // Enviamos el correo en crudo directamente a tu función maestra en el servidor (.gs)
     google.script.run
       .withSuccessHandler(endAction)
       .withFailureHandler(function(e){ errAction(e.message); })
@@ -1672,7 +2013,7 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
         html += "<tr class='main-row' style='cursor:pointer;' onclick=\"seleccionarFila('Papelera', '" + u.email + "', event)\">";
         html += "<td style='font-weight:bold; color:#38bdf8;'>" + u.email + "</td>";
         html += "<td>" + u.fechaBaja + "</td>";
-        html += "<td><span style='" + badgeStyle + "'>⏳ " + u.diasRestantes + " días restantes</span></td>";
+        html += "<td><span style='" + badgeStyle + "'>⏳ " + u.diasRestantes + " dias restantes</span></td>";
         html += "</tr>";
       });
       tbody.innerHTML = html;
@@ -1696,6 +2037,8 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
       var headers = Array.from(headersRow.children);
       var indice = headers.indexOf(th);
       
+      if (th.querySelector('#master-chk')) return;
+
       var esTablaCompleja = tabla.id === 'tabla-listas-gigas' || tabla.id === 'tabla-listas-oni'; 
 
       var ordenActual = th.getAttribute('data-orden') || 'desc';
@@ -1743,6 +2086,7 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
       }
     }
   });
+  
   function exportarTablaCSV(tipo) {
     var idTabla = (tipo === 'gigas') ? 'tabla-listas-gigas' : 'tabla-listas-oni';
     var nombreArchivo = (tipo === 'gigas') ? 'Listas_Gigas_Completo.csv' : 'Listas_ONI_Completo.csv';
@@ -1760,7 +2104,6 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
     }
     
     var csv = [];
-    // AÑADIMOS EL BOM (\uFEFF) Y LAS 5 COLUMNAS CLAVE PARA AUDITORÍA
     csv.push("Lista / Grupo;Email Corporativo;Volumen;Owner / Estado;Miembros");
     
     filas.forEach(function(fila) {
@@ -1771,11 +2114,9 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
             var vol    = celdas[2].innerText.replace(/"/g, '""').trim();
             var owner  = celdas[3].innerText.replace(/"/g, '""').trim();
             
-            // TRUCO DE SYSADMIN: Extraemos los miembros de la fila oculta del acordeón
             var miembros = "";
             var subFila = fila.nextElementSibling;
             if (subFila && subFila.classList.contains('sub-member-row')) {
-                // Cogemos únicamente el texto del correo, ignorando los iconos de corona y la X de borrar
                 var tags = subFila.querySelectorAll('.member-tag span:first-child');
                 var listaMiembros = [];
                 tags.forEach(function(tag) {
@@ -1783,7 +2124,6 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
                         listaMiembros.push(tag.innerText.trim());
                     }
                 });
-                // Los unimos por coma y espacio para que queden perfectos en una celda de Excel
                 miembros = listaMiembros.join(", ").replace(/"/g, '""');
             }
             
@@ -1791,7 +2131,6 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
         }
     });
     
-    // Descarga instantánea en 0 segundos
     var blob = new Blob(["\uFEFF" + csv.join("\n")], { type: 'text/csv;charset=utf-8;' });
     var url = URL.createObjectURL(blob);
     var link = document.createElement("a");
@@ -1801,10 +2140,9 @@ if (typeof IS_ADMIN_AUTHORIZED !== "undefined" && IS_ADMIN_AUTHORIZED) {
     link.click();
     document.body.removeChild(link);
 }
-// 1. Descarga una plantilla limpia lista para abrir en Excel
+
 function exportarPlantillaCuentas() {
     var csv = ["\uFEFFEmail Corporativo;Teléfono Trabajo;Departamento;Puesto / Título;Dirección Trabajo"];
-    // Añadimos una fila de ejemplo para que quede claro el formato
     csv.push('"usuario@tudominio.com";"+34 600000000";"IT";"Sistemas";"Calle Principal 1, Madrid"');
     
     var blob = new Blob([csv.join("\n")], { type: 'text/csv;charset=utf-8;' });
@@ -1817,7 +2155,6 @@ function exportarPlantillaCuentas() {
     document.body.removeChild(link);
 }
 
-// 2. Lee el archivo modificado y lo manda al servidor en segundo plano
 function procesarSubidaCSV(input) {
     var archivo = input.files[0];
     if (!archivo) return;
@@ -1828,12 +2165,10 @@ function procesarSubidaCSV(input) {
         var lineas = contenido.split(/\r\n|\n/);
         var datosParaSubir = [];
         
-        // Saltamos la fila 0 (las cabeceras) y procesamos el resto
         for (var i = 1; i < lineas.length; i++) {
             var linea = lineas[i].trim();
             if (!linea) continue;
             
-            // Detecta automáticamente si el Excel guardó con punto y coma (;) o coma (,)
             var separador = linea.includes(";") ? ";" : ",";
             var celdas = linea.split(separador).map(function(c) {
                 return c.replace(/^"|"$/g, '').trim();
@@ -1882,7 +2217,7 @@ function procesarSubidaCSV(input) {
     };
     lector.readAsText(archivo, "UTF-8");
 }
-// Descarga la foto actual de Google con todas las columnas rellenas
+
 function descargarFotoRRHH() {
     document.body.style.cursor = "wait";
     var btn = document.getElementById("btn-dl-rrhh");
@@ -1901,7 +2236,6 @@ function descargarFotoRRHH() {
                 csv.push(filaLimpiada.join(";"));
             });
             
-            // BOM \uFEFF para que Excel en España lea acentos y columnas sin romper nada
             var blob = new Blob(["\uFEFF" + csv.join("\n")], { type: 'text/csv;charset=utf-8;' });
             var url = URL.createObjectURL(blob);
             var link = document.createElement("a");
@@ -1919,7 +2253,6 @@ function descargarFotoRRHH() {
         .generarDatosRRHHCompleto();
 }
 
-// Lee el archivo de RRHH y envía los cambios al servidor
 function procesarSubidaRRHH(input) {
     var archivo = input.files[0];
     if (!archivo) return;
@@ -1935,7 +2268,6 @@ function procesarSubidaRRHH(input) {
             if (!linea) continue;
             
             var separador = linea.includes(";") ? ";" : ",";
-            // Resuelve correctamente comillas dentro de celdas CSV
             var celdas = linea.match(/(".*?"|[^";,]+)(?=\s*[;,]|\s*$)/g) || [];
             var celdasLimpias = celdas.map(function(c) {
                 return c.replace(/^"|"$/g, '').replace(/""/g, '"').trim();
@@ -1945,7 +2277,7 @@ function procesarSubidaRRHH(input) {
         }
         
         if (datosParaSubir.length <= 1) {
-            alert("⚠️ El archivo parece estar vacío o no tiene el formato correcto.");
+            alert("⚠️ El archivo parece estar vazio ou não tem o formato correto.");
             input.value = "";
             return;
         }
@@ -1980,250 +2312,22 @@ function procesarSubidaRRHH(input) {
     };
     lector.readAsText(archivo, "UTF-8");
 }
-// =========================================================================
-// CEREBRO CAMALEÓNICO: MODO CREAR VS MODO EDITAR
-// =========================================================================
-let MODO_PANEL_IDENTIDADES = 'CREAR'; 
-let EMAIL_USUARIO_EN_EDICION = null;
 
-function cambiarModoPanelIdentidades(modo, datos = {}) {
-  MODO_PANEL_IDENTIDADES = modo;
-  const btnAccion = document.getElementById('btn-accion-identidad');
-  
-  if (modo === 'EDITAR') {
-    EMAIL_USUARIO_EN_EDICION = datos.email;
-    
-    // Cambiamos el aspecto visual del botón
-    if (btnAccion) {
-      btnAccion.innerText = "💾 Guardar Cambios de " + datos.email;
-      btnAccion.style.background = "linear-gradient(135deg, #059669 0%, #0284c7 100%)";
-    }
-    
-    // Rellenamos las cajas con los datos del usuario
-    if (document.getElementById('creador-manager')) document.getElementById('creador-manager').value = datos.manager || '';
-    if (document.getElementById('creador-puesto')) document.getElementById('creador-puesto').value = datos.puesto || '';
-    if (document.getElementById('creador-departamento')) document.getElementById('creador-departamento').value = datos.departamento || '';
-    if (document.getElementById('creador-telefono')) document.getElementById('creador-telefono').value = datos.telefono || '';
-    if (document.getElementById('creador-pais')) document.getElementById('creador-pais').value = datos.pais || 'Spain';
-    if (document.getElementById('creador-email-personal')) document.getElementById('creador-email-personal').value = datos.emailPersonal || '';
-    if (document.getElementById('creador-grupo')) document.getElementById('creador-grupo').value = datos.grupo || '';
-    
-  } else {
-    // Restauramos a modo creación limpia
-    EMAIL_USUARIO_EN_EDICION = null;
-    if (btnAccion) {
-      btnAccion.innerText = "🚀 Crear Cuenta en Workspace y Excel";
-      btnAccion.style.background = "";
-    }
-    
-    if (document.getElementById('creador-manager')) document.getElementById('creador-manager').value = '';
-    if (document.getElementById('creador-puesto')) document.getElementById('creador-puesto').value = '';
-    if (document.getElementById('creador-departamento')) document.getElementById('creador-departamento').value = '';
-    if (document.getElementById('creador-telefono')) document.getElementById('creador-telefono').value = '';
-    if (document.getElementById('creador-pais')) document.getElementById('creador-pais').value = 'Spain';
-    if (document.getElementById('creador-email-personal')) document.getElementById('creador-email-personal').value = '';
-    if (document.getElementById('creador-grupo')) document.getElementById('creador-grupo').value = '';
-  }
-}
-
-function ejecutarAccionIdentidad() {
-                var btn = document.getElementById('btn-crear-identidad');
-                var txtOriginal = btn ? btn.innerHTML : "Procesando...";
-                if (btn) { btn.innerHTML = "⏳ Trabajando en Workspace..."; btn.disabled = true; }
-
-                // Recogemos TODOS los datos de las cajas de la derecha
-                var paqueteDatos = {
-                  email: EMAIL_USUARIO_EN_EDICION || (document.getElementById('creador-correo') ? document.getElementById('creador-correo').value.trim() : ""),
-                  nombre: document.getElementById('creador-nombre') ? document.getElementById('creador-nombre').value.trim() : "",
-                  apellidos: document.getElementById('creador-apellidos') ? document.getElementById('creador-apellidos').value.trim() : "",
-                  puesto: document.getElementById('creador-puesto') ? document.getElementById('creador-puesto').value.trim() : "",
-                  departamento: document.getElementById('creador-departamento') ? document.getElementById('creador-departamento').value.trim() : "",
-                  telefono: document.getElementById('creador-telefono') ? document.getElementById('creador-telefono').value.trim() : "",
-                  emailPersonal: document.getElementById('creador-recovery') ? document.getElementById('creador-recovery').value.trim() : "",
-                  grupo: document.getElementById('creador-grupo') ? document.getElementById('creador-grupo').value.trim() : ""
-                };
-
-                if (MODO_PANEL_IDENTIDADES === 'EDITAR') {
-                  // =========================================================
-                  // MODO MODIFICACIÓN: Actualiza perfil y mete en todas las listas
-                  // =========================================================
-                  google.script.run
-                    .withSuccessHandler(function(res) {
-                      if (btn) { btn.innerHTML = txtOriginal; btn.disabled = false; }
-                      alert("✅ ¡Cambios y listas guardados con éxito para " + paqueteDatos.email + "!");
-                      cambiarModoPanelIdentidades('CREAR');
-                    })
-                    .withFailureHandler(function(err) {
-                      if (btn) { btn.innerHTML = txtOriginal; btn.disabled = false; }
-                      alert("❌ Error al modificar: " + err);
-                    })
-                    .actualizarUsuarioGoogleEnriquecido(paqueteDatos);
-
-                } else {
-                  // =========================================================
-                  // MODO ALTA (EL COMBO NINJA): Crea el usuario y luego lo enriquece
-                  // =========================================================
-                  // 1. Primero llamamos a tu función de creación normal si existe
-                  if (typeof ejecutarCreacionAvanzada === "function") {
-                    ejecutarCreacionAvanzada();
-                  }
-
-                  // 2. Y al mismo tiempo, le damos 2 segundos a Google para que cree la cuenta
-                  // y disparándole por detrás toda la inyección de listas y teléfono:
-                  setTimeout(function() {
-                    // Si el correo del alta se escribió en la caja, lo cogemos
-                    var correoNuevo = document.getElementById('creador-correo') ? document.getElementById('creador-correo').value.trim() : "";
-                    if (correoNuevo && correoNuevo.includes("@")) {
-                      paqueteDatos.email = correoNuevo;
-                      google.script.run.actualizarUsuarioGoogleEnriquecido(paqueteDatos);
-                    }
-                  }, 2500);
-                }
-              }
-// =========================================================================
-// ⭐ FILTRO FRANCOTIRADOR: INVENTARIO DE LISTAS POR USUARIO ⭐
-// =========================================================================
-function filtrarInventarioPorUsuario(correo) {
-  // Seleccionamos todas las filas principales de las listas de Gigas y ONI
-  const filasPrincipales = document.querySelectorAll('#tabla-listas-gigas-body .main-row, #tabla-listas-oni-body .main-row');
-  
-  // Si no hay correo o está vacío, mostramos las 285 listas de nuevo
-  if (!correo || correo.trim() === "") {
-    filasPrincipales.forEach(fila => {
-      fila.style.display = "";
-      const filaMiembros = fila.nextElementSibling;
-      if (filaMiembros && filaMiembros.classList.contains('sub-member-row')) {
-        filaMiembros.style.display = "none"; // Dejamos los desplegables cerrados
-      }
-    });
-    return;
-  }
-  
-  const emailBuscado = correo.toLowerCase().trim();
-  
-  // Recorremos lista por lista comprobando si el usuario es miembro u Owner
-  filasPrincipales.forEach(fila => {
-    const filaMiembros = fila.nextElementSibling;
-    // Unimos el texto de la fila principal (Owner/Nombre) y el desplegable de miembros
-    const textoTotal = (fila.textContent + " " + (filaMiembros ? filaMiembros.textContent : "")).toLowerCase();
-    
-    if (textoTotal.includes(emailBuscado)) {
-      fila.style.display = ""; // ¡Coincidencia! Mostramos esta lista
-    } else {
-      fila.style.display = "none"; // No pertenece: ocultamos la lista
-      if (filaMiembros) filaMiembros.style.display = "none"; 
-    }
-  });
-}
-// =========================================================================
-// 🚀 PILOTO AUTOMÁTICO: CARGA INICIAL SILENCIOSA
-// =========================================================================
-window.addEventListener('DOMContentLoaded', function() {
-  // Le damos 1 segundo de cortesía al navegador para que levante la interfaz
-  setTimeout(function() {
-    // Sustituye 'refrescarListas' por el nombre real que tenga tu botón azul:
-    if (typeof refrescarListas === "function") {
-      refrescarListas();
-    } else if (typeof cargarInventario === "function") {
-      cargarInventario();
-    }
-  }, 1000);
-});
-function ejecutarTraspasoDrive() {
-  var origen = document.getElementById('traspaso-origen') ? document.getElementById('traspaso-origen').value.trim() : "";
-  var destino = document.getElementById('traspaso-destino') ? document.getElementById('traspaso-destino').value.trim() : "";
-  var btn = document.getElementById('btn-traspaso-drive');
-  var txtOriginal = btn ? btn.innerHTML : "🔀 Iniciar Traspaso de Drive";
-
-  if (!origen || !destino) {
-    alert("⚠️ Por favor, escribe el correo de origen y el de destino.");
-    return;
-  }
-
-  if (confirm("¿Confirmas el traspaso de TODOS los archivos de Drive de:\n\n👤 ORIGEN: " + origen + "\n🎯 DESTINO: " + destino + "?\n\n(Es un proceso seguro: los archivos no se borran, solo cambian de propietario en segundo plano).")) {
-    if (btn) { btn.innerHTML = "⏳ Procesando en Google..."; btn.disabled = true; }
-    google.script.run
-      .withSuccessHandler(function(res) {
-        if (btn) { btn.innerHTML = txtOriginal; btn.disabled = false; }
-        if (res.exito) { alert("✅ ¡ÉXITO!\n\n" + res.mensaje); } 
-        else { alert("❌ ERROR: " + res.error); }
-      })
-      .withFailureHandler(function(err) {
-        if (btn) { btn.innerHTML = txtOriginal; btn.disabled = false; }
-        alert("❌ Error de comunicación con el servidor: " + err);
-      })
-      .traspasarPropiedadDrive(origen, destino);
-  }
-}
-
-  function cerrarYLimpiarPanel(evento, idPanel) {
-  if (evento) evento.stopPropagation();
-  
-  var panel = document.getElementById(idPanel);
-  if (!panel) return;
-
-  // Cerramos la tarjeta
-  panel.classList.add('collapsed');
-
-  // Vaciamos los campos de texto
-  var inputs = panel.querySelectorAll('input');
-  inputs.forEach(function(input) {
-    input.value = '';
-  });
-}
-  // Espía de arranque: Espera a tener permisos para cargar las listas
-window.addEventListener('load', function() {
-  var vigilarPermisos = setInterval(function() {
-    // Si la llave de permisos ya está encendida (true)...
-    if (typeof IS_ADMIN_AUTHORIZED !== 'undefined' && IS_ADMIN_AUTHORIZED === true) {
-      clearInterval(vigilarPermisos); // Detenemos al espía para que no consuma memoria
-      lanzarRefrescarSoloListas();    // ¡Cargamos las listas automáticamente!
-    }
-  }, 300); // Comprueba en silencio cada 300 milisegundos
-});
-  function mostrarPopUpBuscador(texto) {
-  var viejoPop = document.getElementById('pop-buscador-flotante');
-  if(viejoPop) viejoPop.remove();
-
-  var pop = document.createElement('div');
-  pop.id = 'pop-buscador-flotante';
-  pop.innerHTML = "⚠️ " + texto;
-  
-  pop.style.cssText = "position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background-color: #ef4444; color: white; padding: 12px 24px; border-radius: 8px; z-index: 9999; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); font-family: sans-serif; font-size: 14px; font-weight: 500; transition: opacity 0.4s ease;";
-  
-  document.body.appendChild(pop);
-
-  setTimeout(function() {
-    pop.style.opacity = '0';
-    setTimeout(function() { 
-      if(pop.parentNode) pop.remove(); 
-    }, 400); 
-  }, 3000);
-}
-  // Cerrar todos los paneles centrales automáticamente al iniciar
-window.addEventListener('DOMContentLoaded', function() {
-  var todosLosPaneles = document.querySelectorAll('.card');
-  todosLosPaneles.forEach(function(panel) {
-    panel.classList.add('collapsed');
-  });
-});
-// ========================================================
+  // ========================================================
   // 🛡️ CARGA DE SEGURIDAD Y PANTALLA DE BLOQUEO
   // ========================================================
   document.addEventListener("DOMContentLoaded", function() {
     
     google.script.run.withSuccessHandler(function(usuario) {
       
-      // 🚨 1. SI NO ESTÁ AUTORIZADO (Escudo a prueba de fallos)
       if (!usuario.autorizado) {
         var escudo = document.createElement("div");
         escudo.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:#0f172a; z-index:999999; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px;";
         escudo.innerHTML = "<h1 style='color:#ef4444; font-family:sans-serif; margin-bottom:10px; font-size: 32px;'>⚠️ ACCESO DENEGADO</h1><h3 style='color:#cbd5e1; font-family:sans-serif; font-weight:normal;'>El sistema ha detectado el correo:<br><br><b style='color:#38bdf8; font-size:24px; padding: 10px; background:#1e293b; border-radius:8px; border:1px solid #334155;'>" + usuario.email + "</b><br><br>y no tiene permisos operativos.</h3><p style='color:#64748b; margin-top:20px;'>Si el correo es correcto, contacta con el SuperAdministrador para que te dé de alta.</p>";
         document.body.appendChild(escudo);
-        return; // Cortamos la ejecución aquí
+        return; 
       }
 
-      // 👑 2. MOSTRAR EL ROL AL LADO DEL CORREO (Si entra)
       var contenedorUsuario = document.getElementById("display-user-email"); 
       if (contenedorUsuario) {
         var colorBadge = (usuario.rol === "ADMIN") ? "#e11d48" : "#2563eb"; 
@@ -2244,10 +2348,146 @@ window.addEventListener('DOMContentLoaded', function() {
         
         var btnPermisos = document.getElementById("btn-seguridad-panel");
         if (btnPermisos) btnPermisos.style.display = "none";
+
+        var botonesAdmin = [
+          "lanzarCampanaHuerfanas()", 
+          "lanzarProcesarRespuestas()", 
+          "lanzarEscanerMaestra()", 
+          "lanzarBorradoListaTotal()"
+        ];
+        botonesAdmin.forEach(function(accion) {
+          var btn = document.querySelector('button[onclick="' + accion + '"]');
+          if (btn) btn.style.display = "none";
+        });
+
+        var btnDLRRHH = document.getElementById("btn-dl-rrhh");
+        if (btnDLRRHH) {
+          var contenedorRRHH = btnDLRRHH.closest("div[style*='margin: 16px 0']");
+          if (contenedorRRHH) contenedorRRHH.style.display = "none";
+        }
       }
 
     }).obtenerDetalleUsuarioActivo();
   });
+
+  // ========================================================
+  // 🛡️ ESCUDO ANTI-CURIOSOS (Solo para Operadores)
+  // ========================================================
+  document.addEventListener('contextmenu', function(e) {
+    if (!IS_ADMIN_AUTHORIZED) {
+      e.preventDefault(); 
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (IS_ADMIN_AUTHORIZED) return;
+
+    if (e.key === 'F12' || e.keyCode === 123) {
+      e.preventDefault();
+      return false;
+    }
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+      e.preventDefault();
+      return false;
+    }
+    if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
+      e.preventDefault();
+      return false;
+    }
+  });
+  // ========================================================
+  // 📜 FASE 7: CONTROLADORES DE AUDITORÍA
+  // ========================================================
+  function cargarAuditoriaLogs() {
+    var tbody = document.getElementById('tabla-auditoria-body');
+    tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; font-weight:bold; color:#38bdf8;'>⏳ Cargando los últimos eventos...</td></tr>";
+    
+    google.script.run.withSuccessHandler(function(res) {
+      var filas = JSON.parse(res);
+      if(filas.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No hay registros en el historial todavía.</td></tr>";
+        return;
+      }
+      
+      var html = "";
+      filas.forEach(function(f) {
+        // Colorear según la acción
+        var colorAccion = "#38bdf8"; // Azul por defecto
+        var txtAccion = String(f[2]).toUpperCase();
+        if(txtAccion.includes("BAJA") || txtAccion.includes("ELIMINAR") || txtAccion.includes("BORRAR") || txtAccion.includes("REVOCAR") || txtAccion.includes("PURGA") || txtAccion.includes("SUSPENDER")) colorAccion = "#ef4444";
+        else if(txtAccion.includes("ALTA") || txtAccion.includes("AÑADIR") || txtAccion.includes("RECUPERAR") || txtAccion.includes("CONCEDER") || txtAccion.includes("ACTIVAR")) colorAccion = "#10b981";
+        else if(txtAccion.includes("MANAGER") || txtAccion.includes("OU") || txtAccion.includes("LICENCIA") || txtAccion.includes("OWNER")) colorAccion = "#f59e0b";
+        
+        html += "<tr>";
+        html += "<td style='color:#94a3b8; font-size:12px; white-space:nowrap;'>" + f[0] + "</td>";
+        html += "<td style='font-weight:bold;'>" + f[1] + "</td>";
+        html += "<td style='color:" + colorAccion + "; font-weight:bold;'>" + f[2] + "</td>";
+        html += "<td style='font-family:monospace; font-size:12px;'>" + f[3] + "</td>";
+        html += "</tr>";
+      });
+      tbody.innerHTML = html;
+    }).withFailureHandler(function(e) {
+      tbody.innerHTML = "<tr><td colspan='4' style='color:#ef4444; text-align:center; font-weight:bold;'>⚠️ Fallo al conectar con el registro.</td></tr>";
+    }).webObtenerHistorialLogsBreve();
+  }
+  
+  function descargarAuditoriaCompleta() {
+    showLog("⏳ Preparando y procesando la descarga de todo el historial...");
+    google.script.run.withSuccessHandler(function(res) {
+      var matriz = JSON.parse(res);
+      if(matriz.length <= 1) return errAction("El historial está vacío.");
+      
+      var csv = [];
+      csv.push("\uFEFF"); // Identificador UTF-8 para que Excel lea las tildes
+      matriz.forEach(function(fila) {
+        var filaData = [];
+        fila.forEach(function(celda) {
+          var texto = String(celda || "").replace(/"/g, '""');
+          filaData.push('"' + texto + '"');
+        });
+        csv.push(filaData.join(";"));
+      });
+      
+      var blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" }); 
+      var enlace = document.createElement("a"); 
+      
+      var hoy = new Date();
+      var fechaLabel = hoy.getFullYear() + "-" + ("0"+(hoy.getMonth()+1)).slice(-2) + "-" + ("0"+hoy.getDate()).slice(-2);
+      
+      enlace.href = URL.createObjectURL(blob); 
+      enlace.setAttribute("download", "Gigas_Auditoria_Global_" + fechaLabel + ".csv"); 
+      document.body.appendChild(enlace); 
+      enlace.click(); 
+      document.body.removeChild(enlace);
+      endAction("¡Historial descargado correctamente!");
+    }).withFailureHandler(function(e){ errAction(e.message); }).webObtenerHistorialLogsCompletoCSV();
+  }
+  // Control del botón de Traspaso Drive Manual
+  function ejecutarTraspasoDrive() {
+    if(!verificarFiltroVisualHtml()) return;
+    
+    var o = document.getElementById('traspaso-origen').value.trim().toLowerCase();
+    var d = document.getElementById('traspaso-destino').value.trim().toLowerCase();
+    
+    if(!o || !d) return errAction("Rellena el correo de origen y el de destino en la caja de traspaso.");
+    if(!confirm("📦 ¿INICIAR TRASPASO DE DRIVE?\n\nDe: " + o + "\nA: " + d + "\n\nSe enviará la orden a Google. Recibirás un email cuando el proceso haya terminado por completo para que puedas dar la cuenta de baja.")) return;
+    
+    showLog("⏳ Configurando el traspaso e instalando radar...");
+    
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (res.exito) {
+          // Limpiamos las cajitas tras el éxito
+          document.getElementById('traspaso-origen').value = "";
+          document.getElementById('traspaso-destino').value = "";
+          endAction(res.mensaje);
+        } else {
+          errAction(res.error);
+        }
+      })
+      .withFailureHandler(function(e) { errAction(e.message); })
+      .traspasarPropiedadDrive(o, d);
+  }
 </script>
 </body>
 </html>
