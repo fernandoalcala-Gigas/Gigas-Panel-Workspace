@@ -364,7 +364,7 @@ function obtenerDatosDashboard() {
   var actuales = 0; var anteriores = 0;
   var historialAgrupado = {}; 
   var mapaLogons = {};
-  var inactivas90 = 0; // CONTADOR FASE 5
+  var inactivas90 = 0;
   
   var asignadasStarter = 0;
   var asignadasStandard = 0;
@@ -431,18 +431,15 @@ function obtenerDatosDashboard() {
             var d = new Date(loginTime);
             valLogin = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear();
             
-            // FASE 5: Lógica de más de 90 días sin loguear
             if (Math.floor((hoy.getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) > 90) {
                inactivoLogon = true;
             }
           } else {
-             // Si nunca ha entrado, pero se creó hace más de 90 días, también cuenta como inactivo
              if (Math.floor((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24)) > 90) {
                inactivoLogon = true;
              }
           }
           
-          // Solo contamos las inactivas si no están ya suspendidas (para evitar ruido)
           if (inactivoLogon && !response.users[i].suspended) {
              inactivas90++;
           }
@@ -463,7 +460,6 @@ function obtenerDatosDashboard() {
     graficaHistorico.push([mesLabel, historialAgrupado[historialKeys[k]]]);
   }
 
-  // FASE 5: Añadimos columna virtual de inactividad
   if (base.headers.length > 0) {
     var emailIdx = -1; var logonIdx = -1; var inacIdx = -1;
     for(var h = 0; h < base.headers.length; h++) {
@@ -496,7 +492,7 @@ function obtenerDatosDashboard() {
     fechaSincro: dl.fechaListas, metricasGrupos: dl.metricasGrupos, 
     baseCuentas: base, baseServicios: serv, 
     crecimiento: { actual: actuales, anterior: anteriores, historico: graficaHistorico },
-    inactivas90: inactivas90 // FASE 5: Pasamos el dato al UI
+    inactivas90: inactivas90
   });
 }
 
@@ -511,7 +507,7 @@ function webEjecutarFlujoBajaTotal(correoBaja, managerDestino, crearAlias, trans
   verificarPermisoAdmin();
   var semaforo = LockService.getScriptLock();
   try {
-    semaforo.waitLock(30000); // 30 segundos de espera máxima si está ocupado
+    semaforo.waitLock(30000);
   } catch (e) {
     throw new Error("⚠️ El sistema está muy ocupado sincronizando el Excel. Por favor, espera un minuto y vuelve a intentarlo.");
   }
@@ -740,10 +736,9 @@ function webCambiarEstadoCuenta(u, s) {
 function webBotonActualizarGrupos() {
   verificarPermisoEjecucion();
   
-  // 🚥 INYECTAMOS EL SEMÁFORO
   var semaforo = LockService.getScriptLock();
   try {
-    semaforo.waitLock(30000); // Intenta esperar 30 segundos
+    semaforo.waitLock(30000);
   } catch (e) {
     return "⚠️ Error: El sistema de la Hoja de Excel está bloqueado porque alguien más está escribiendo ahora mismo. Por favor, inténtalo de nuevo en unos minutos.";
   }
@@ -787,7 +782,7 @@ function webBotonActualizarGrupos() {
               givenName: u.name ? u.name.givenName : "",
               familyName: u.name ? u.name.familyName : "",
               visitado: false,
-              licencia: "Cloud Identity Free", // Valor por defecto
+              licencia: "Cloud Identity Free",
               ou: u.orgUnitPath || "/"
             };
           }
@@ -921,7 +916,6 @@ function webBotonActualizarGrupos() {
     return msgListas + "🔄 Sincronización Completada. Bajas purgadas: " + filasBorradas + ". Altas insertadas: " + filasInsertadas + ". Cambios: " + contadorCambiosEstado + " estados, " + contadorCambiosLicencia + " licencias, " + contadorCambiosOu + " OUs.";
   
   } finally {
-    // 🚥 IMPORTANTE: Liberamos el semáforo ocurra lo que ocurra
     semaforo.releaseLock();
   }
 }
@@ -1063,7 +1057,6 @@ function webBorrarMiembroLista(g, u) {
 function webCrearUsuarioAvanzado(datos) {
   verificarPermisoEjecucion();
 
-  // 🚥 INYECTAMOS EL SEMÁFORO DE ESCRITURA
   var semaforo = LockService.getScriptLock();
   try {
     semaforo.waitLock(30000); 
@@ -1177,7 +1170,6 @@ function webCrearUsuarioAvanzado(datos) {
   } catch (error) { 
     return { exito: false, error: error.message }; 
   } finally {
-    // 🚥 IMPORTANTE: Liberamos el semáforo
     semaforo.releaseLock();
   }
 }
@@ -1185,7 +1177,6 @@ function webCrearUsuarioAvanzado(datos) {
 function webCrearListaDistribucion(datos) {
   verificarPermisoEjecucion();
   
-  // 🚥 SEMÁFORO DE ESCRITURA PARA EVITAR CHOQUES CON LA SINCRONIZACIÓN
   var semaforo = LockService.getScriptLock();
   try {
     semaforo.waitLock(30000);
@@ -2324,197 +2315,222 @@ function procesarSubidaRRHHBackend(filasCSV) {
   return resultados;
 }
 
-function crearCuentaGoogleEnriquecida(datos) {
-  verificarPermisoEjecucion();
+// =========================================================
+// ⚡ FASE 6: ACCIONES MASIVAS
+// =========================================================
 
-  // 🚥 INYECTAMOS EL SEMÁFORO DE ESCRITURA
+function webEjecutarAccionMasiva(loteDatos) {
+  verificarPermisoEjecucion();
+  
+  var correos = loteDatos.correos || [];
+  var accion = loteDatos.accion; // "SUSPENDER", "ACTIVAR", "MOVER_OU"
+  var parametro = loteDatos.parametro || "";
+  
+  if (correos.length === 0) throw new Error("No hay cuentas seleccionadas para la acción masiva.");
+  
   var semaforo = LockService.getScriptLock();
   try {
-    semaforo.waitLock(30000); 
+    semaforo.waitLock(30000);
   } catch (e) {
-    return { exito: false, error: "⚠️ El sistema está muy ocupado sincronizando. Espera unos segundos y vuelve a pulsar el botón de crear." };
+    throw new Error("⚠️ El sistema está ocupado. Intenta de nuevo en unos segundos.");
   }
 
   try {
-    var aliasLimpio = datos.alias.trim().toLowerCase().replace(/\s+/g, '');
-    var emailCompleto = aliasLimpio + "@" + datos.dominio.trim().toLowerCase();
-    var passwordGenerada = Math.random().toString(36).slice(-8) + "Gigs26!";
-    var given = datos.nombre ? datos.nombre.trim() : aliasLimpio;
-    var family = datos.apellido ? datos.apellido.trim() : datos.tipo;
-    var ouDestino = datos.ou ? datos.ou.trim() : "/";
-    var nuevoUsuario = { primaryEmail: emailCompleto, name: { givenName: given, familyName: family }, password: passwordGenerada, changePasswordAtNextLogin: true, orgUnitPath: ouDestino };
-    if (datos.manager) nuevoUsuario.relations = [{ type: "manager", value: datos.manager.trim() }];
+    var resultados = { exitosos: 0, errores: 0, detalles: [] };
     
-    AdminDirectory.Users.insert(nuevoUsuario);
-    registrarEnHistorial("ALTA USUARIO", "Cuenta: " + emailCompleto + " | Tipo: " + datos.tipo + " | Licencia asignada: " + datos.licencia + " | OU Destino: " + ouDestino);
-    
-    var msgLicencia = "✅ Licencia asignada correctamente";
-    
-    if (datos.licencia && datos.licencia !== "Cloud Identity Free") {
+    // 1. Ejecutar en Workspace
+    for (var i = 0; i < correos.length; i++) {
+      var email = correos[i].toLowerCase().trim();
       try {
-        var skuMap = {
-          "Google Workspace Business Starter": "1010020027",
-          "Google Workspace Enterprise Standard": "1010020026",
-          "Google Workspace Enterprise Plus": "1010020020"
-        };
-        
-        var skuId = skuMap[datos.licencia];
-        if (!skuId) {
-          throw new Error("El nombre de la licencia no coincide con el skuMap: " + datos.licencia);
+        if (accion === "SUSPENDER") {
+          AdminDirectory.Users.update({ suspended: true }, email);
+        } else if (accion === "ACTIVAR") {
+          AdminDirectory.Users.update({ suspended: false }, email);
+        } else if (accion === "MOVER_OU") {
+          AdminDirectory.Users.update({ orgUnitPath: parametro }, email);
         }
-
-        var asignado = false;
-        var ultimoError = "";
+        resultados.exitosos++;
+      } catch (err) {
+        resultados.errores++;
+        resultados.detalles.push(email + ": " + err.message);
+      }
+      Utilities.sleep(300); // Pausa de seguridad para la API
+    }
+    
+    // 2. Intentar actualizar Hoja Maestra si no es cambio de licencia (ese ya lo hace por sí solo si lo conectamos)
+    try {
+      var ss = SpreadsheetApp.getActiveSpreadsheet();
+      var hoja = ss.getSheetByName("Hoja Maestra (657)");
+      if (hoja) {
+        var data = hoja.getDataRange().getValues();
+        var headers = data[0].map(function(h) { return String(h).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); });
+        var idxEmail = headers.indexOf("email address"); if(idxEmail === -1) idxEmail = headers.indexOf("email");
+        var idxStatus = headers.indexOf("status [read only]"); if(idxStatus === -1) idxStatus = headers.indexOf("status"); if(idxStatus === -1) idxStatus = headers.indexOf("estado");
+        var idxOu = headers.indexOf("ou"); if(idxOu === -1) idxOu = headers.indexOf("unidad organizativa");
         
-        for (var i = 0; i < 4; i++) {
-          Utilities.sleep(3000); 
-          try {
-            AdminLicenseManager.LicenseAssignments.insert({ userId: emailCompleto }, "Google-Apps", skuId);
-            asignado = true;
-            break; 
-          } catch(err) {
-            ultimoError = err.message;
+        if (idxEmail > -1) {
+          for (var r = 1; r < data.length; r++) {
+            var cellEmail = String(data[r][idxEmail]).toLowerCase().trim();
+            if (correos.includes(cellEmail)) {
+              if (accion === "SUSPENDER" && idxStatus > -1) hoja.getRange(r + 1, idxStatus + 1).setValue("Suspended");
+              if (accion === "ACTIVAR" && idxStatus > -1) hoja.getRange(r + 1, idxStatus + 1).setValue("Active");
+              if (accion === "MOVER_OU" && idxOu > -1) hoja.getRange(r + 1, idxOu + 1).setValue(parametro);
+            }
           }
         }
-        
-        if (!asignado) {
-          msgLicencia = "⚠️ Cuenta creada, pero falló la asignación tras 4 intentos: " + ultimoError;
-        }
-
-      } catch(eLic) {
-        msgLicencia = "⚠️ Error crítico de licencia: " + eLic.message;
       }
-    } else {
-      msgLicencia = "☁️ Se asignó Cloud Identity Free (Por defecto)";
+    } catch (eExcel) {
+      resultados.detalles.push("Aviso BBDD: No se pudo sincronizar el Excel automáticamente (" + eExcel.message + ")");
     }
     
-    var libro = SpreadsheetApp.getActiveSpreadsheet(); 
-    var hojaDestino = libro.getSheetByName("Hoja Maestra (657)") || libro.getSheetByName("HOJA MAESTRA 657") || libro.getSheets()[0];
+    registrarEnHistorial("ACCIÓN MASIVA: " + accion, "Aplicado a " + resultados.exitosos + " cuentas. Parametro: " + (parametro || "N/A"));
+    return resultados;
     
-    if (hojaDestino) {
-      var allData = hojaDestino.getDataRange().getValues();
-      var cabeceras = allData[0]; 
-      var nuevaFila = new Array(cabeceras.length).fill("");
-      var colOrigenIdx = -1;
-
-      var origenText = "";
-      var palabraClave = "";
-      if (datos.tipo === "Nominativa") { origenText = "Cuentas nominativas de Gigas"; palabraClave = "nominativa"; }
-      else if (datos.tipo === "TPartner") { origenText = "Cuentas TPartner"; palabraClave = "tpartner"; }
-      else if (datos.tipo === "Kayako") { origenText = "Cuentas Kayako"; palabraClave = "kayako"; }
-      else if (datos.tipo === "Externa") { origenText = "Cuentas asesorgigas"; palabraClave = "asesorgigas"; }
-      else if (datos.tipo === "Onmovil") { origenText = "Cuentas Onmovil"; palabraClave = "onmovil"; }
-      else if (datos.tipo === "Servicio") { origenText = "Cuentas de servicio Gigas"; palabraClave = "servicio"; }
-      else { origenText = datos.tipo; palabraClave = datos.tipo.toLowerCase(); }
-
-      for (var c = 0; c < cabeceras.length; c++) {
-        var head = String(cabeceras[c]).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        if (head.includes("email") || head.includes("correo")) nuevaFila[c] = emailCompleto;
-        else if (head.includes("manager") || head.includes("responsable")) nuevaFila[c] = datos.manager.trim();
-        else if (head.includes("status") || head.includes("estado")) nuevaFila[c] = "Active"; 
-        else if (head.includes("origen") || head.includes("hoja de origen")) { nuevaFila[c] = origenText; colOrigenIdx = c; }
-        else if (head.includes("first name") || head.includes("firstname") || head === "nombre") nuevaFila[c] = given;
-        else if (head.includes("last name") || head.includes("lastname") || head === "apellido" || head.includes("apellidos")) nuevaFila[c] = family;
-        else if (head.includes("motivo") || head.includes("servicio") || head.includes("dedicacion")) nuevaFila[c] = datos.motivo || "";
-        else if (head === "ou" || head.includes("unidad") || head.includes("orgunit")) nuevaFila[c] = ouDestino;
-        else if (head.includes("licencia")) nuevaFila[c] = datos.licencia;
-      }
-
-      var filaInsercion = -1;
-      if (colOrigenIdx !== -1) {
-        for (var f = allData.length - 1; f >= 1; f--) {
-          if (String(allData[f][colOrigenIdx]).toLowerCase().includes(palabraClave)) { filaInsercion = f + 1; break; }
-        }
-      }
-      
-      if (filaInsercion !== -1) {
-        hojaDestino.insertRowAfter(filaInsercion);
-        hojaDestino.getRange(filaInsercion + 1, 1, 1, cabeceras.length).setValues([nuevaFila]);
-        var rule = hojaDestino.getRange(filaInsercion, 1, 1, cabeceras.length).getDataValidations();
-        hojaDestino.getRange(filaInsercion + 1, 1, 1, cabeceras.length).setDataValidations(rule);
-        hojaDestino.getRange(filaInsercion, 1, 1, cabeceras.length).copyTo(hojaDestino.getRange(filaInsercion + 1, 1, 1, cabeceras.length), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
-      } else {
-        hojaDestino.appendRow(nuevaFila);
-      }
-    }
-    return { exito: true, email: emailCompleto, pass: passwordGenerada, msgLic: msgLicencia, hoja: hojaDestino.getName() };
-  } catch (error) { 
-    return { exito: false, error: error.message }; 
   } finally {
-    // 🚥 IMPORTANTE: Liberamos el semáforo
     semaforo.releaseLock();
   }
 }
 
-function actualizarUsuarioGoogleEnriquecido(datos) {
-  verificarPermisoEjecucion();
-  try {
-    var correo = datos.email.toLowerCase().trim();
-    
-    var userPatch = {};
-    if (datos.puesto || datos.departamento) {
-      userPatch.organizations = [{
-        title: datos.puesto || "",
-        department: datos.departamento || "",
-        primary: true
-      }];
-    }
-    if (datos.telefono) {
-      userPatch.phones = [{ value: datos.telefono, type: "work", primary: true }];
-    }
-    if (datos.emailPersonal) {
-      userPatch.recoveryEmail = datos.emailPersonal;
-    }
-    if (datos.nombre || datos.apellidos) {
-      userPatch.name = {
-        givenName: datos.nombre || "",
-        familyName: datos.apellidos || ""
-      };
-    }
-    
-    if (Object.keys(userPatch).length > 0) {
-      AdminDirectory.Users.update(userPatch, correo);
-    }
-    
-    var advertencias = "";
+// =========================================================
+// ⚡ FASE 6: ACCIONES MASIVAS
+// =========================================================
 
-    if (datos.grupo && datos.grupo.trim() !== "") {
-      var listas = datos.grupo.split(",");
-      
-      // ⏳ PAUSA INTELIGENTE: 7 segundos para que Google asimile la nueva cuenta
-      Utilities.sleep(7000); 
-      
-      for (var i = 0; i < listas.length; i++) {
-        var emailLista = listas[i].trim().toLowerCase();
-        if (emailLista.includes("@")) {
-          var insertado = false;
-          
-          // Intentamos insertarlo hasta 2 veces si hay lag en Google
-          for (var intento = 0; intento < 2; intento++) {
-            try {
-              AdminDirectory.Members.insert({
-                email: correo,
-                role: "MEMBER"
-              }, emailLista);
-              insertado = true;
-              break; 
-            } catch(eGrupo) {
-              if (intento === 0) Utilities.sleep(3000); // Pausa extra si el primer intento falla
-            }
-          }
-          
-          if (!insertado) {
-            advertencias += "⚠️ Fallo propagación en: " + emailLista;
-          }
+function webEjecutarAccionMasiva(loteDatos) {
+  verificarPermisoEjecucion();
+  
+  var correos = loteDatos.correos || [];
+  var accion = loteDatos.accion; // "SUSPENDER", "ACTIVAR", "MOVER_OU", "ASIGNAR_LICENCIA", "ANADIR_GRUPO"
+  var parametro = loteDatos.parametro || "";
+  
+  if (correos.length === 0) throw new Error("No hay cuentas seleccionadas para la acción masiva.");
+  
+  var semaforo = LockService.getScriptLock();
+  try {
+    semaforo.waitLock(30000);
+  } catch (e) {
+    throw new Error("⚠️ El sistema está ocupado. Intenta de nuevo en unos segundos.");
+  }
+
+  try {
+    var resultados = { exitosos: 0, errores: 0, detalles: [] };
+    
+    var skuMap = {
+      "Google Workspace Business Starter": { sku: "1010020027", prod: "Google-Apps" },
+      "Google Workspace Enterprise Standard": { sku: "1010020026", prod: "Google-Apps" },
+      "Google Workspace Enterprise Plus": { sku: "1010020020", prod: "Google-Apps" },
+      "Cloud Identity Free": { sku: "1010310002", prod: "Cloudidentity" }
+    };
+    var configLic = null;
+    
+    if (accion === "ASIGNAR_LICENCIA") {
+      configLic = skuMap[parametro];
+      if (!configLic) throw new Error("Licencia no reconocida: " + parametro);
+    }
+    
+    // 1. Ejecutar en Workspace
+    for (var i = 0; i < correos.length; i++) {
+      var email = correos[i].toLowerCase().trim();
+      try {
+        if (accion === "SUSPENDER") {
+          AdminDirectory.Users.update({ suspended: true }, email);
+        } else if (accion === "ACTIVAR") {
+          AdminDirectory.Users.update({ suspended: false }, email);
+        } else if (accion === "MOVER_OU") {
+          AdminDirectory.Users.update({ orgUnitPath: parametro }, email);
+        } else if (accion === "ASIGNAR_LICENCIA") {
+          try { AdminLicenseManager.LicenseAssignments.remove("Google-Apps", "1010020027", email); } catch(e){}
+          try { AdminLicenseManager.LicenseAssignments.remove("Google-Apps", "1010020026", email); } catch(e){}
+          try { AdminLicenseManager.LicenseAssignments.remove("Google-Apps", "1010020020", email); } catch(e){}
+          AdminLicenseManager.LicenseAssignments.insert({ userId: email }, configLic.prod, configLic.sku);
+        } else if (accion === "ANADIR_GRUPO") {
+          AdminDirectory.Members.insert({ email: email, role: "MEMBER" }, parametro.toLowerCase().trim());
+        }
+        resultados.exitosos++;
+      } catch (err) {
+        if (accion === "ANADIR_GRUPO" && err.message && err.message.includes("Member already exists")) {
+          resultados.exitosos++; // Lo damos por bueno si ya estaba dentro
+        } else {
+          resultados.errores++;
+          resultados.detalles.push(email + ": " + err.message);
         }
       }
+      Utilities.sleep(300); // Pausa de seguridad para la API de Google
     }
     
-    return { exito: true, mensaje: advertencias };
-  } catch(e) {
-    return { exito: false, error: e.toString() };
+    // 2. Intentar actualizar Hoja Maestra si aplica
+    if (accion !== "ANADIR_GRUPO") {
+        try {
+          var ss = SpreadsheetApp.getActiveSpreadsheet();
+          var hoja = ss.getSheetByName("Hoja Maestra (657)");
+          if (hoja) {
+            var data = hoja.getDataRange().getValues();
+            var headers = data[0].map(function(h) { return String(h).toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); });
+            var idxEmail = headers.indexOf("email address"); if(idxEmail === -1) idxEmail = headers.indexOf("email");
+            var idxStatus = headers.indexOf("status [read only]"); if(idxStatus === -1) idxStatus = headers.indexOf("status"); if(idxStatus === -1) idxStatus = headers.indexOf("estado");
+            var idxOu = headers.indexOf("ou"); if(idxOu === -1) idxOu = headers.indexOf("unidad organizativa");
+            
+            var idxLic = -1;
+            for (var h = 0; h < headers.length; h++) {
+              if (headers[h].includes("licencia")) { idxLic = h; break; }
+            }
+            
+            if (idxEmail > -1) {
+              for (var r = 1; r < data.length; r++) {
+                var cellEmail = String(data[r][idxEmail]).toLowerCase().trim();
+                if (correos.includes(cellEmail)) {
+                  if (accion === "SUSPENDER" && idxStatus > -1) hoja.getRange(r + 1, idxStatus + 1).setValue("Suspended");
+                  if (accion === "ACTIVAR" && idxStatus > -1) hoja.getRange(r + 1, idxStatus + 1).setValue("Active");
+                  if (accion === "MOVER_OU" && idxOu > -1) hoja.getRange(r + 1, idxOu + 1).setValue(parametro);
+                  if (accion === "ASIGNAR_LICENCIA" && idxLic > -1) hoja.getRange(r + 1, idxLic + 1).setValue(parametro);
+                }
+              }
+            }
+          }
+        } catch (eExcel) {
+          resultados.detalles.push("Aviso BBDD: No se pudo sincronizar el Excel automáticamente (" + eExcel.message + ")");
+        }
+    }
+    
+    registrarEnHistorial("ACCIÓN MASIVA: " + accion, "Aplicado a " + resultados.exitosos + " cuentas. Parámetro: " + (parametro || "N/A"));
+    return resultados;
+    
+  } finally {
+    semaforo.releaseLock();
   }
 }
+
+// =========================================================
+// 📜 FASE 7: LOG DE AUDITORÍA
+// =========================================================
+
+function webObtenerHistorialLogsBreve() {
+  verificarPermisoEjecucion();
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hojaLog = ss.getSheetByName("Log_Historial");
+  if (!hojaLog) return JSON.stringify([]);
+  
+  // Usamos getDisplayValues() para que la fecha salga bonita como en Excel
+  var datos = hojaLog.getDataRange().getDisplayValues(); 
+  if (datos.length < 2) return JSON.stringify([]);
+  
+  // Quitamos la cabecera, invertimos para que el más nuevo salga primero y pillamos solo los 100 últimos
+  var rows = datos.slice(1);
+  rows.reverse();
+  return JSON.stringify(rows.slice(0, 100)); 
+}
+
+function webObtenerHistorialLogsCompletoCSV() {
+  verificarPermisoEjecucion();
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hojaLog = ss.getSheetByName("Log_Historial");
+  if (!hojaLog) return JSON.stringify([]);
+  
+  // Usamos getDisplayValues() para que al exportar CSV también salgan las fechas bien
+  return JSON.stringify(hojaLog.getDataRange().getDisplayValues());
+}
+// =========================================================
+// 📦 FASE 8: RADAR DE TRASPASOS DE DRIVE
+// =========================================================
 
 function traspasarPropiedadDrive(correoOrigen, correoDestino) {
   verificarPermisoAdmin();
@@ -2523,76 +2539,122 @@ function traspasarPropiedadDrive(correoOrigen, correoDestino) {
       return { exito: false, error: "⚠️ Debes rellenar tanto el correo de origen como el de destino." };
     }
     
-    let idOrigen = correoOrigen;
-    let idDestino = correoDestino;
+    var idOrigen = AdminDirectory.Users.get(correoOrigen).id;
+    var idDestino = AdminDirectory.Users.get(correoDestino).id;
     
-    try {
-      if (typeof AdminDirectory !== 'undefined') {
-        idOrigen = AdminDirectory.Users.get(correoOrigen).id;
-        idDestino = AdminDirectory.Users.get(correoDestino).id;
-      }
-    } catch (errDir) {
-      return { 
-        exito: false, 
-        error: "❌ No se ha encontrado a uno de los usuarios en tu directorio de Google. Asegúrate de que los correos están bien escritos, pertenecen a tu empresa y la cuenta de origen NO ha sido borrada todavía." 
-      };
-    }
-    
-    const token = ScriptApp.getOAuthToken();
-    
-    const DRIVE_APP_ID = "435070579839"; 
-    const payload = {
+    var token = ScriptApp.getOAuthToken();
+    var payload = {
       oldOwnerUserId: idOrigen,
       newOwnerUserId: idDestino,
       applicationDataTransfers: [
         {
-          applicationId: DRIVE_APP_ID,
-          applicationTransferParams: [
-            {
-              key: "PRIVACY_LEVEL",
-              value: "SHARED,PRIVATE"
-            }
-          ]
+          applicationId: "435070579839", // ID interno de Google Drive
+          applicationTransferParams: [{ key: "PRIVACY_LEVEL", value: "SHARED,PRIVATE" }]
         }
       ]
     };
     
-    const url = "https://admin.googleapis.com/admin/datatransfer/v1/transfers";
-    const opciones = {
+    var opciones = {
       method: "post",
       contentType: "application/json",
-      headers: {
-        "Authorization": "Bearer " + token
-      },
+      headers: { "Authorization": "Bearer " + token },
       payload: JSON.stringify(payload),
       muteHttpExceptions: true
     };
     
-    const respuesta = UrlFetchApp.fetch(url, opciones);
-    const codigoEstado = respuesta.getResponseCode();
-    const textoRespuesta = respuesta.getContentText();
+    var respuesta = UrlFetchApp.fetch("https://admin.googleapis.com/admin/datatransfer/v1/transfers", opciones);
+    var codigoEstado = respuesta.getResponseCode();
+    var textoRespuesta = respuesta.getContentText();
     
     if (codigoEstado === 200 || codigoEstado === 201) {
-      return { 
-        exito: true, 
-        mensaje: "✅ ¡ORDEN RECIBIDA Y EN PROCESO!\n\nLos archivos de " + correoOrigen + " han empezado a transferirse en segundo plano hacia " + correoDestino + ". Google os enviará un correo electrónico automático al finalizar." 
-      };
-    } else {
-      let errorLimpio = textoRespuesta;
-      try {
-        const jsonError = JSON.parse(textoRespuesta);
-        if (jsonError.error && jsonError.error.message) {
-          errorLimpio = jsonError.error.message;
-        }
-      } catch (ex) { }
+      var jsonRes = JSON.parse(textoRespuesta);
+      var transferId = jsonRes.id;
+      var emailIT = Session.getActiveUser().getEmail();
+      
+      // Anotamos el traspaso en la hoja oculta para que el radar lo vigile
+      guardarTraspasoPendiente(transferId, correoOrigen, correoDestino, emailIT);
       
       return { 
-        exito: false, 
-        error: "❌ El servidor de Google ha rechazado la orden (" + codigoEstado + "): " + errorLimpio 
+        exito: true, 
+        mensaje: "✅ ¡TRANSFERENCIA INICIADA!\n\nEl traspaso de " + correoOrigen + " está en marcha. Te enviaremos un email en cuanto Google finalice para que puedas borrar la cuenta." 
       };
+    } else {
+      var jsonError = JSON.parse(textoRespuesta);
+      return { exito: false, error: "❌ Google rechazó la orden: " + (jsonError.error.message || textoRespuesta) };
     }
-    
   } catch (e) {
-    return { exito: false, error: "Fallo de conexión: " + (e.message || e.toString()) };
+    return { exito: false, error: "Fallo de conexión o cuenta no encontrada: " + e.message };
+  }
+}
+
+function guardarTraspasoPendiente(transferId, origen, destino, emailIT) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hoja = ss.getSheetByName("Radar_Drive");
+  if (!hoja) {
+    hoja = ss.insertSheet("Radar_Drive");
+    hoja.appendRow(["Transfer ID", "Origen", "Destino", "Solicitante IT", "Estado", "Fecha Inicio"]);
+    hoja.getRange("A1:F1").setFontWeight("bold").setBackground("#0f172a").setFontColor("#ffffff");
+    hoja.hideSheet(); // La ocultamos para que no moleste visualmente
+  }
+  var fechaHoy = Utilities.formatDate(new Date(), "Europe/Madrid", "dd/MM/yyyy HH:mm");
+  hoja.appendRow([transferId, origen, destino, emailIT, "IN_PROGRESS", fechaHoy]);
+}
+
+function verificarTraspasosDrivePendientes() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hoja = ss.getSheetByName("Radar_Drive");
+  if (!hoja) return;
+
+  var datos = hoja.getDataRange().getValues();
+  if (datos.length < 2) return;
+
+  var token = ScriptApp.getOAuthToken();
+
+  for (var i = 1; i < datos.length; i++) {
+    var transferId = datos[i][0];
+    var origen = datos[i][1];
+    var destino = datos[i][2];
+    var emailIT = datos[i][3];
+    var estado = String(datos[i][4] || "").toUpperCase();
+
+    if (estado === "IN_PROGRESS") {
+      var url = "https://admin.googleapis.com/admin/datatransfer/v1/transfers/" + transferId;
+      var opciones = { method: "get", headers: { "Authorization": "Bearer " + token }, muteHttpExceptions: true };
+
+      try {
+        var respuesta = UrlFetchApp.fetch(url, opciones);
+        if (respuesta.getResponseCode() === 200) {
+          var json = JSON.parse(respuesta.getContentText());
+          
+          // Convertimos siempre a mayúsculas para evitar fallos de coincidencias
+          var nuevoEstado = String(json.overallTransferStatusCode || "").toUpperCase(); 
+
+          console.log("🎯 Estado normalizado devuelto por Google: " + nuevoEstado);
+
+          if (nuevoEstado === "COMPLETED" || nuevoEstado === "FAILED") {
+            // Actualizamos la celda en el Excel
+            hoja.getRange(i + 1, 5).setValue(nuevoEstado);
+            
+            var esExito = (nuevoEstado === "COMPLETED");
+            var asunto = esExito ? "✅ Traspaso Drive COMPLETADO: " + origen : "⚠️ Aviso / Fallo Traspaso Drive: " + origen;
+            
+            var cuerpo = "Hola,\n\nGoogle ha finalizado el proceso de transferencia con el estado: " + nuevoEstado + ".\n\n";
+            cuerpo += "▶️ Origen: " + origen + "\n";
+            cuerpo += "▶️ Destino: " + destino + "\n\n";
+            
+            if (esExito) {
+              cuerpo += "Los archivos ya están a salvo en el destino. Ya puedes ir al panel y ejecutar la Baja Total de la cuenta.";
+            } else {
+              cuerpo += "Google no ha podido transferir los archivos (puede deberse a que la cuenta está vacía o sin licencia de Drive). Revisa la cuenta antes de proceder con la baja definitiva.";
+            }
+            
+            MailApp.sendEmail(emailIT, asunto, cuerpo);
+            console.log("✉️ Email enviado con éxito a " + emailIT);
+          }
+        }
+      } catch(e) {
+        console.log("❌ Error en la verificación: " + e.message);
+      }
+    }
   }
 }
